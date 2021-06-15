@@ -85,6 +85,11 @@ int main(){
 	if(image == NULL) printf("omegalul\n");
 	SDL_FreeSurface(temp);
 
+	// Timing
+	unsigned int targetFrequency = 60;
+	Uint32 targetTime = 1000 / targetFrequency;
+	Uint32 startTime = SDL_GetTicks();
+
 	// The Loop
 	while(true){
 		SDL_RenderClear(window.render);
@@ -105,7 +110,13 @@ int main(){
 									SDL_FLIP_NONE);
 		if(error != 0) printf("Render fault!\n");
 
-		SDL_Delay(60);
+		// If we were too quick, wait until it is time
+		Uint32 time = SDL_GetTicks() - startTime;
+		if(time < targetTime){
+			SDL_Delay(targetTime - time);
+		}
+
+		startTime = SDL_GetTicks();		
 
 		SDL_RenderPresent(window.render);
 	}
