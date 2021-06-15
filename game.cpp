@@ -9,6 +9,17 @@
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
+/*
+	Translates the coordinates of a GameObject to coordinates relative to the Camera
+*/
+SDL_Rect translateToCamera(Camera *camera, GameObject *obj){
+	SDL_Rect rect = {camera->wndX + (obj->x - camera->x),
+			 camera->wndY + (obj->y - camera->y),
+			 (int)(obj->image->width * camera->zoomLevel),
+			 (int)(obj->image->height * camera->zoomLevel)};
+
+	return rect;
+}
 
 /*
 	Initialize the things needed for the engine to run
@@ -70,7 +81,16 @@ bool init(WindowStruct *window) {
 
 void render(WindowStruct *window, SDL_Texture *image){
 	SDL_Rect dst = {100, 100, 1200, 1200};
+
 	int error = SDL_RenderCopyEx(window->render, image, NULL, &dst, 0, NULL,
+								SDL_FLIP_NONE);
+	if(error != 0) printf("Render fault!\n");
+}
+
+void render(WindowStruct *window, GameObject *obj, Camera *cam){
+	SDL_Rect dst = translateToCamera(cam, obj);
+
+	int error = SDL_RenderCopyEx(window->render, obj->image->image, NULL, &dst, 0, NULL,
 								SDL_FLIP_NONE);
 	if(error != 0) printf("Render fault!\n");
 }
@@ -98,10 +118,31 @@ int main(){
 	if(image == NULL) printf("omegalul\n");
 	SDL_FreeSurface(temp);
 
+	printf("Images loaded!\n");
+
+	GameObject obj;
+	obj.image = new Image;
+	obj.image->image = image;
+	obj.image->width = 1200;
+	obj.image->height = 1200;
+	obj.x = 0;
+	obj.y = 0;
+
+	printf("Game object done!\n");
+
+	Camera cam;
+	cam.x = 0;
+	cam.y = 0;
+	cam.zoomLevel = 0.5f;
+	cam.wndX = 0;
+	cam.wndY = 0;
+
 	// Timing
 	unsigned int targetFrequency = 60;
 	Uint32 targetTime = 1000 / targetFrequency;
 	Uint32 startTime = SDL_GetTicks();
+
+	printf("Initialization done\n");
 
 	// The Loop
 	while(true){
@@ -118,7 +159,7 @@ int main(){
 			}
 		}
 
-		render(&window, image);
+		render(&window, &obj, &cam);
 
 		// If we were too quick, wait until it is time
 		Uint32 time = SDL_GetTicks() - startTime;
