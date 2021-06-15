@@ -4,15 +4,11 @@
 #include<SDL2/SDL_ttf.h>
 #include<stdlib.h>
 #include<stdio.h>
+#include "structures.h"
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
-struct WindowStruct {
-	SDL_Window *window;
-	SDL_Texture *screenTexture;
-	SDL_Renderer *render;
-};
 
 /*
 	Initialize the things needed for the engine to run
