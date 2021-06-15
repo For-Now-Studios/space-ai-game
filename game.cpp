@@ -81,6 +81,20 @@ int main(){
 
 	// The Loop
 	while(true){
+		SDL_RenderClear(window.render);
+
+		SDL_Event event;
+		while(SDL_PollEvent(&event) != 0){
+			switch(event.type){
+				case SDL_QUIT:
+					exit(0);
+					break;
+				default:
+					break;
+			}
+		}
+
+		SDL_RenderPresent(window.render);
 	}
 
 	return 0;
