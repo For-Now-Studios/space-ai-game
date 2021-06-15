@@ -4,7 +4,7 @@
 #include<SDL2/SDL_ttf.h>
 #include<stdlib.h>
 #include<stdio.h>
-#include "structures.h"
+#include "structs.h"
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;

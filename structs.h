@@ -40,8 +40,6 @@ struct Camera {
 	//Window Coordinates
 	int wndX;
 	int wndY;
-	int width;
-	int height;
 };
 
 struct Point {
