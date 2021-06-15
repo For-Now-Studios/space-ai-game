@@ -79,6 +79,12 @@ int main(){
 		exit(1);
 	}
 
+	SDL_Surface *temp = IMG_Load("hal9000.png");
+	if(temp == NULL) printf("bruh!\n");
+	SDL_Texture *image = SDL_CreateTextureFromSurface(window.render, temp);
+	if(image == NULL) printf("omegalul\n");
+	SDL_FreeSurface(temp);
+
 	// The Loop
 	while(true){
 		SDL_RenderClear(window.render);
@@ -94,8 +100,17 @@ int main(){
 			}
 		}
 
+		SDL_Rect dst = {100, 100, 1200, 1200};
+		int error = SDL_RenderCopyEx(window.render, image, NULL, &dst, 0, NULL,
+									SDL_FLIP_NONE);
+		if(error != 0) printf("Render fault!\n");
+
+		SDL_Delay(60);
+
 		SDL_RenderPresent(window.render);
 	}
+
+	SDL_DestroyTexture(image);
 
 	return 0;
 }
