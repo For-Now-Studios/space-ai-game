@@ -12,6 +12,20 @@ struct Image {
 	SDL_Texture *image;
 	int width;
 	int height;
+
+	Image(const char *path, int w, int h, SDL_Renderer *render) : width{ w }, height{ h } {
+		SDL_Surface *temp = IMG_Load(path);
+		if (temp == NULL) printf("bruh!\n");
+		image = SDL_CreateTextureFromSurface(render, temp);
+		if (image == NULL) printf("omegalul\n");
+		SDL_FreeSurface(temp);
+		printf("%s loaded!\n", path);
+	}
+
+	~Image() {
+		SDL_DestroyTexture(image);
+		printf("File deleted!\n");
+	}
 };
 
 struct GameObject {
