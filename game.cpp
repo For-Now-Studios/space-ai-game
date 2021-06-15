@@ -166,14 +166,15 @@ int main(int argc, char *argv[]){
 	printf("Initialization done\n");
 
 	// The Loop
-	while(true){
+	bool running = true;
+	while(running){
 		SDL_RenderClear(window.render);
 
 		SDL_Event event;
 		while(SDL_PollEvent(&event) != 0){
 			switch(event.type){
 				case SDL_QUIT:
-					exit(0);
+					running = false;
 					break;
 				default:
 					break;
