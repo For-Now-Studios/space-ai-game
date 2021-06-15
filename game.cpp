@@ -72,6 +72,23 @@ bool init(WindowStruct *window) {
 	return true;
 }
 
+void render(WindowStruct *window, SDL_Texture *image){
+	SDL_Rect dst = {100, 100, 1200, 1200};
+	int error = SDL_RenderCopyEx(window->render, image, NULL, &dst, 0, NULL,
+								SDL_FLIP_NONE);
+	if(error != 0) printf("Render fault!\n");
+}
+
+void close(WindowStruct *window){
+	SDL_DestroyRenderer(window->render);
+	SDL_DestroyWindow(window->window);
+
+	IMG_Quit();
+	Mix_Quit();
+	TTF_Quit();
+	SDL_Quit();
+}
+
 int main(){
 	WindowStruct window;
 
@@ -105,10 +122,7 @@ int main(){
 			}
 		}
 
-		SDL_Rect dst = {100, 100, 1200, 1200};
-		int error = SDL_RenderCopyEx(window.render, image, NULL, &dst, 0, NULL,
-									SDL_FLIP_NONE);
-		if(error != 0) printf("Render fault!\n");
+		render(&window, image);
 
 		// If we were too quick, wait until it is time
 		Uint32 time = SDL_GetTicks() - startTime;
