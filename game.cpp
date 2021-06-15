@@ -119,7 +119,7 @@ void close(WindowStruct *window){
 	SDL_Quit();
 }
 
-int main(){
+int main(int argc, char *argv[]){
 	WindowStruct window;
 
 	if(!init(&window)){

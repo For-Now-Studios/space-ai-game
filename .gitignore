@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+# Visual Studio
+Debug/
+Release/
+SAG-vc.vcxproj
+SAG-vc.vcxproj.filters
