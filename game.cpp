@@ -109,7 +109,12 @@ void render(WindowStruct *window, GameObject *obj, Camera *cam){
 								0, NULL, SDL_FLIP_NONE);
 }
 
-void close(WindowStruct *window){
+void close(WindowStruct *window, vector<Image*>& images){
+	for (int i = 0; i < images.size(); i++)
+	{
+		images[i]->~Image();
+	}
+
 	SDL_DestroyRenderer(window->render);
 	SDL_DestroyWindow(window->window);
 
@@ -126,18 +131,10 @@ int main(int argc, char *argv[]){
 		exit(1);
 	}
 
-	SDL_Surface *temp = IMG_Load("hal9000.png");
-	if(temp == NULL) printf("bruh!\n");
-	SDL_Texture *image = SDL_CreateTextureFromSurface(window.render, temp);
-	if(image == NULL) printf("omegalul\n");
-	SDL_FreeSurface(temp);
+	Image *img = new Image("hal9000.png", 120, 120, window.render);
 
-	printf("Images loaded!\n");
-
-	Image *img = new Image;
-	img->image = image;
-	img->width = 120;
-	img->height = 120;
+	vector<Image*> images;
+	images.push_back(img);
 
 	vector<GameObject> objects;
 
@@ -201,7 +198,7 @@ int main(int argc, char *argv[]){
 		SDL_RenderPresent(window.render);
 	}
 
-	SDL_DestroyTexture(image);
+	close(&window, images);
 
 	return 0;
 }
