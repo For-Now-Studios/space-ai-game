@@ -41,8 +41,3 @@ struct Camera {
 	int wndX;
 	int wndY;
 };
-
-struct Point {
-	int x;
-	int y;
-};

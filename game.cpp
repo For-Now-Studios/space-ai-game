@@ -4,7 +4,10 @@
 #include<SDL2/SDL_ttf.h>
 #include<stdlib.h>
 #include<stdio.h>
+#include<vector>
 #include "structs.h"
+
+using namespace std;
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
@@ -79,20 +82,31 @@ bool init(WindowStruct *window) {
 	return true;
 }
 
-void render(WindowStruct *window, SDL_Texture *image){
-	SDL_Rect dst = {100, 100, 1200, 1200};
+/*
+	Render the specified image or game object to the screen
+*/
+void render(WindowStruct *window, Image *image, int x, int y){
+	SDL_Rect dst = {x, y, image->width, image->height};
 
-	int error = SDL_RenderCopyEx(window->render, image, NULL, &dst, 0, NULL,
-								SDL_FLIP_NONE);
-	if(error != 0) printf("Render fault!\n");
+	SDL_RenderCopyEx(window->render, image->image, NULL, &dst, 0, NULL,
+									SDL_FLIP_NONE);
 }
+void render(WindowStruct *window, Image *image, int x, int y, Camera *cam){
+	GameObject obj;
+	obj.x = x;
+	obj.y = y;
+	obj.image = image;
 
+	SDL_Rect dst = translateToCamera(cam, &obj);
+
+	SDL_RenderCopyEx(window->render, image->image, NULL, &dst, 0, NULL,
+									SDL_FLIP_NONE);
+}
 void render(WindowStruct *window, GameObject *obj, Camera *cam){
 	SDL_Rect dst = translateToCamera(cam, obj);
 
-	int error = SDL_RenderCopyEx(window->render, obj->image->image, NULL, &dst, 0, NULL,
-								SDL_FLIP_NONE);
-	if(error != 0) printf("Render fault!\n");
+	SDL_RenderCopyEx(window->render, obj->image->image, NULL, &dst,
+								0, NULL, SDL_FLIP_NONE);
 }
 
 void close(WindowStruct *window){
@@ -120,20 +134,23 @@ int main(){
 
 	printf("Images loaded!\n");
 
+	Image *img = new Image;
+	img->image = image;
+	img->width = 120;
+	img->height = 120;
+
+	vector<GameObject> objects;
+
 	GameObject obj;
-	obj.image = new Image;
-	obj.image->image = image;
-	obj.image->width = 120;
-	obj.image->height = 120;
+	obj.image = img;
 	obj.x = 0;
 	obj.y = 0;
 	GameObject obj2;
-	obj2.image = new Image;
-	obj2.image->image = image;
-	obj2.image->width = 120;
-	obj2.image->height = 120;
+	obj2.image = img;
 	obj2.x = 120;
 	obj2.y = 0;
+	objects.push_back(obj);
+	objects.push_back(obj2);
 
 	printf("Game object done!\n");
 
@@ -166,8 +183,12 @@ int main(){
 			}
 		}
 
-		render(&window, &obj, &cam);
-		render(&window, &obj2, &cam);
+		render(&window, img, 0, 120);
+		render(&window, img, 120, 120, &cam);
+		
+		for(GameObject obj : objects){
+			render(&window, &obj, &cam);
+		}
 
 		// If we were too quick, wait until it is time
 		Uint32 time = SDL_GetTicks() - startTime;
