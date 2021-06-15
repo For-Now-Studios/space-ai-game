@@ -13,8 +13,8 @@ const int SCREEN_HEIGHT = 480;
 	Translates the coordinates of a GameObject to coordinates relative to the Camera
 */
 SDL_Rect translateToCamera(Camera *camera, GameObject *obj){
-	SDL_Rect rect = {camera->wndX + (obj->x - camera->x),
-			 camera->wndY + (obj->y - camera->y),
+	SDL_Rect rect = {camera->wndX + (int)((obj->x - camera->x) * camera->zoomLevel),
+			 camera->wndY + (int)((obj->y - camera->y) * camera->zoomLevel),
 			 (int)(obj->image->width * camera->zoomLevel),
 			 (int)(obj->image->height * camera->zoomLevel)};
 
@@ -123,17 +123,24 @@ int main(){
 	GameObject obj;
 	obj.image = new Image;
 	obj.image->image = image;
-	obj.image->width = 1200;
-	obj.image->height = 1200;
+	obj.image->width = 120;
+	obj.image->height = 120;
 	obj.x = 0;
 	obj.y = 0;
+	GameObject obj2;
+	obj2.image = new Image;
+	obj2.image->image = image;
+	obj2.image->width = 120;
+	obj2.image->height = 120;
+	obj2.x = 120;
+	obj2.y = 0;
 
 	printf("Game object done!\n");
 
 	Camera cam;
 	cam.x = 0;
 	cam.y = 0;
-	cam.zoomLevel = 0.5f;
+	cam.zoomLevel = 1.0f;
 	cam.wndX = 0;
 	cam.wndY = 0;
 
@@ -160,6 +167,7 @@ int main(){
 		}
 
 		render(&window, &obj, &cam);
+		render(&window, &obj2, &cam);
 
 		// If we were too quick, wait until it is time
 		Uint32 time = SDL_GetTicks() - startTime;
