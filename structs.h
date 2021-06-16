@@ -51,8 +51,6 @@ struct Music {
 
 struct Sound {
 	Mix_Chunk *sound;
-	//TODO: Should the Sound Wrapper contain info about which channel it runs on
-	//and which effects should affect it
 
 	Sound(const char *path){
 		sound = Mix_LoadWAV(path);
