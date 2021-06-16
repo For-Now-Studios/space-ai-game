@@ -110,9 +110,9 @@ void render(WindowStruct *window, GameObject *obj, Camera *cam){
 }
 
 void close(WindowStruct *window, vector<Image*>& images){
-	for (int i = 0; i < images.size(); i++)
+	for (Image* img : images)
 	{
-		images[i]->~Image();
+		img->~Image();
 	}
 
 	SDL_DestroyRenderer(window->render);
@@ -126,6 +126,14 @@ void close(WindowStruct *window, vector<Image*>& images){
 
 int main(int argc, char *argv[]){
 	WindowStruct window;
+	MouseStruct mouse;
+	mouse.x = 0;
+	mouse.y = 0;
+	mouse.scrollRight = 0;
+	mouse.scrollUp = 0;
+	mouse.buttons[0] = MouseStruct::Button{ false, false, false };
+	mouse.buttons[1] = MouseStruct::Button{ false, false, false };
+	mouse.buttons[2] = MouseStruct::Button{ false, false, false };
 
 	if(!init(&window)){
 		exit(1);
@@ -170,11 +178,36 @@ int main(int argc, char *argv[]){
 	while(running){
 		SDL_RenderClear(window.render);
 
+		//Need to make these zero or they will get stuck.
+		for(MouseStruct::Button& button : mouse.buttons) button.isReleased = 0;
+		mouse.scrollRight = 0;
+		mouse.scrollUp = 0;
+
+		//Start handling events.
 		SDL_Event event;
 		while(SDL_PollEvent(&event) != 0){
 			switch(event.type){
 				case SDL_QUIT:
 					running = false;
+					break;
+
+				case SDL_MOUSEMOTION:
+					mouse.x = event.motion.x;
+					mouse.y = event.motion.y;
+					break;
+				case SDL_MOUSEBUTTONUP:
+				case SDL_MOUSEBUTTONDOWN:
+					mouse.x = event.button.x;
+					mouse.y = event.button.y;
+					//1 is left button, 2 is middle button, 3 is right button.
+					//So we can just subtract 1 and use an array, only one button is handled at a time.
+					mouse.buttons[event.button.button - 1].doubleClick = event.button.clicks - 1;
+					mouse.buttons[event.button.button - 1].isPressed = event.button.state == SDL_PRESSED;
+					mouse.buttons[event.button.button - 1].isReleased = event.button.state == SDL_RELEASED;
+					break;
+				case SDL_MOUSEWHEEL:
+					mouse.scrollRight = event.wheel.x;
+					mouse.scrollUp = event.wheel.y;
 					break;
 				default:
 					break;

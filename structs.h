@@ -36,6 +36,27 @@ struct GameObject {
 	//Images
 	Image *image;
 };
+/*
+	An object contain all information about the mouse.
+*/
+struct MouseStruct {
+	//Game coordinates.
+	int x;
+	int y;
+
+
+	int scrollUp; //1 scrolling up, -1 down, 0 no scrolling
+	int scrollRight; //1 scrolling right, -1 left, 0 no scrolling
+
+	//Nested button, for each button on the mouse.
+	struct Button {
+		bool isPressed;
+		bool isReleased;
+		bool doubleClick; //If the button is doubleclicked, it is usually 1.
+	};
+
+	Button buttons[3]; //0 left, 1 middle, 2 right button
+};
 
 /*
 	A object used for translating game coordinates to window coordinates;
