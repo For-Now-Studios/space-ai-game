@@ -222,6 +222,9 @@ int main(int argc, char *argv[]){
 			}
 		}
 
+		objects.at(0).x = mouse.x - objects.at(0).image->width / 2;
+		objects.at(0).y = mouse.y -  objects.at(0).image->height / 2;
+
 		render(&window, img, 0, 120);
 		render(&window, img, 120, 120, &cam);
 		
