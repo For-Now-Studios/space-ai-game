@@ -13,18 +13,19 @@ struct Image {
 	int width;
 	int height;
 
-	Image(const char *path, int w, int h, SDL_Renderer *render) : width{ w }, height{ h } {
+	Image(const char *path, int w, int h, SDL_Renderer *render) : width{ w },
+									height{ h } {
 		SDL_Surface *temp = IMG_Load(path);
-		if (temp == NULL) printf("bruh!\n");
+		if (temp == NULL) printf("Failed to load image at %s\n", path);
 		image = SDL_CreateTextureFromSurface(render, temp);
-		if (image == NULL) printf("omegalul\n");
+		if (image == NULL) printf("Failed to convert %s to a texture!\n", path);
 		SDL_FreeSurface(temp);
-		printf("%s loaded!\n", path);
+		printf("Image %s has been loaded!\n", path);
 	}
 
 	~Image() {
 		SDL_DestroyTexture(image);
-		printf("File deleted!\n");
+		printf("Image has been freed!\n");
 	}
 };
 

@@ -126,6 +126,11 @@ void close(WindowStruct *window, vector<Image*>& images){
 
 int main(int argc, char *argv[]){
 	WindowStruct window;
+
+	if(!init(&window)){
+		exit(1);
+	}
+
 	MouseStruct mouse;
 	mouse.x = 0;
 	mouse.y = 0;
@@ -134,10 +139,6 @@ int main(int argc, char *argv[]){
 	mouse.buttons[0] = MouseStruct::Button{ false, false, false };
 	mouse.buttons[1] = MouseStruct::Button{ false, false, false };
 	mouse.buttons[2] = MouseStruct::Button{ false, false, false };
-
-	if(!init(&window)){
-		exit(1);
-	}
 
 	Image *img = new Image("hal9000.png", 120, 120, window.render);
 
@@ -199,11 +200,18 @@ int main(int argc, char *argv[]){
 				case SDL_MOUSEBUTTONDOWN:
 					mouse.x = event.button.x;
 					mouse.y = event.button.y;
-					//1 is left button, 2 is middle button, 3 is right button.
-					//So we can just subtract 1 and use an array, only one button is handled at a time.
-					mouse.buttons[event.button.button - 1].doubleClick = event.button.clicks - 1;
-					mouse.buttons[event.button.button - 1].isPressed = event.button.state == SDL_PRESSED;
-					mouse.buttons[event.button.button - 1].isReleased = event.button.state == SDL_RELEASED;
+					/* In SDL, left button = 1, middle = 2, and
+					   right = 3. If we subtract this by one we can
+					   use our array setup
+					*/
+					mouse.buttons[event.button.button - 1]
+						.doubleClick = event.button.clicks - 1;
+					mouse.buttons[event.button.button - 1]
+						.isPressed = event.button.state == 
+									SDL_PRESSED;
+					mouse.buttons[event.button.button - 1]
+						.isReleased = event.button.state == 
+									SDL_RELEASED;
 					break;
 				case SDL_MOUSEWHEEL:
 					mouse.scrollRight = event.wheel.x;
