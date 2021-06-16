@@ -18,14 +18,14 @@ int masterVolume = MIX_MAX_VOLUME / 2; //The volume level everything else is sca
 /*
 	Resume all active sound effects
 */
-void resumeAllSound(){
+void resumeAllSoundEffects(){
 	Mix_Resume(-1);
 }
 
 /*
 	Pause all active sound effects
 */
-void pauseAllSound(){
+void pauseAllSoundEffects(){
 	Mix_Pause(-1);
 }
 
@@ -46,16 +46,16 @@ void pauseSound(int channel){
 /*
 	Resume both sound and music
 */
-void resumeAll(){
-	resumeAllSound();
+void resumeAllSound(){
+	resumeAllSoundEffects();
 	//TODO: RESUME MUSIC
 }
 
 /*
 	Pause both sound and music
 */
-void pauseAll(){
-	pauseAllSound();
+void pauseAllSound(){
+	pauseAllSoundEffects();
 	//TODO: PAUSE MUSIC
 }
 
@@ -284,10 +284,10 @@ int main(int argc, char *argv[]){
 
 		// Fading out of continous sound test 
 		if(ticks == 180){
-			pauseAllSound();
+			pauseSound(channel);
 		}
 		if(ticks == 240){
-			resumeAllSound();
+			resumeSound(channel);
 		}
 		else if(ticks == 360){
 			stopSound(channel, 1000);
