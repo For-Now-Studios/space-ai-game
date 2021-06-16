@@ -17,15 +17,51 @@ struct Image {
 									height{ h } {
 		SDL_Surface *temp = IMG_Load(path);
 		if (temp == NULL) printf("Failed to load image at %s\n", path);
+
 		image = SDL_CreateTextureFromSurface(render, temp);
 		if (image == NULL) printf("Failed to convert %s to a texture!\n", path);
+
 		SDL_FreeSurface(temp);
+
 		printf("Image %s has been loaded!\n", path);
 	}
 
 	~Image() {
 		SDL_DestroyTexture(image);
 		printf("Image has been freed!\n");
+	}
+};
+
+
+struct Music {
+	Mix_Music *music;
+
+	Music(const char *path){
+		music = Mix_LoadMUS(path);
+
+		if(music == NULL) printf("Could not load music at %s\n", path);
+	}
+
+	~Music(){
+		Mix_FreeMusic(music);
+		printf("Music has been freed!\n");
+	}
+
+};
+
+struct Sound {
+	Mix_Chunk *sound;
+	//TODO: Should the Sound Wrapper contain info about which channel it runs on
+	//and which effects should affect it
+
+	Sound(const char *path){
+		sound = Mix_LoadWAV(path);
+		if(sound == NULL) printf("Could not load sound at %s\n", path);
+	}
+
+	~Sound(){
+		Mix_FreeChunk(sound);
+		printf("Sound has been freed!\n");
 	}
 };
 

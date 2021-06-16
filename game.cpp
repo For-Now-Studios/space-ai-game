@@ -167,6 +167,14 @@ int main(int argc, char *argv[]){
 	cam.wndX = 0;
 	cam.wndY = 0;
 
+	// MUSIC TEST
+	Music *music = new Music("testMusic.wav");
+	Sound *sound = new Sound("testSound.wav");
+	Mix_Volume(-1, 64);
+	Mix_VolumeMusic(64);
+	Mix_FadeInMusic(music->music, -1, 4475);
+	Mix_PlayChannel(-1, sound->sound, 0);
+
 	// Timing
 	unsigned int targetFrequency = 60;
 	Uint32 targetTime = 1000 / targetFrequency;
