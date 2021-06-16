@@ -8,6 +8,21 @@ struct WindowStruct {
 	SDL_Renderer *render;
 };
 
+struct Font {
+	TTF_Font *font;
+
+	Font(const char *path, int size){
+		font = TTF_OpenFont(path, size);
+
+		if(font == NULL) printf("Could not open font at %s\n", path);
+	}
+
+	~Font() {
+		TTF_CloseFont(font);
+		printf("Font has been freed!\n");
+	}
+};
+
 struct Image {
 	SDL_Texture *image;
 	int width;
@@ -26,12 +41,27 @@ struct Image {
 		printf("Image %s has been loaded!\n", path);
 	}
 
+	Image(Font *font, const char *text, SDL_Color colour, SDL_Renderer *render){
+		if(TTF_SizeUTF8(font->font, text, &width, &height) == -1){
+			printf("Could not render the string '%s'\n", text);
+		}
+
+		SDL_Surface *temp = TTF_RenderUTF8_Blended(font->font, text, colour);
+		if (temp == NULL) printf("Failed to turn '%s' to an image\n", text);
+
+		image = SDL_CreateTextureFromSurface(render, temp);
+		if (image == NULL) printf("Failed to convert '%s' to an image!\n", text);
+
+		SDL_FreeSurface(temp);
+
+		printf("Text %s has been rendered!\n", text);
+	}
+
 	~Image() {
 		SDL_DestroyTexture(image);
 		printf("Image has been freed!\n");
 	}
 };
-
 
 struct Music {
 	Mix_Music *music;

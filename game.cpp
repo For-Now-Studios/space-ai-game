@@ -192,7 +192,8 @@ bool init(WindowStruct *window) {
 
 	//Initialize Fonts
 	if (TTF_Init() == -1) {
-		printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
+		printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n",
+									TTF_GetError());
 
 		return false;
 	}
@@ -237,7 +238,7 @@ void render(WindowStruct *window, GameObject *obj, Camera *cam){
 }
 
 void close(WindowStruct *window, vector<Image*>& images, vector<Music*>& music,
-								vector<Sound*>& sounds){
+					vector<Sound*>& sounds, vector<Font*>& fonts){
 	for (Image* img : images)
 	{
 		img->~Image();
@@ -249,6 +250,10 @@ void close(WindowStruct *window, vector<Image*>& images, vector<Music*>& music,
 
 	for(Sound* s : sounds){
 		s->~Sound();
+	}
+
+	for(Font* f : fonts){
+		f->~Font();
 	}
 
 	SDL_DestroyRenderer(window->render);
@@ -315,6 +320,11 @@ int main(int argc, char *argv[]){
 	Mix_VolumeMusic(masterVolume);
 	switchMusic(music.at(0), -1, 0, 60000);
 	int channel = playSound(sounds.at(0), -1, 2.0f, 1000);
+
+	vector<Font*> fonts;
+	fonts.push_back(new Font("testFont.ttf", 16));
+
+	images.push_back(new Image(fonts.at(0), "Hello Jacob!", {0,0,0}, window.render));
 
 	// Timing
 	unsigned int targetFrequency = 60;
@@ -411,6 +421,7 @@ int main(int argc, char *argv[]){
 
 		render(&window, img, 0, 120);
 		render(&window, img, 120, 120, &cam);
+		render(&window, images.at(1), 120, 300);
 		
 		for(GameObject obj : objects){
 			render(&window, &obj, &cam);
@@ -427,7 +438,7 @@ int main(int argc, char *argv[]){
 		SDL_RenderPresent(window.render);
 	}
 
-	close(&window, images, music, sounds);
+	close(&window, images, music, sounds, fonts);
 
 	return 0;
 }
