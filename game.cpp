@@ -236,14 +236,25 @@ void render(WindowStruct *window, GameObject *obj, Camera *cam){
 								0, NULL, SDL_FLIP_NONE);
 }
 
-void close(WindowStruct *window, vector<Image*>& images){
+void close(WindowStruct *window, vector<Image*>& images, vector<Music*>& music,
+								vector<Sound*>& sounds){
 	for (Image* img : images)
 	{
 		img->~Image();
 	}
 
+	for(Music* m : music){
+		m->~Music();
+	}
+
+	for(Sound* s : sounds){
+		s->~Sound();
+	}
+
 	SDL_DestroyRenderer(window->render);
 	SDL_DestroyWindow(window->window);
+
+	Mix_CloseAudio();
 
 	IMG_Quit();
 	Mix_Quit();
@@ -295,16 +306,15 @@ int main(int argc, char *argv[]){
 	cam.wndY = 0;
 
 	// MUSIC TEST
-	Music *music = new Music("Space_Amb_2.wav");
-	Music *music2 = new Music("testMusic.wav");
-	Sound *sound = new Sound("testSound.wav");
+	vector<Music*> music;
+	music.push_back(new Music("Space_Amb_2.wav"));
+	music.push_back(new Music("testMusic.wav"));
+	vector<Sound*> sounds;
+	sounds.push_back(new Sound("testSound.wav"));
 	Mix_Volume(-1, masterVolume);
 	Mix_VolumeMusic(masterVolume);
-	//Mix_FadeInMusic(music->music, -1, 4475);
-	//Mix_PlayMusic(music->music, -1);
-	switchMusic(music, -1, 0, 60000);
-	//Mix_PlayChannel(-1, sound->sound, 0);
-	int channel = playSound(sound, -1, 2.0f, 1000);
+	switchMusic(music.at(0), -1, 0, 60000);
+	int channel = playSound(sounds.at(0), -1, 2.0f, 1000);
 
 	// Timing
 	unsigned int targetFrequency = 60;
@@ -335,14 +345,14 @@ int main(int argc, char *argv[]){
 			stopSound(channel, 1000);
 		}
 		else if(ticks == 640){
-			switchMusic(music2, 0, 1000, 1000);
+			switchMusic(music.at(1), 0, 1000, 1000);
 		}
 		else if(ticks == 820){
 			pauseMusic();
 		}
 		else if(ticks == 940){
 			resumeMusic();
-			playSound(sound);
+			playSound(sounds.at(0));
 		}
 		else if(ticks == 1000){
 			pauseAll();
@@ -417,7 +427,7 @@ int main(int argc, char *argv[]){
 		SDL_RenderPresent(window.render);
 	}
 
-	close(&window, images);
+	close(&window, images, music, sounds);
 
 	return 0;
 }
