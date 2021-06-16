@@ -14,6 +14,46 @@ const int SCREEN_HEIGHT = 480;
 
 int masterVolume = MIX_MAX_VOLUME / 2; //The volume level everything else is scaled too
 
+/*
+	Resume the current background music
+*/
+void resumeMusic(){
+	Mix_ResumeMusic();
+}
+
+/*
+	Pause the current background music
+*/
+void pauseMusic(){
+	Mix_PauseMusic();
+}
+
+/*
+	Stops the current background music, letting it fade out for the specified time
+*/
+void stopMusic(int fadeTime){
+	if(fadeTime > 0) Mix_FadeOutMusic(fadeTime);
+	else Mix_HaltMusic();
+}
+
+/*
+	Switch the current background music to the specified music, letting the old music
+	fade out and the new music fade in for the specified time. The new music will
+	loop for the specified number of loops, or indefinatley if loops = -1
+*/
+void switchMusic(Music *music, int loops, int fadeInTime, int fadeOutTime){
+	if(fadeOutTime > 0) Mix_FadeOutMusic(fadeOutTime);
+	else Mix_HaltMusic();
+
+	if(fadeInTime > 0) Mix_FadeInMusic(music->music, loops, fadeInTime);
+	else Mix_PlayMusic(music->music, loops);
+}
+void switchMusic(Music *music, int loops){
+	switchMusic(music, loops, 0, 0);
+}
+void switchMusic(Music *music){
+	switchMusic(music, -1, 0, 0);
+}
 
 /*
 	Resume all active sound effects
@@ -48,7 +88,7 @@ void pauseSound(int channel){
 */
 void resumeAll(){
 	resumeAllSound();
-	//TODO: RESUME MUSIC
+	resumeMusic();
 }
 
 /*
@@ -56,7 +96,7 @@ void resumeAll(){
 */
 void pauseAll(){
 	pauseAllSound();
-	//TODO: PAUSE MUSIC
+	pauseMusic();
 }
 
 /*
@@ -256,11 +296,13 @@ int main(int argc, char *argv[]){
 
 	// MUSIC TEST
 	Music *music = new Music("Space_Amb_2.wav");
+	Music *music2 = new Music("testMusic.wav");
 	Sound *sound = new Sound("testSound.wav");
 	Mix_Volume(-1, masterVolume);
 	Mix_VolumeMusic(masterVolume);
 	//Mix_FadeInMusic(music->music, -1, 4475);
-	Mix_PlayMusic(music->music, -1);
+	//Mix_PlayMusic(music->music, -1);
+	switchMusic(music, -1, 0, 60000);
 	//Mix_PlayChannel(-1, sound->sound, 0);
 	int channel = playSound(sound, -1, 2.0f, 1000);
 
@@ -291,6 +333,28 @@ int main(int argc, char *argv[]){
 		}
 		else if(ticks == 360){
 			stopSound(channel, 1000);
+		}
+		else if(ticks == 640){
+			switchMusic(music2, 0, 1000, 1000);
+		}
+		else if(ticks == 820){
+			pauseMusic();
+		}
+		else if(ticks == 940){
+			resumeMusic();
+			playSound(sound);
+		}
+		else if(ticks == 1000){
+			pauseAll();
+		}
+		else if(ticks == 1060){
+			resumeAllSound();
+		}
+		else if(ticks == 1180){
+			pauseAll();
+		}
+		else if(ticks == 1300){
+			resumeAll();
 		}
 		ticks++;
 
