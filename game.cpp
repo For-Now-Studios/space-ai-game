@@ -30,20 +30,32 @@ bool fileReadLine(fstream *fs, char *line, int *len, int maxLength){
 	return true;
 }
 
-int splitString(char *string, char **splitString, int maxLength){
-	int res = 1;
-	char *temp = strtok(string, " ");
-	strncpy(splitString[0], temp, maxLength);
+/*
+	Takes the given string and splits it around the delimiter " ".
+	Returns an array of len substrings, where each substring can at most be
+	maxLength long.
 
-	while(temp != NULL){
-		temp = strtok(NULL, " ");
-		if(temp != NULL){
-			strncpy(splitString[res], temp, maxLength);
-			res++;
-		}
+	NOTE: String will be truncated to only containe the first substring, and
+	the array of substrings (consisting of all substrings) will have to be
+	deallocated at some point
+*/
+char **splitString(char *string, int &len, int maxLength){
+	len = 0;
+
+	vector<char *> temp;
+	temp.push_back(strtok(string, " "));
+	while(temp.at(len) != NULL){
+		len += 1;
+		temp.push_back(strtok(NULL, " "));
 	}
 	
-	return res;
+	char **result = new char *[len];
+	for(int i = 0; i < len; i++){
+		result[i] = new char[maxLength];
+		strncpy(result[i], temp.at(i), maxLength);
+	}
+	
+	return result;
 }
 
 bool loadMedia(const char* path, Media *media, SDL_Renderer *render){
@@ -64,18 +76,14 @@ bool loadMedia(const char* path, Media *media, SDL_Renderer *render){
 	}
 	while(len > 0){
 		if(mode == 0){
-			if(strcmp(text, "MUSIC:") == 0) mode++;
+			if(strcmp(text, "IMAGES:") == 0){} //Skip the first line
+			else if(strcmp(text, "MUSIC:") == 0) mode++;
 			else{
-				 char **parts = new char *[3];
-				for(int i = 0; i < 3; i++){
-					parts[i] = new char[len];
-				}				
-
-				len = splitString(text, parts, len);
+				char **parts = splitString(text, len, len);
 				if(len == 3){
 					int w = atoi(parts[1]);
 					int h = atoi(parts[2]);
-					media->images.push_back(new Image(text, w, h,
+					media->images.push_back(new Image(parts[0], w, h,
 										render));
 				}
 				else if(len == 1){
@@ -87,6 +95,12 @@ bool loadMedia(const char* path, Media *media, SDL_Renderer *render){
 					result = false;
 					break;
 				}
+
+				//Cleanup
+				for(int i = 0; i < len; i++){
+					delete parts[i];
+				}				
+				delete parts;
 			}
 		}
 		else if(mode == 1){
@@ -98,13 +112,16 @@ bool loadMedia(const char* path, Media *media, SDL_Renderer *render){
 			else media->sounds.push_back(new Sound(text));
 		}
 		else if(mode == 3){
-			char **parts = new char *[2];
-			for(int i = 0; i < 3; i++){
-				parts[i] = new char[len];
-			}				
-			len = splitString(text, parts, len);
+			char **parts = splitString(text, len, len);
+
 			int size = atoi(parts[1]);
 			media->fonts.push_back(new Font(text, size));
+
+			//Cleanup
+			for(int i = 0; i < len; i++){
+				delete parts[i];
+			}				
+			delete parts;
 		}
 
 		if(!fileReadLine(&fs, text, &len, MAX_FILE_NAME_LENGTH)){
