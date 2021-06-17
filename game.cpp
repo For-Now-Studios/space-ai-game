@@ -17,6 +17,57 @@ const int SCREEN_HEIGHT = 480;
 int masterVolume = MIX_MAX_VOLUME / 2; //The volume level everything else is scaled too
 
 /*
+	Test funtion and struct parameter.
+*/
+struct btnHelloParameter { const char* name; };
+void btnHello(void *cntxt)
+{
+	btnHelloParameter *parameters = (btnHelloParameter*)cntxt;
+	printf("Hello %s!\n", parameters->name);
+}
+
+/*
+	TODO: Maybe make this function load data from a level file?
+	
+	NOTE: Currently just a collection of used game objects collected in a singular
+	space for ease of use
+*/
+bool loadLevel(vector<GameObject *>* objects, vector<IsClickable *>* clickable,
+							Media* media, const char *path){
+	GameObject *obj = new GameObject;
+	obj->image = media->images.at(0);
+	obj->x = 0;
+	obj->y = 0;
+
+	GameObject *obj2 = new GameObject;
+	obj2->image = media->images.at(0);
+	obj2->x = 120;
+	obj2->y = 0;
+
+	/*	So we can go through all buttons alter on.
+		Also the destuctors are all called when the "button" object gets
+		destroyed, which is at the final return statement.*/
+	GameObjClick *button = new GameObjClick;
+	button->x = 0;
+	button->y = 0;
+	button->image = media->images.at(0);
+	button->area = SDL_Rect{ 0,0,media->images.at(0)->width,
+							media->images.at(0)->height};
+
+	button->function = btnHello;
+	button->data = (void*)(new btnHelloParameter{ "Alexander, Tim & Jacob!" });
+
+	clickable->push_back(button);
+
+	objects->push_back(obj);
+	objects->push_back(obj2);
+	objects->push_back(button);
+	
+
+	return true;
+}
+
+/*
 	Read the next line of text from the specified open file stream.
 	At max maxLength text can be read, but the actual size of the line is stored
 	in len.
@@ -408,16 +459,6 @@ void close(WindowStruct *window, Media& media){
 	SDL_Quit();
 }
 
-/*
-	Test funtion and struct parameter.
-*/
-struct btnHelloParameter { const char* name; };
-void btnHello(void *cntxt)
-{
-	btnHelloParameter *parameters = (btnHelloParameter*)cntxt;
-	printf("Hello %s!\n", parameters->name);
-}
-
 int main(int argc, char *argv[]){
 	WindowStruct window;
 
@@ -437,40 +478,24 @@ int main(int argc, char *argv[]){
 	Media media;
 	bool running = loadMedia(&media, "manifest", window.render);
 
-	/*Image *img = new Image("hal9000.png", 120, 120, window.render);
-
-	vector<Image*> images;
-	images.push_back(img);*/
-
 	vector<IsClickable*> clickable;
 	vector<GameObject*> objects;
 
-	GameObject obj;
-	obj.image = media.images.at(0);
-	obj.x = 0;
-	obj.y = 0;
-	GameObject obj2;
-	obj2.image = media.images.at(0);
-	obj2.x = 120;
-	obj2.y = 0;
-	/*	So we can go through all buttons alter on.
-		Also the destuctors are all called when the "button" object gets destroyed, which is at the final return statement.*/
-	GameObjClick button;
-	button.x = 0;
-	button.y = 0;
-	button.image = media.images.at(0);
-	button.area = SDL_Rect{ 0,0,media.images.at(0)->width,media.images.at(0)->height};
-	button.function = btnHello;
-	button.data = (void*)(new btnHelloParameter{ "Alexander, Tim & Jacob!" });
+	int channel; //MUSIC TEST
+	if(running){
+		if(loadLevel(&objects, &clickable, &media, "")){
+			printf("Game object done!\n");
 
-	clickable.push_back(&button);
-
-	objects.push_back(&obj);
-	objects.push_back(&obj2);
-	objects.push_back(&button);
-	
-
-	printf("Game object done!\n");
+			// MUSIC TEST
+			Mix_Volume(-1, masterVolume);
+			Mix_VolumeMusic(masterVolume);
+			switchMusic(media.music.at(0), -1, 0, 60000);
+			channel = playSound(media.sounds.at(0), -1, 2.0f, 1000);
+		
+			media.images.push_back(new Image(media.fonts.at(0),
+						"Hello Jacob!", {0,0,0}, window.render));
+		}
+	}
 
 	Camera cam;
 	cam.x = 0;
@@ -478,23 +503,6 @@ int main(int argc, char *argv[]){
 	cam.zoomLevel = 1.0f;
 	cam.wndX = 0;
 	cam.wndY = 0;
-
-	// MUSIC TEST
-	/*vector<Music*> music;
-	music.push_back(new Music("Space_Amb_2.wav"));
-	music.push_back(new Music("testMusic.wav"));
-	vector<Sound*> sounds;
-	sounds.push_back(new Sound("testSound.wav"));*/
-	Mix_Volume(-1, masterVolume);
-	Mix_VolumeMusic(masterVolume);
-	switchMusic(media.music.at(0), -1, 0, 60000);
-	int channel = playSound(media.sounds.at(0), -1, 2.0f, 1000);
-
-	/*vector<Font*> fonts;
-	fonts.push_back(new Font("testFont.ttf", 16));*/
-
-	media.images.push_back(new Image(media.fonts.at(0), "Hello Jacob!", {0,0,0},
-									window.render));
 
 	// Timing
 	unsigned int targetFrequency = 60;
