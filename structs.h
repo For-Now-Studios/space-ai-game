@@ -1,4 +1,5 @@
 #pragma once
+#include<vector>
 #include<SDL2/SDL.h>
 #include<SDL2/SDL_image.h>
 
@@ -28,6 +29,20 @@ struct Image {
 	int width;
 	int height;
 
+	Image(const char *path, SDL_Renderer *render){
+		SDL_Surface *temp = IMG_Load(path);
+		if (temp == NULL) printf("Failed to load image at %s\n", path);
+
+		width = temp->w;
+		height = temp->h;
+
+		image = SDL_CreateTextureFromSurface(render, temp);
+		if (image == NULL) printf("Failed to convert %s to a texture!\n", path);
+
+		SDL_FreeSurface(temp);
+
+		printf("Image %s has been loaded!\n", path);
+	}
 	Image(const char *path, int w, int h, SDL_Renderer *render) : width{ w },
 									height{ h } {
 		SDL_Surface *temp = IMG_Load(path);
@@ -160,4 +175,11 @@ struct Camera {
 	//Window Coordinates
 	int wndX;
 	int wndY;
+};
+
+struct Media{
+	std::vector<Image*> images;
+	std::vector<Sound*> sounds;
+	std::vector<Music*> music;
+	std::vector<Font*> fonts;
 };

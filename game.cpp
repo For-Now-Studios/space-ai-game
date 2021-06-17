@@ -5,6 +5,8 @@
 #include<stdlib.h>
 #include<stdio.h>
 #include<vector>
+#include<fstream>
+#include<string.h>
 #include "structs.h"
 
 using namespace std;
@@ -13,6 +15,109 @@ const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
 int masterVolume = MIX_MAX_VOLUME / 2; //The volume level everything else is scaled too
+
+bool fileReadLine(fstream *fs, char *line, int *len, int maxLength){
+	fs->getline(line, maxLength);
+	*len = fs->gcount();
+	if(fs->eof()){
+		return true;
+	}
+	else if(fs->fail()){
+		printf("Error reading in text with legth %d!\n", len);
+		return false;
+	}
+
+	return true;
+}
+
+int splitString(char *string, char **splitString, int maxLength){
+	int res = 1;
+	char *temp = strtok(string, " ");
+	strncpy(splitString[0], temp, maxLength);
+
+	while(temp != NULL){
+		temp = strtok(NULL, " ");
+		if(temp != NULL){
+			strncpy(splitString[res], temp, maxLength);
+			res++;
+		}
+	}
+	
+	return res;
+}
+
+bool loadMedia(const char* path, Media *media, SDL_Renderer *render){
+	const int MAX_FILE_NAME_LENGTH = 1024;
+
+	bool result = true;
+
+	fstream fs;
+	fs.open(path, fstream::in);
+
+	char text[MAX_FILE_NAME_LENGTH];
+	int mode = 0;
+	int len;
+	if(!fileReadLine(&fs, text, &len, MAX_FILE_NAME_LENGTH)){
+		printf("Error reading file paths from file %s!\n", path);
+		result = false;
+		len = 0;
+	}
+	while(len > 0){
+		if(mode == 0){
+			if(strcmp(text, "MUSIC:") == 0) mode++;
+			else{
+				 char **parts = new char *[3];
+				for(int i = 0; i < 3; i++){
+					parts[i] = new char[len];
+				}				
+
+				len = splitString(text, parts, len);
+				if(len == 3){
+					int w = atoi(parts[1]);
+					int h = atoi(parts[2]);
+					media->images.push_back(new Image(text, w, h,
+										render));
+				}
+				else if(len == 1){
+					media->images.push_back(new Image(text, render));
+				}
+				else{
+					printf("Image file with format %s was badly\
+								formated!\n", text);
+					result = false;
+					break;
+				}
+			}
+		}
+		else if(mode == 1){
+			if(strcmp(text, "SOUNDS:") == 0) mode++;
+			else media->music.push_back(new Music(text));
+		}
+		else if(mode == 2){
+			if(strcmp(text, "FONTS:") == 0) mode++;
+			else media->sounds.push_back(new Sound(text));
+		}
+		else if(mode == 3){
+			char **parts = new char *[2];
+			for(int i = 0; i < 3; i++){
+				parts[i] = new char[len];
+			}				
+			len = splitString(text, parts, len);
+			int size = atoi(parts[1]);
+			media->fonts.push_back(new Font(text, size));
+		}
+
+		if(!fileReadLine(&fs, text, &len, MAX_FILE_NAME_LENGTH)){
+			printf("Error reading file paths from file %s!\n", path);
+			result = false;
+			break;
+		}
+	}
+
+	fs.close();
+
+	return result;
+}
 
 /*
 	Resume the current background music
@@ -293,20 +398,23 @@ int main(int argc, char *argv[]){
 	mouse.buttons[1] = MouseStruct::Button{ false, false, false };
 	mouse.buttons[2] = MouseStruct::Button{ false, false, false };
 
-	Image *img = new Image("hal9000.png", 120, 120, window.render);
+	Media media;
+	bool running = loadMedia("manifest", &media, window.render);
+
+	/*Image *img = new Image("hal9000.png", 120, 120, window.render);
 
 	vector<Image*> images;
-	images.push_back(img);
+	images.push_back(img);*/
 
 	vector<IsClickable*> clickable;
 	vector<GameObject*> objects;
 
 	GameObject obj;
-	obj.image = img;
+	obj.image = media.images.at(0);
 	obj.x = 0;
 	obj.y = 0;
 	GameObject obj2;
-	obj2.image = img;
+	obj2.image = media.images.at(0);
 	obj2.x = 120;
 	obj2.y = 0;
 	/*	So we can go through all buttons alter on.
@@ -314,8 +422,8 @@ int main(int argc, char *argv[]){
 	GameObjClick button;
 	button.x = 0;
 	button.y = 0;
-	button.image = img;
-	button.area = SDL_Rect{ 0,0,img->width,img->height };
+	button.image = media.images.at(0);
+	button.area = SDL_Rect{ 0,0,media.images.at(0)->width,media.images.at(0)->height};
 	button.function = btnHello;
 	button.data = (void*)(new btnHelloParameter{ "Alexander, Tim & Jacob!" });
 
@@ -336,20 +444,21 @@ int main(int argc, char *argv[]){
 	cam.wndY = 0;
 
 	// MUSIC TEST
-	vector<Music*> music;
+	/*vector<Music*> music;
 	music.push_back(new Music("Space_Amb_2.wav"));
 	music.push_back(new Music("testMusic.wav"));
 	vector<Sound*> sounds;
-	sounds.push_back(new Sound("testSound.wav"));
+	sounds.push_back(new Sound("testSound.wav"));*/
 	Mix_Volume(-1, masterVolume);
 	Mix_VolumeMusic(masterVolume);
-	switchMusic(music.at(0), -1, 0, 60000);
-	int channel = playSound(sounds.at(0), -1, 2.0f, 1000);
+	switchMusic(media.music.at(0), -1, 0, 60000);
+	int channel = playSound(media.sounds.at(0), -1, 2.0f, 1000);
 
-	vector<Font*> fonts;
-	fonts.push_back(new Font("testFont.ttf", 16));
+	/*vector<Font*> fonts;
+	fonts.push_back(new Font("testFont.ttf", 16));*/
 
-	images.push_back(new Image(fonts.at(0), "Hello Jacob!", {0,0,0}, window.render));
+	media.images.push_back(new Image(media.fonts.at(0), "Hello Jacob!", {0,0,0},
+									window.render));
 
 	// Timing
 	unsigned int targetFrequency = 60;
@@ -359,7 +468,6 @@ int main(int argc, char *argv[]){
 	printf("Initialization done\n");
 
 	// The Loop
-	bool running = true;
 	int ticks = 0;
 	while(running){
 		SDL_RenderClear(window.render);
@@ -380,14 +488,14 @@ int main(int argc, char *argv[]){
 			stopSound(channel, 1000);
 		}
 		else if(ticks == 640){
-			switchMusic(music.at(1), 0, 1000, 1000);
+			switchMusic(media.music.at(1), 0, 1000, 1000);
 		}
 		else if(ticks == 820){
 			pauseMusic();
 		}
 		else if(ticks == 940){
 			resumeMusic();
-			playSound(sounds.at(0));
+			playSound(media.sounds.at(0));
 		}
 		else if(ticks == 1000){
 			pauseAll();
@@ -455,9 +563,9 @@ int main(int argc, char *argv[]){
 		objects.at(0)->x = mouse.x - objects.at(0)->image->width / 2;
 		objects.at(0)->y = mouse.y -  objects.at(0)->image->height / 2;
 
-		render(&window, img, 0, 120);
-		render(&window, img, 120, 120, &cam);
-		render(&window, images.at(1), 120, 300);
+		render(&window, media.images.at(0), 0, 120);
+		render(&window, media.images.at(0), 120, 120, &cam);
+		render(&window, media.images.at(1), 120, 300);
 		
 		for(GameObject* obj : objects){
 			render(&window, obj, &cam);
@@ -474,7 +582,7 @@ int main(int argc, char *argv[]){
 		SDL_RenderPresent(window.render);
 	}
 
-	close(&window, images, music, sounds, fonts);
+	close(&window, media.images, media.music, media.sounds, media.fonts);
 
 	return 0;
 }
