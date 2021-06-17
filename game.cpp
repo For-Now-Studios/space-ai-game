@@ -342,22 +342,21 @@ void render(WindowStruct *window, GameObject *obj, Camera *cam){
 								0, NULL, SDL_FLIP_NONE);
 }
 
-void close(WindowStruct *window, vector<Image*>& images, vector<Music*>& music,
-					vector<Sound*>& sounds, vector<Font*>& fonts){
-	for (Image* img : images)
+void close(WindowStruct *window, Media& media){
+	for (Image* img : media.images)
 	{
 		img->~Image();
 	}
 
-	for(Music* m : music){
+	for(Music* m : media.music){
 		m->~Music();
 	}
 
-	for(Sound* s : sounds){
+	for(Sound* s : media.sounds){
 		s->~Sound();
 	}
 
-	for(Font* f : fonts){
+	for(Font* f : media.fonts){
 		f->~Font();
 	}
 
@@ -582,7 +581,7 @@ int main(int argc, char *argv[]){
 		SDL_RenderPresent(window.render);
 	}
 
-	close(&window, media.images, media.music, media.sounds, media.fonts);
+	close(&window, media);
 
 	return 0;
 }
