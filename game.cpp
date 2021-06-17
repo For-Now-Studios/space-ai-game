@@ -5,6 +5,8 @@
 #include<stdlib.h>
 #include<stdio.h>
 #include<vector>
+#include<fstream>
+#include<string.h>
 #include "structs.h"
 
 using namespace std;
@@ -13,6 +15,197 @@ const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
 int masterVolume = MIX_MAX_VOLUME / 2; //The volume level everything else is scaled too
+
+/*
+	Test funtion and struct parameter.
+*/
+struct btnHelloParameter { const char* name; };
+void btnHello(void *cntxt)
+{
+	btnHelloParameter *parameters = (btnHelloParameter*)cntxt;
+	printf("Hello %s!\n", parameters->name);
+}
+
+/*
+	TODO: Maybe make this function load data from a level file?
+	
+	NOTE: Currently just a collection of used game objects collected in a singular
+	space for ease of use
+*/
+bool loadLevel(vector<GameObject *>* objects, vector<IsClickable *>* clickable,
+							Media* media, const char *path){
+	GameObject *obj = new GameObject;
+	obj->image = media->images.at(0);
+	obj->x = 0;
+	obj->y = 0;
+
+	GameObject *obj2 = new GameObject;
+	obj2->image = media->images.at(0);
+	obj2->x = 120;
+	obj2->y = 0;
+
+	/*	So we can go through all buttons alter on.
+		Also the destuctors are all called when the "button" object gets
+		destroyed, which is at the final return statement.*/
+	GameObjClick *button = new GameObjClick;
+	button->x = 0;
+	button->y = 0;
+	button->image = media->images.at(0);
+	button->area = SDL_Rect{ 0,0,media->images.at(0)->width,
+							media->images.at(0)->height};
+
+	button->function = btnHello;
+	button->data = (void*)(new btnHelloParameter{ "Alexander, Tim & Jacob!" });
+
+	clickable->push_back(button);
+
+	objects->push_back(obj);
+	objects->push_back(obj2);
+	objects->push_back(button);
+	
+
+	return true;
+}
+
+/*
+	Read the next line of text from the specified open file stream.
+	At max maxLength text can be read, but the actual size of the line is stored
+	in len.
+
+	If the line was properly read, or if the EOF was encountered, the
+	function returns true. Otherwise it will return false and report that an error
+	had occured
+*/
+bool fileReadLine(fstream *fs, char *line, int *len, int maxLength){
+	fs->getline(line, maxLength);
+	*len = fs->gcount();
+	if(fs->eof()){
+		return true;
+	}
+	else if(fs->fail()){
+		printf("Error reading in text with legth %d!\n", len);
+		return false;
+	}
+
+	return true;
+}
+
+/*
+	Takes the given string and splits it around the delimiter " ".
+	Returns an array of len substrings, where each substring can at most be
+	maxLength long.
+
+	NOTE: String will be truncated to only containe the first substring, and
+	the array of substrings (consisting of all substrings) will have to be
+	deallocated at some point
+*/
+char **splitString(char *string, int &len, int maxLength){
+	len = 0;
+
+	vector<char *> temp;
+	temp.push_back(strtok(string, " "));
+	while(temp.at(len) != NULL){
+		len += 1;
+		temp.push_back(strtok(NULL, " "));
+	}
+	
+	char **result = new char *[len];
+	for(int i = 0; i < len; i++){
+		result[i] = new char[maxLength];
+		strncpy(result[i], temp.at(i), maxLength);
+	}
+	
+	return result;
+}
+
+/*
+	Initializes the specified media object by loading all the media which filepath
+	is specified in the specified manifest file. Returns true if all media was
+	loaded correctly, or false if an error was encountered
+*/
+bool loadMedia(Media *media, const char *path, SDL_Renderer *render){
+	const int MAX_FILE_NAME_LENGTH = 1024;
+
+	bool result = true;
+
+	fstream fs;
+	fs.open(path, fstream::in);
+
+	char text[MAX_FILE_NAME_LENGTH];
+	int mode = 0;
+	int len;
+	if(!fileReadLine(&fs, text, &len, MAX_FILE_NAME_LENGTH)){
+		printf("Error reading file paths from file %s!\n", path);
+		result = false;
+		len = 0;
+	}
+	while(len > 0){
+		if(mode == 0){
+			if(strcmp(text, "IMAGES:") == 0){} //Skip the first line
+			else if(strcmp(text, "MUSIC:") == 0) mode++;
+			else{
+				char **parts = splitString(text, len, len);
+				if(len == 3){
+					int w = atoi(parts[1]);
+					int h = atoi(parts[2]);
+					media->images.push_back(new Image(parts[0], w, h,
+										render));
+				}
+				else if(len == 1){
+					media->images.push_back(new Image(text, render));
+				}
+				else{
+					printf("Image file %s was badly formated!\n",
+										 text);
+					result = false;
+					break;
+				}
+
+				//Cleanup
+				for(int i = 0; i < len; i++){
+					delete parts[i];
+				}				
+				delete parts;
+			}
+		}
+		else if(mode == 1){
+			if(strcmp(text, "SOUNDS:") == 0) mode++;
+			else media->music.push_back(new Music(text));
+		}
+		else if(mode == 2){
+			if(strcmp(text, "FONTS:") == 0) mode++;
+			else media->sounds.push_back(new Sound(text));
+		}
+		else if(mode == 3){
+			char **parts = splitString(text, len, len);
+			
+			if(len != 2){
+				printf("Font file %s was badly formated!\n", text);
+				result = false;
+				break;
+			}
+
+			int size = atoi(parts[1]);
+			media->fonts.push_back(new Font(text, size));
+
+			//Cleanup
+			for(int i = 0; i < len; i++){
+				delete parts[i];
+			}				
+			delete parts;
+		}
+
+		if(!fileReadLine(&fs, text, &len, MAX_FILE_NAME_LENGTH)){
+			printf("Error reading file paths from file %s!\n", path);
+			result = false;
+			break;
+		}
+	}
+
+	fs.close();
+
+	return result;
+}
 
 /*
 	Resume the current background music
@@ -237,22 +430,21 @@ void render(WindowStruct *window, GameObject *obj, Camera *cam){
 								0, NULL, SDL_FLIP_NONE);
 }
 
-void close(WindowStruct *window, vector<Image*>& images, vector<Music*>& music,
-					vector<Sound*>& sounds, vector<Font*>& fonts){
-	for (Image* img : images)
+void close(WindowStruct *window, Media& media){
+	for (Image* img : media.images)
 	{
 		img->~Image();
 	}
 
-	for(Music* m : music){
+	for(Music* m : media.music){
 		m->~Music();
 	}
 
-	for(Sound* s : sounds){
+	for(Sound* s : media.sounds){
 		s->~Sound();
 	}
 
-	for(Font* f : fonts){
+	for(Font* f : media.fonts){
 		f->~Font();
 	}
 
@@ -265,16 +457,6 @@ void close(WindowStruct *window, vector<Image*>& images, vector<Music*>& music,
 	Mix_Quit();
 	TTF_Quit();
 	SDL_Quit();
-}
-
-/*
-	Test funtion and struct parameter.
-*/
-struct btnHelloParameter { const char* name; };
-void btnHello(void *cntxt)
-{
-	btnHelloParameter *parameters = (btnHelloParameter*)cntxt;
-	printf("Hello %s!\n", parameters->name);
 }
 
 int main(int argc, char *argv[]){
@@ -293,40 +475,27 @@ int main(int argc, char *argv[]){
 	mouse.buttons[1] = MouseStruct::Button{ false, false, false };
 	mouse.buttons[2] = MouseStruct::Button{ false, false, false };
 
-	Image *img = new Image("hal9000.png", 120, 120, window.render);
-
-	vector<Image*> images;
-	images.push_back(img);
+	Media media;
+	bool running = loadMedia(&media, "manifest", window.render);
 
 	vector<IsClickable*> clickable;
 	vector<GameObject*> objects;
 
-	GameObject obj;
-	obj.image = img;
-	obj.x = 0;
-	obj.y = 0;
-	GameObject obj2;
-	obj2.image = img;
-	obj2.x = 120;
-	obj2.y = 0;
-	/*	So we can go through all buttons alter on.
-		Also the destuctors are all called when the "button" object gets destroyed, which is at the final return statement.*/
-	GameObjClick button;
-	button.x = 0;
-	button.y = 0;
-	button.image = img;
-	button.area = SDL_Rect{ 0,0,img->width,img->height };
-	button.function = btnHello;
-	button.data = (void*)(new btnHelloParameter{ "Alexander, Tim & Jacob!" });
+	int channel; //MUSIC TEST
+	if(running){
+		if(loadLevel(&objects, &clickable, &media, "")){
+			printf("Game object done!\n");
 
-	clickable.push_back(&button);
-
-	objects.push_back(&obj);
-	objects.push_back(&obj2);
-	objects.push_back(&button);
-	
-
-	printf("Game object done!\n");
+			// MUSIC TEST
+			Mix_Volume(-1, masterVolume);
+			Mix_VolumeMusic(masterVolume);
+			switchMusic(media.music.at(0), -1, 0, 60000);
+			channel = playSound(media.sounds.at(0), -1, 2.0f, 1000);
+		
+			media.images.push_back(new Image(media.fonts.at(0),
+						"Hello Jacob!", {0,0,0}, window.render));
+		}
+	}
 
 	Camera cam;
 	cam.x = 0;
@@ -334,22 +503,6 @@ int main(int argc, char *argv[]){
 	cam.zoomLevel = 1.0f;
 	cam.wndX = 0;
 	cam.wndY = 0;
-
-	// MUSIC TEST
-	vector<Music*> music;
-	music.push_back(new Music("Space_Amb_2.wav"));
-	music.push_back(new Music("testMusic.wav"));
-	vector<Sound*> sounds;
-	sounds.push_back(new Sound("testSound.wav"));
-	Mix_Volume(-1, masterVolume);
-	Mix_VolumeMusic(masterVolume);
-	switchMusic(music.at(0), -1, 0, 60000);
-	int channel = playSound(sounds.at(0), -1, 2.0f, 1000);
-
-	vector<Font*> fonts;
-	fonts.push_back(new Font("testFont.ttf", 16));
-
-	images.push_back(new Image(fonts.at(0), "Hello Jacob!", {0,0,0}, window.render));
 
 	// Timing
 	unsigned int targetFrequency = 60;
@@ -359,7 +512,6 @@ int main(int argc, char *argv[]){
 	printf("Initialization done\n");
 
 	// The Loop
-	bool running = true;
 	int ticks = 0;
 	while(running){
 		SDL_RenderClear(window.render);
@@ -380,14 +532,14 @@ int main(int argc, char *argv[]){
 			stopSound(channel, 1000);
 		}
 		else if(ticks == 640){
-			switchMusic(music.at(1), 0, 1000, 1000);
+			switchMusic(media.music.at(1), 0, 1000, 1000);
 		}
 		else if(ticks == 820){
 			pauseMusic();
 		}
 		else if(ticks == 940){
 			resumeMusic();
-			playSound(sounds.at(0));
+			playSound(media.sounds.at(0));
 		}
 		else if(ticks == 1000){
 			pauseAll();
@@ -455,9 +607,9 @@ int main(int argc, char *argv[]){
 		objects.at(0)->x = mouse.x - objects.at(0)->image->width / 2;
 		objects.at(0)->y = mouse.y -  objects.at(0)->image->height / 2;
 
-		render(&window, img, 0, 120);
-		render(&window, img, 120, 120, &cam);
-		render(&window, images.at(1), 120, 300);
+		render(&window, media.images.at(0), 0, 120);
+		render(&window, media.images.at(0), 120, 120, &cam);
+		render(&window, media.images.at(1), 120, 300);
 		
 		for(GameObject* obj : objects){
 			render(&window, obj, &cam);
@@ -474,7 +626,7 @@ int main(int argc, char *argv[]){
 		SDL_RenderPresent(window.render);
 	}
 
-	close(&window, images, music, sounds, fonts);
+	close(&window, media);
 
 	return 0;
 }
