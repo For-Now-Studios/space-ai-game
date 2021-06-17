@@ -5,6 +5,7 @@
 #include<stdlib.h>
 #include<stdio.h>
 #include<vector>
+#include<deque>
 #include<fstream>
 #include<string.h>
 #include "structs.h"
@@ -24,6 +25,72 @@ void btnHello(void *cntxt)
 {
 	btnHelloParameter *parameters = (btnHelloParameter*)cntxt;
 	printf("Hello %s!\n", parameters->name);
+}
+
+void buildClickAreas(CurrentClick *cc, vector<IsClickable*> clickable)
+{
+
+}
+
+void addPopup(CurrentClick *cc)
+{
+
+}
+
+void updateClickAreas(CurrentClick *cc)
+{
+
+}
+
+IsClickable* checkCord(CurrentClick *cc, int x, int y, MouseStruct mouse)
+{
+	//bool found = false;
+	for (vector<ClickArea>::reverse_iterator it = cc->UI.rbegin(); it != cc->UI.rend(); ++it) {
+		if (it->area.x < mouse.x && mouse.x < it->area.x + it->area.w &&
+			it->area.y < mouse.y && mouse.y < it->area.y + it->area.h) {
+			for (vector<IsClickable*>::reverse_iterator jt = it->clicks.rbegin(); jt != it->clicks.rend(); ++jt) {
+				IsClickable* ic = *jt;
+				if (ic->area.x < mouse.x && mouse.x < ic->area.x + ic->area.w &&
+					ic->area.y < mouse.y && mouse.y < ic->area.y + ic->area.h) {
+					return ic;
+					break;
+				}
+			}
+			break;
+		}
+	}
+
+	for (vector<ClickArea>::reverse_iterator it = cc->Popup.rbegin(); it != cc->Popup.rend(); ++it) {
+		if (it->area.x < mouse.x && mouse.x < it->area.x + it->area.w &&
+			it->area.y < mouse.y && mouse.y < it->area.y + it->area.h) {
+			for (vector<IsClickable*>::reverse_iterator jt = it->clicks.rbegin(); jt != it->clicks.rend(); ++jt) {
+				IsClickable* ic = *jt;
+				if (ic->area.x < mouse.x && mouse.x < ic->area.x + ic->area.w &&
+					ic->area.y < mouse.y && mouse.y < ic->area.y + ic->area.h) {
+					return ic;
+					break;
+				}
+			}
+			break;
+		}
+	}
+
+	// TODO: Make the coordinates game coordinates.
+	for (vector<ClickArea>::reverse_iterator it = cc->Game.rbegin(); it != cc->Game.rend(); ++it) {
+		if (it->area.x < mouse.x && mouse.x < it->area.x + it->area.w &&
+			it->area.y < mouse.y && mouse.y < it->area.y + it->area.h) {
+			for (vector<IsClickable*>::reverse_iterator jt = it->clicks.rbegin(); jt != it->clicks.rend(); ++jt) {
+				IsClickable* ic = *jt;
+				if (ic->area.x < mouse.x && mouse.x < ic->area.x + ic->area.w &&
+					ic->area.y < mouse.y && mouse.y < ic->area.y + ic->area.h) {
+					return ic;
+					break;
+				}
+			}
+			break;
+		}
+	}
+	return nullptr;
 }
 
 /*

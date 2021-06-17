@@ -122,6 +122,17 @@ struct IsClickable {
 	}
 };
 
+struct ClickArea{
+	SDL_Rect area;
+	std::vector<IsClickable*> clicks;
+};
+
+struct CurrentClick {
+	std::vector<ClickArea> UI;
+	std::vector<ClickArea> Popup;
+	std::vector<ClickArea> Game;
+};
+
 struct GameObject {
 	//Game Coordinates
 	int x;
