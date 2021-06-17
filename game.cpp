@@ -16,6 +16,15 @@ const int SCREEN_HEIGHT = 480;
 
 int masterVolume = MIX_MAX_VOLUME / 2; //The volume level everything else is scaled too
 
+/*
+	Read the next line of text from the specified open file stream.
+	At max maxLength text can be read, but the actual size of the line is stored
+	in len.
+
+	If the line was properly read, or if the EOF was encountered, the
+	function returns true. Otherwise it will return false and report that an error
+	had occured
+*/
 bool fileReadLine(fstream *fs, char *line, int *len, int maxLength){
 	fs->getline(line, maxLength);
 	*len = fs->gcount();
@@ -58,7 +67,12 @@ char **splitString(char *string, int &len, int maxLength){
 	return result;
 }
 
-bool loadMedia(const char* path, Media *media, SDL_Renderer *render){
+/*
+	Initializes the specified media object by loading all the media which filepath
+	is specified in the specified manifest file. Returns true if all media was
+	loaded correctly, or false if an error was encountered
+*/
+bool loadMedia(Media *media, const char *path, SDL_Renderer *render){
 	const int MAX_FILE_NAME_LENGTH = 1024;
 
 	bool result = true;
@@ -90,8 +104,8 @@ bool loadMedia(const char* path, Media *media, SDL_Renderer *render){
 					media->images.push_back(new Image(text, render));
 				}
 				else{
-					printf("Image file with format %s was badly\
-								formated!\n", text);
+					printf("Image file %s was badly formated!\n",
+										 text);
 					result = false;
 					break;
 				}
@@ -113,6 +127,12 @@ bool loadMedia(const char* path, Media *media, SDL_Renderer *render){
 		}
 		else if(mode == 3){
 			char **parts = splitString(text, len, len);
+			
+			if(len != 2){
+				printf("Font file %s was badly formated!\n", text);
+				result = false;
+				break;
+			}
 
 			int size = atoi(parts[1]);
 			media->fonts.push_back(new Font(text, size));
@@ -415,7 +435,7 @@ int main(int argc, char *argv[]){
 	mouse.buttons[2] = MouseStruct::Button{ false, false, false };
 
 	Media media;
-	bool running = loadMedia("manifest", &media, window.render);
+	bool running = loadMedia(&media, "manifest", window.render);
 
 	/*Image *img = new Image("hal9000.png", 120, 120, window.render);
 
