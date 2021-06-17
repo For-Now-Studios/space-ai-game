@@ -267,6 +267,16 @@ void close(WindowStruct *window, vector<Image*>& images, vector<Music*>& music,
 	SDL_Quit();
 }
 
+/*
+	Test funtion and struct parameter.
+*/
+struct btnHelloParameter { const char* name; };
+void btnHello(void *cntxt)
+{
+	btnHelloParameter *parameters = (btnHelloParameter*)cntxt;
+	printf("Hello %s!\n", parameters->name);
+}
+
 int main(int argc, char *argv[]){
 	WindowStruct window;
 
@@ -288,7 +298,8 @@ int main(int argc, char *argv[]){
 	vector<Image*> images;
 	images.push_back(img);
 
-	vector<GameObject> objects;
+	vector<IsClickable*> clickable;
+	vector<GameObject*> objects;
 
 	GameObject obj;
 	obj.image = img;
@@ -298,8 +309,22 @@ int main(int argc, char *argv[]){
 	obj2.image = img;
 	obj2.x = 120;
 	obj2.y = 0;
-	objects.push_back(obj);
-	objects.push_back(obj2);
+	/*	So we can go through all buttons alter on.
+		Also the destuctors are all called when the "button" object gets destroyed, which is at the final return statement.*/
+	GameObjClick button;
+	button.x = 0;
+	button.y = 0;
+	button.image = img;
+	button.area = SDL_Rect{ 0,0,img->width,img->height };
+	button.function = btnHello;
+	button.data = (void*)(new btnHelloParameter{ "Alexander, Tim & Jacob!" });
+
+	clickable.push_back(&button);
+
+	objects.push_back(&obj);
+	objects.push_back(&obj2);
+	objects.push_back(&button);
+	
 
 	printf("Game object done!\n");
 
@@ -416,15 +441,26 @@ int main(int argc, char *argv[]){
 			}
 		}
 
-		objects.at(0).x = mouse.x - objects.at(0).image->width / 2;
-		objects.at(0).y = mouse.y -  objects.at(0).image->height / 2;
+		//Simple button test
+		if (mouse.buttons[0].isReleased)
+		{
+			for (const IsClickable* c : clickable) {
+				if (c->area.x < mouse.x && mouse.x < c->area.x + c->area.w &&
+					c->area.y < mouse.y && mouse.y < c->area.y + c->area.h) {
+					c->function(c->data);
+				}
+			}
+		}
+
+		objects.at(0)->x = mouse.x - objects.at(0)->image->width / 2;
+		objects.at(0)->y = mouse.y -  objects.at(0)->image->height / 2;
 
 		render(&window, img, 0, 120);
 		render(&window, img, 120, 120, &cam);
 		render(&window, images.at(1), 120, 300);
 		
-		for(GameObject obj : objects){
-			render(&window, &obj, &cam);
+		for(GameObject* obj : objects){
+			render(&window, obj, &cam);
 		}
 
 		// If we were too quick, wait until it is time

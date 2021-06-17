@@ -93,6 +93,20 @@ struct Sound {
 	}
 };
 
+//Struct that can be added to make an object clickable.
+struct IsClickable {
+	SDL_Rect area; //Area that is clickable
+	void(*function)(void*); //The function being called when clicked
+	void* data; //The data sent into the function
+
+	// Destructor to delete the data, as it needs to be put on the heap (I think in most cases)
+	~IsClickable() {
+		delete data;
+		data = nullptr;
+		printf("Data for a clickable thing has been freed!\n");
+	}
+};
+
 struct GameObject {
 	//Game Coordinates
 	int x;
@@ -101,6 +115,12 @@ struct GameObject {
 	//Images
 	Image *image;
 };
+
+/*
+	A clickable version of GameObject
+*/
+struct GameObjClick : GameObject, IsClickable {};
+
 /*
 	An object contain all information about the mouse.
 */
