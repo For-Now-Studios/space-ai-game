@@ -24,6 +24,11 @@ int playSound(Sound *sound, int loops, double volume);
 int playSound(Sound *sound, int loops);
 int playSound(Sound *sound);
 
+// Graphics.cpp
+void render(WindowStruct *window, Image *image, int x, int y);
+void render(WindowStruct *window, Image *image, int x, int y, Camera *cam);
+void render(WindowStruct *window, GameObject *obj, Camera *cam);
+
 // Camera.cpp
 SDL_Rect translateToGame(const Camera *camera, const SDL_Rect *obj);
 SDL_Rect translateToCamera(const Camera *camera, const SDL_Rect *obj);
