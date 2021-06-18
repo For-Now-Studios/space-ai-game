@@ -430,7 +430,7 @@ void render(WindowStruct *window, GameObject *obj, Camera *cam){
 								0, NULL, SDL_FLIP_NONE);
 }
 
-void close(WindowStruct *window, Media& media){
+void close(WindowStruct *window, Media& media, vector<GameObject*>& objects){
 	for (Image* img : media.images)
 	{
 		img->~Image();
@@ -446,6 +446,10 @@ void close(WindowStruct *window, Media& media){
 
 	for(Font* f : media.fonts){
 		f->~Font();
+	}
+
+	for (GameObject* obj : objects) {
+		delete obj;
 	}
 
 	SDL_DestroyRenderer(window->render);
@@ -626,7 +630,7 @@ int main(int argc, char *argv[]){
 		SDL_RenderPresent(window.render);
 	}
 
-	close(&window, media);
+	close(&window, media, objects);
 
 	return 0;
 }

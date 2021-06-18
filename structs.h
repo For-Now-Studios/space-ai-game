@@ -115,7 +115,7 @@ struct IsClickable {
 	void* data; //The data sent into the function
 
 	// Destructor to delete the data, as it needs to be put on the heap (I think in most cases)
-	~IsClickable() {
+	virtual ~IsClickable() {
 		delete data;
 		data = nullptr;
 		printf("Data for a clickable thing has been freed!\n");
@@ -129,12 +129,18 @@ struct GameObject {
 
 	//Images
 	Image *image;
+
+	virtual ~GameObject() {
+
+	}
 };
 
 /*
 	A clickable version of GameObject
 */
-struct GameObjClick : GameObject, IsClickable {};
+struct GameObjClick : GameObject, IsClickable {
+
+};
 
 /*
 	An object contain all information about the mouse.
