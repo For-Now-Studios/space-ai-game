@@ -3,7 +3,10 @@
 #include<SDL2/SDL_image.h>
 #include<SDL2/SDL_mixer.h>
 #include<SDL2/SDL_ttf.h>
+#include<fstream>
 #include "structs.h"
+
+using namespace std;
 
 // Sound.cpp
 void resumeMusic();
@@ -32,3 +35,8 @@ void render(WindowStruct *window, GameObject *obj, Camera *cam);
 // Camera.cpp
 SDL_Rect translateToGame(const Camera *camera, const SDL_Rect *obj);
 SDL_Rect translateToCamera(const Camera *camera, const SDL_Rect *obj);
+
+// IO.cpp
+bool fileReadLine(fstream *fs, char *line, int *len, int maxLength);
+char **splitString(char *string, int &len, int maxLength);
+bool loadMedia(Media *media, const char *path, SDL_Renderer *render);
