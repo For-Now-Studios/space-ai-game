@@ -5,7 +5,6 @@
 #include<stdlib.h>
 #include<stdio.h>
 #include<vector>
-#include<deque>
 #include<fstream>
 #include<string.h>
 #include "structs.h"
