@@ -333,13 +333,25 @@ int playSound(Sound *sound){
 }
 
 /*
-	Translates the coordinates of a GameObject to coordinates relative to the Camera
+	Translates the given rect from camera coordinates to game coordinates
 */
-SDL_Rect translateToCamera(Camera *camera, GameObject *obj){
+SDL_Rect translateToGame(const Camera *camera, const SDL_Rect *obj){
+	SDL_Rect rect = {camera->x + (int)((obj->x - camera->wndX) / camera->zoomLevel),
+			 camera->y + (int)((obj->y - camera->wndY) / camera->zoomLevel),
+			 (int)(obj->w / camera->zoomLevel),
+			 (int)(obj->h / camera->zoomLevel)};
+
+	return rect;
+}
+
+/*
+	Translates the given rect from game coordinates to camera coordinates
+*/
+SDL_Rect translateToCamera(const Camera *camera, const SDL_Rect *obj){
 	SDL_Rect rect = {camera->wndX + (int)((obj->x - camera->x) * camera->zoomLevel),
 			 camera->wndY + (int)((obj->y - camera->y) * camera->zoomLevel),
-			 (int)(obj->image->width * camera->zoomLevel),
-			 (int)(obj->image->height * camera->zoomLevel)};
+			 (int)(obj->w * camera->zoomLevel),
+			 (int)(obj->h * camera->zoomLevel)};
 
 	return rect;
 }
@@ -413,10 +425,7 @@ void render(WindowStruct *window, Image *image, int x, int y){
 									SDL_FLIP_NONE);
 }
 void render(WindowStruct *window, Image *image, int x, int y, Camera *cam){
-	GameObject obj;
-	obj.x = x;
-	obj.y = y;
-	obj.image = image;
+	SDL_Rect obj = {x, y, image->width, image->height};
 
 	SDL_Rect dst = translateToCamera(cam, &obj);
 
@@ -424,7 +433,9 @@ void render(WindowStruct *window, Image *image, int x, int y, Camera *cam){
 									SDL_FLIP_NONE);
 }
 void render(WindowStruct *window, GameObject *obj, Camera *cam){
-	SDL_Rect dst = translateToCamera(cam, obj);
+	SDL_Rect rect = {obj->x, obj->y, obj->image->width, obj->image->height};
+
+	SDL_Rect dst = translateToCamera(cam, &rect);
 
 	SDL_RenderCopyEx(window->render, obj->image->image, NULL, &dst,
 								0, NULL, SDL_FLIP_NONE);
@@ -596,16 +607,19 @@ int main(int argc, char *argv[]){
 		//Simple button test
 		if (mouse.buttons[0].isReleased)
 		{
-			for (const IsClickable* c : clickable) {
-				if (c->area.x < mouse.x && mouse.x < c->area.x + c->area.w &&
-					c->area.y < mouse.y && mouse.y < c->area.y + c->area.h) {
+			for(const IsClickable* c : clickable) {
+				SDL_Rect rec = translateToCamera(&cam, &c->area);
+				if (rec.x < mouse.x && mouse.x < rec.x + rec.w &&
+					rec.y < mouse.y && mouse.y < rec.y + rec.h) {
 					c->function(c->data);
 				}
 			}
 		}
 
-		objects.at(0)->x = mouse.x - objects.at(0)->image->width / 2;
-		objects.at(0)->y = mouse.y -  objects.at(0)->image->height / 2;
+		SDL_Rect temp = {mouse.x, mouse.y, 1, 1};
+		SDL_Rect trans = translateToGame(&cam, &temp);
+		objects.at(0)->x = trans.x - objects.at(0)->image->width / 2;
+		objects.at(0)->y = trans.y -  objects.at(0)->image->height / 2;
 
 		render(&window, media.images.at(0), 0, 120);
 		render(&window, media.images.at(0), 120, 120, &cam);
