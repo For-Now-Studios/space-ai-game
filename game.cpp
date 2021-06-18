@@ -31,18 +31,12 @@ void buildClickAreas(CurrentClick *cc, vector<IsClickable*> clickable) {
 	//UI
 	ClickArea *UI = new ClickArea;
 	UI->area = SDL_Rect{0, 420, SCREEN_WIDTH, 60};
-	UI->clicks.push_back(clickable.at(5));
+	UI->clicks.push_back(clickable.at(2));
 
 	cc->UI.push_back(UI);
 
 	//Popup
-	ClickArea *P = new ClickArea;
-	P->area = SDL_Rect{200, 200, 120, 120};
-	P->clicks.push_back(clickable.at(2));
-	P->clicks.push_back(clickable.at(3));
-	P->clicks.push_back(clickable.at(4));
-
-	cc->Popup.push_back(P);
+	//nothign in the start
 
 	//Game
 	ClickArea *S0 = new ClickArea;
@@ -53,8 +47,8 @@ void buildClickAreas(CurrentClick *cc, vector<IsClickable*> clickable) {
 	ClickArea *S1 = new ClickArea;
 	S1->area = SDL_Rect{0, SCREEN_WIDTH/2, SCREEN_WIDTH/2,SCREEN_HEIGHT};
 
-	cc->Game.push_back(S0);
 	cc->Game.push_back(S1);
+	cc->Game.push_back(S0);
 }
 
 void cleanClickAreas(CurrentClick *cc) {
@@ -69,8 +63,22 @@ void cleanClickAreas(CurrentClick *cc) {
 	}
 }
 
-void addPopup(CurrentClick *cc, ClickArea* area) {
+/*
+	Returns the index.
+*/
+int addPopup(CurrentClick *cc, ClickArea* area) {
+	cc->Popup.push_back(area);
+	return cc->Popup.size() - 1;
+}
 
+void closePopup(CurrentClick *cc, int index, vector<GameObject *>* objects, int first, int last) {
+	delete (*cc->Popup.erase(cc->Popup.begin() + index));
+	vector<GameObject *>::iterator buttons = objects->erase(objects->begin() + first, objects->begin() + last + 1);
+	for (int i = first; i < last+1; i++)
+	{
+		delete (*buttons);
+		buttons++;
+	}
 }
 
 void updateClickAreas(CurrentClick *cc) {
@@ -81,10 +89,12 @@ IsClickable* checkCord(CurrentClick *cc, int x, int y) {
 	//bool found = false;
 	for (vector<ClickArea*>::reverse_iterator it = cc->UI.rbegin(); it != cc->UI.rend(); ++it) {
 		ClickArea* cc = *it;
+		printf("check00\n");
 		if (cc->area.x < x && x < cc->area.x + cc->area.w &&
 			cc->area.y < y && y < cc->area.y + cc->area.h) {
 			for (vector<IsClickable*>::reverse_iterator jt = cc->clicks.rbegin(); jt != cc->clicks.rend(); ++jt) {
 				IsClickable* ic = *jt;
+				printf("check01\n");
 				if (ic->area.x < x && x < ic->area.x + ic->area.w &&
 					ic->area.y < y && y < ic->area.y + ic->area.h) {
 					return ic;
@@ -97,10 +107,12 @@ IsClickable* checkCord(CurrentClick *cc, int x, int y) {
 
 	for (vector<ClickArea*>::reverse_iterator it = cc->Popup.rbegin(); it != cc->Popup.rend(); ++it) {
 		ClickArea* cc = *it;
+		printf("check10\n");
 		if (cc->area.x < x && x < cc->area.x + cc->area.w &&
 			cc->area.y < y && y < cc->area.y + cc->area.h) {
 			for (vector<IsClickable*>::reverse_iterator jt = cc->clicks.rbegin(); jt != cc->clicks.rend(); ++jt) {
 				IsClickable* ic = *jt;
+				printf("check11\n");
 				if (ic->area.x < x && x < ic->area.x + ic->area.w &&
 					ic->area.y < y && y < ic->area.y + ic->area.h) {
 					return ic;
@@ -114,10 +126,12 @@ IsClickable* checkCord(CurrentClick *cc, int x, int y) {
 	// TODO: Make the coordinates game coordinates.
 	for (vector<ClickArea*>::reverse_iterator it = cc->Game.rbegin(); it != cc->Game.rend(); ++it) {
 		ClickArea* cc = *it;
+		printf("check20\n");
 		if (cc->area.x < x && x < cc->area.x + cc->area.w &&
 			cc->area.y < y && y < cc->area.y + cc->area.h) {
 			for (vector<IsClickable*>::reverse_iterator jt = cc->clicks.rbegin(); jt != cc->clicks.rend(); ++jt) {
 				IsClickable* ic = *jt;
+				printf("check21\n");
 				if (ic->area.x < x && x < ic->area.x + ic->area.w &&
 					ic->area.y < y && y < ic->area.y + ic->area.h) {
 					return ic;
@@ -131,6 +145,58 @@ IsClickable* checkCord(CurrentClick *cc, int x, int y) {
 	return nullptr;
 }
 
+struct popPopUpPars {
+	CurrentClick *cc;
+	bool poppedUp;
+	vector<GameObject *>* objects;
+	Media* media;
+};
+struct closePopUpPars {
+	int index;
+	int first;
+	int last;
+	CurrentClick *cc;
+	popPopUpPars *pPUP;
+	vector<GameObject *>* objects;
+};
+void closePopUp(void *cntxt) {
+	closePopUpPars *pars = (closePopUpPars*)cntxt;
+	closePopup(pars->cc, pars->index, pars->objects, pars->first, pars->last);
+	printf("Hello %s!\n", "Closed a popup");
+	pars->pPUP->poppedUp = false;
+}
+void popPopUp(void *cntxt) {
+	popPopUpPars *pars = (popPopUpPars*)cntxt;
+	if (!pars->poppedUp) {
+		GameObjClick *p = new GameObjClick(200, 200, pars->media->images.at(0), btnHello,
+			(void*)(new btnHelloParameter{ "p!" }));
+
+		GameObjClick *p0 = new GameObjClick(200, 200, pars->media->images.at(1), btnHello,
+			(void*)(new btnHelloParameter{ "p0!" }));
+
+		closePopUpPars* cPUP = new closePopUpPars{0,0,0,pars->cc,pars};
+		GameObjClick *px = new GameObjClick(260, 200, pars->media->images.at(1), closePopUp,
+			(void*)(cPUP));
+
+		pars->objects->push_back(p);
+		cPUP->first = pars->objects->size() - 1;
+		pars->objects->push_back(p0);
+		pars->objects->push_back(px);
+		cPUP->last = pars->objects->size() - 1;
+
+		cPUP->objects = pars->objects;
+
+		ClickArea* P = new ClickArea;
+		P->area = SDL_Rect{ 200, 200, 120, 120 };
+		P->clicks.push_back(p);
+		P->clicks.push_back(p0);
+		P->clicks.push_back(px);
+		cPUP->index = addPopup(pars->cc, P);
+		printf("Hello %s!\n", "Made a popup");
+		pars->poppedUp = true;
+	}
+}
+
 /*
 	TODO: Maybe make this function load data from a level file?
 	
@@ -138,7 +204,7 @@ IsClickable* checkCord(CurrentClick *cc, int x, int y) {
 	space for ease of use
 */
 bool loadLevel(vector<GameObject *>* objects, vector<IsClickable *>* clickable,
-							Media* media, const char *path){
+							Media* media, const char *path, CurrentClick* cc){
 	GameObject *obj = new GameObject;
 	obj->image = media->images.at(0);
 	obj->x = 0;
@@ -149,41 +215,24 @@ bool loadLevel(vector<GameObject *>* objects, vector<IsClickable *>* clickable,
 	obj2->x = 120;
 	obj2->y = 0;
 
-	/*	So we can go through all buttons alter on.
-		Also the destuctors are all called when the "button" object gets
-		destroyed, which is at the final return statement.*/
-	GameObjClick *button = new GameObjClick(0,0, media->images.at(0), btnHello,
-		(void*)(new btnHelloParameter{ "Alexander, Tim & Jacob!" }));
-
+	/*	So we can go through all buttons later on.*/
 	GameObjClick *c0 = new GameObjClick(0, 200, media->images.at(1), btnHello,
 		(void*)(new btnHelloParameter{ "c0!" }));
-
-	GameObjClick *p = new GameObjClick(200, 200, media->images.at(0), btnHello,
-		(void*)(new btnHelloParameter{ "p!" }));
-
-	GameObjClick *p0 = new GameObjClick(200, 200, media->images.at(1), btnHello,
-		(void*)(new btnHelloParameter{ "p0!" }));
-
-	GameObjClick *px = new GameObjClick(260, 200, media->images.at(1), btnHello,
-		(void*)(new btnHelloParameter{ "px!" }));
+	
+	GameObjClick *button = new GameObjClick(0, 0, media->images.at(0), popPopUp,
+		(void*)(new popPopUpPars{cc, false, objects, media}));
 
 	GameObjClick *ui0 = new GameObjClick(0, 420, media->images.at(1), btnHello, //blaze it
 		(void*)(new btnHelloParameter{ "ui0!" }));
 
 	clickable->push_back(button);
 	clickable->push_back(c0);
-	clickable->push_back(p);
-	clickable->push_back(p0);
-	clickable->push_back(px);
 	clickable->push_back(ui0);
 
 	objects->push_back(obj);
 	objects->push_back(obj2);
 	objects->push_back(button);
 	objects->push_back(c0);
-	objects->push_back(p);
-	objects->push_back(p0);
-	objects->push_back(px);
 	objects->push_back(ui0);
 	
 
@@ -613,7 +662,7 @@ int main(int argc, char *argv[]){
 
 	int channel; //MUSIC TEST
 	if(running){
-		if(loadLevel(&objects, &clickable, &media, "")){
+		if(loadLevel(&objects, &clickable, &media, "", &currClick)){
 			printf("Game object done!\n");
 
 			// MUSIC TEST
@@ -629,6 +678,7 @@ int main(int argc, char *argv[]){
 			buildClickAreas(&currClick, clickable);
 		}
 	}
+	//Pause the music & sound
 	pauseAll();
 
 	Camera cam;
@@ -728,10 +778,13 @@ int main(int argc, char *argv[]){
 		}
 
 		//More advanced simple button test
-		IsClickable* clicked = checkCord(&currClick, mouse.x, mouse.y);
-		if (clicked != nullptr && mouse.buttons[0].isReleased) {
-			clicked->function(clicked->data);
+		if (mouse.buttons[0].isReleased) {
+			IsClickable* clicked = checkCord(&currClick, mouse.x, mouse.y);
+			if (clicked != nullptr) {
+				clicked->function(clicked->data);
+			}
 		}
+		
 
 		objects.at(0)->x = mouse.x - objects.at(0)->image->width / 2;
 		objects.at(0)->y = mouse.y -  objects.at(0)->image->height / 2;
@@ -740,7 +793,7 @@ int main(int argc, char *argv[]){
 		//render(&window, media.images.at(0), 120, 120, &cam);
 		render(&window, media.images.at(2), 120, 300);
 		
-		for(GameObject* obj : objects){
+		for(GameObject* obj : objects) {
 			render(&window, obj, &cam);
 		}
 

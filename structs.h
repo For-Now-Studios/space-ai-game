@@ -127,6 +127,11 @@ struct GameObject {
 	int x;
 	int y;
 
+	void moveBy(int xDir, int yDir) {
+		x += xDir;
+		y += yDir;
+	}
+
 	//Images
 	Image *image;
 
@@ -156,6 +161,13 @@ struct GameObjClick : GameObject, IsClickable {
 		area = ar;
 		function = func;
 		data = d;
+	}
+
+	void moveBy(int xDir, int yDir) {
+		x += xDir;
+		y += yDir;
+		area.x += xDir;
+		area.y += yDir;
 	}
 };
 
