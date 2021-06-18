@@ -126,8 +126,9 @@ struct GameObject {
 	//Game Coordinates
 	int x;
 	int y;
-
-	virtual void moveBy(int xDir, int yDir) {
+	
+	// Function to move the object, implemented mostly because so children can make their own move functions and be run.
+	virtual void moveBy(int xDir, int yDir) { 
 		x += xDir;
 		y += yDir;
 	}
@@ -171,14 +172,23 @@ struct GameObjClick : GameObject, IsClickable {
 	}
 };
 
+/*
+	A clickable area with a vector containing things that are clickable.
+*/
 struct ClickArea {
 	SDL_Rect area;
 	std::vector<IsClickable*> clicks;
 };
 
+/*
+	Struct for the object that builds up the clickable objects on the screen.
+*/
 struct CurrentClick {
+	//Number of characters per each divide up part of the game.
 	int numChars[2];
-	std::vector<IsClickable*> Characters;
+
+	//All clickable characters, though it could be anything moving.
+	std::vector<IsClickable*> Characters; 
 	std::vector<ClickArea*> UI;
 	std::vector<ClickArea*> Popup;
 	std::vector<ClickArea*> Game;
