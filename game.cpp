@@ -27,31 +27,66 @@ void btnHello(void *cntxt)
 	printf("Hello %s!\n", parameters->name);
 }
 
-void buildClickAreas(CurrentClick *cc, vector<IsClickable*> clickable)
-{
+void buildClickAreas(CurrentClick *cc, vector<IsClickable*> clickable) {
+	//UI
+	ClickArea *UI = new ClickArea;
+	UI->area = SDL_Rect{0, 420, SCREEN_WIDTH, 60};
+	UI->clicks.push_back(clickable.at(5));
+
+	cc->UI.push_back(UI);
+
+	//Popup
+	ClickArea *P = new ClickArea;
+	P->area = SDL_Rect{200, 200, 120, 120};
+	P->clicks.push_back(clickable.at(2));
+	P->clicks.push_back(clickable.at(3));
+	P->clicks.push_back(clickable.at(4));
+
+	cc->Popup.push_back(P);
+
+	//Game
+	ClickArea *S0 = new ClickArea;
+	S0->area = SDL_Rect{0, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT};
+	S0->clicks.push_back(clickable.at(0));
+	S0->clicks.push_back(clickable.at(1));
+
+	ClickArea *S1 = new ClickArea;
+	S1->area = SDL_Rect{0, SCREEN_WIDTH/2, SCREEN_WIDTH/2,SCREEN_HEIGHT};
+
+	cc->Game.push_back(S0);
+	cc->Game.push_back(S1);
+}
+
+void cleanClickAreas(CurrentClick *cc) {
+	for (ClickArea* ca : cc->UI) {
+		delete ca;
+	}
+	for (ClickArea* ca : cc->Popup) {
+		delete ca;
+	}
+	for (ClickArea* ca : cc->Game) {
+		delete ca;
+	}
+}
+
+void addPopup(CurrentClick *cc, ClickArea* area) {
 
 }
 
-void addPopup(CurrentClick *cc)
-{
+void updateClickAreas(CurrentClick *cc) {
 
 }
 
-void updateClickAreas(CurrentClick *cc)
-{
-
-}
-
-IsClickable* checkCord(CurrentClick *cc, int x, int y, MouseStruct mouse)
-{
+IsClickable* checkCord(CurrentClick *cc, int x, int y) {
 	//bool found = false;
-	for (vector<ClickArea>::reverse_iterator it = cc->UI.rbegin(); it != cc->UI.rend(); ++it) {
-		if (it->area.x < mouse.x && mouse.x < it->area.x + it->area.w &&
-			it->area.y < mouse.y && mouse.y < it->area.y + it->area.h) {
-			for (vector<IsClickable*>::reverse_iterator jt = it->clicks.rbegin(); jt != it->clicks.rend(); ++jt) {
+	for (vector<ClickArea*>::reverse_iterator it = cc->UI.rbegin(); it != cc->UI.rend(); ++it) {
+		ClickArea* cc = *it;
+		if (cc->area.x < x && x < cc->area.x + cc->area.w &&
+			cc->area.y < y && y < cc->area.y + cc->area.h) {
+			for (vector<IsClickable*>::reverse_iterator jt = cc->clicks.rbegin(); jt != cc->clicks.rend(); ++jt) {
 				IsClickable* ic = *jt;
-				if (ic->area.x < mouse.x && mouse.x < ic->area.x + ic->area.w &&
-					ic->area.y < mouse.y && mouse.y < ic->area.y + ic->area.h) {
+				if (ic->area.x < x && x < ic->area.x + ic->area.w &&
+					ic->area.y < y && y < ic->area.y + ic->area.h) {
 					return ic;
 					break;
 				}
@@ -60,13 +95,14 @@ IsClickable* checkCord(CurrentClick *cc, int x, int y, MouseStruct mouse)
 		}
 	}
 
-	for (vector<ClickArea>::reverse_iterator it = cc->Popup.rbegin(); it != cc->Popup.rend(); ++it) {
-		if (it->area.x < mouse.x && mouse.x < it->area.x + it->area.w &&
-			it->area.y < mouse.y && mouse.y < it->area.y + it->area.h) {
-			for (vector<IsClickable*>::reverse_iterator jt = it->clicks.rbegin(); jt != it->clicks.rend(); ++jt) {
+	for (vector<ClickArea*>::reverse_iterator it = cc->Popup.rbegin(); it != cc->Popup.rend(); ++it) {
+		ClickArea* cc = *it;
+		if (cc->area.x < x && x < cc->area.x + cc->area.w &&
+			cc->area.y < y && y < cc->area.y + cc->area.h) {
+			for (vector<IsClickable*>::reverse_iterator jt = cc->clicks.rbegin(); jt != cc->clicks.rend(); ++jt) {
 				IsClickable* ic = *jt;
-				if (ic->area.x < mouse.x && mouse.x < ic->area.x + ic->area.w &&
-					ic->area.y < mouse.y && mouse.y < ic->area.y + ic->area.h) {
+				if (ic->area.x < x && x < ic->area.x + ic->area.w &&
+					ic->area.y < y && y < ic->area.y + ic->area.h) {
 					return ic;
 					break;
 				}
@@ -76,13 +112,14 @@ IsClickable* checkCord(CurrentClick *cc, int x, int y, MouseStruct mouse)
 	}
 
 	// TODO: Make the coordinates game coordinates.
-	for (vector<ClickArea>::reverse_iterator it = cc->Game.rbegin(); it != cc->Game.rend(); ++it) {
-		if (it->area.x < mouse.x && mouse.x < it->area.x + it->area.w &&
-			it->area.y < mouse.y && mouse.y < it->area.y + it->area.h) {
-			for (vector<IsClickable*>::reverse_iterator jt = it->clicks.rbegin(); jt != it->clicks.rend(); ++jt) {
+	for (vector<ClickArea*>::reverse_iterator it = cc->Game.rbegin(); it != cc->Game.rend(); ++it) {
+		ClickArea* cc = *it;
+		if (cc->area.x < x && x < cc->area.x + cc->area.w &&
+			cc->area.y < y && y < cc->area.y + cc->area.h) {
+			for (vector<IsClickable*>::reverse_iterator jt = cc->clicks.rbegin(); jt != cc->clicks.rend(); ++jt) {
 				IsClickable* ic = *jt;
-				if (ic->area.x < mouse.x && mouse.x < ic->area.x + ic->area.w &&
-					ic->area.y < mouse.y && mouse.y < ic->area.y + ic->area.h) {
+				if (ic->area.x < x && x < ic->area.x + ic->area.w &&
+					ic->area.y < y && y < ic->area.y + ic->area.h) {
 					return ic;
 					break;
 				}
@@ -90,6 +127,7 @@ IsClickable* checkCord(CurrentClick *cc, int x, int y, MouseStruct mouse)
 			break;
 		}
 	}
+
 	return nullptr;
 }
 
@@ -114,21 +152,39 @@ bool loadLevel(vector<GameObject *>* objects, vector<IsClickable *>* clickable,
 	/*	So we can go through all buttons alter on.
 		Also the destuctors are all called when the "button" object gets
 		destroyed, which is at the final return statement.*/
-	GameObjClick *button = new GameObjClick;
-	button->x = 0;
-	button->y = 0;
-	button->image = media->images.at(0);
-	button->area = SDL_Rect{ 0,0,media->images.at(0)->width,
-							media->images.at(0)->height};
+	GameObjClick *button = new GameObjClick(0,0, media->images.at(0), btnHello,
+		(void*)(new btnHelloParameter{ "Alexander, Tim & Jacob!" }));
 
-	button->function = btnHello;
-	button->data = (void*)(new btnHelloParameter{ "Alexander, Tim & Jacob!" });
+	GameObjClick *c0 = new GameObjClick(0, 200, media->images.at(1), btnHello,
+		(void*)(new btnHelloParameter{ "c0!" }));
+
+	GameObjClick *p = new GameObjClick(200, 200, media->images.at(0), btnHello,
+		(void*)(new btnHelloParameter{ "p!" }));
+
+	GameObjClick *p0 = new GameObjClick(200, 200, media->images.at(1), btnHello,
+		(void*)(new btnHelloParameter{ "p0!" }));
+
+	GameObjClick *px = new GameObjClick(260, 200, media->images.at(1), btnHello,
+		(void*)(new btnHelloParameter{ "px!" }));
+
+	GameObjClick *ui0 = new GameObjClick(0, 420, media->images.at(1), btnHello, //blaze it
+		(void*)(new btnHelloParameter{ "ui0!" }));
 
 	clickable->push_back(button);
+	clickable->push_back(c0);
+	clickable->push_back(p);
+	clickable->push_back(p0);
+	clickable->push_back(px);
+	clickable->push_back(ui0);
 
 	objects->push_back(obj);
 	objects->push_back(obj2);
 	objects->push_back(button);
+	objects->push_back(c0);
+	objects->push_back(p);
+	objects->push_back(p0);
+	objects->push_back(px);
+	objects->push_back(ui0);
 	
 
 	return true;
@@ -497,7 +553,7 @@ void render(WindowStruct *window, GameObject *obj, Camera *cam){
 								0, NULL, SDL_FLIP_NONE);
 }
 
-void close(WindowStruct *window, Media& media, vector<GameObject*>& objects){
+void close(WindowStruct *window, Media& media, vector<GameObject*>& objects, CurrentClick* cc){
 	for (Image* img : media.images)
 	{
 		img->~Image();
@@ -514,6 +570,8 @@ void close(WindowStruct *window, Media& media, vector<GameObject*>& objects){
 	for(Font* f : media.fonts){
 		f->~Font();
 	}
+
+	cleanClickAreas(cc);
 
 	for (GameObject* obj : objects) {
 		delete obj;
@@ -549,6 +607,7 @@ int main(int argc, char *argv[]){
 	Media media;
 	bool running = loadMedia(&media, "manifest", window.render);
 
+	CurrentClick currClick;
 	vector<IsClickable*> clickable;
 	vector<GameObject*> objects;
 
@@ -565,8 +624,12 @@ int main(int argc, char *argv[]){
 		
 			media.images.push_back(new Image(media.fonts.at(0),
 						"Hello Jacob!", {0,0,0}, window.render));
+			
+			//Clickable areas
+			buildClickAreas(&currClick, clickable);
 		}
 	}
+	pauseAll();
 
 	Camera cam;
 	cam.x = 0;
@@ -593,7 +656,7 @@ int main(int argc, char *argv[]){
 		mouse.scrollUp = 0;
 
 		// Fading out of continous sound test 
-		if(ticks == 180){
+		/*if(ticks == 180){
 			pauseAllSound();
 		}
 		if(ticks == 240){
@@ -624,7 +687,7 @@ int main(int argc, char *argv[]){
 		else if(ticks == 1300){
 			resumeAll();
 		}
-		ticks++;
+		ticks++;*/
 
 		//Start handling events.
 		SDL_Event event;
@@ -664,23 +727,18 @@ int main(int argc, char *argv[]){
 			}
 		}
 
-		//Simple button test
-		if (mouse.buttons[0].isReleased)
-		{
-			for (const IsClickable* c : clickable) {
-				if (c->area.x < mouse.x && mouse.x < c->area.x + c->area.w &&
-					c->area.y < mouse.y && mouse.y < c->area.y + c->area.h) {
-					c->function(c->data);
-				}
-			}
+		//More advanced simple button test
+		IsClickable* clicked = checkCord(&currClick, mouse.x, mouse.y);
+		if (clicked != nullptr && mouse.buttons[0].isReleased) {
+			clicked->function(clicked->data);
 		}
 
 		objects.at(0)->x = mouse.x - objects.at(0)->image->width / 2;
 		objects.at(0)->y = mouse.y -  objects.at(0)->image->height / 2;
 
-		render(&window, media.images.at(0), 0, 120);
-		render(&window, media.images.at(0), 120, 120, &cam);
-		render(&window, media.images.at(1), 120, 300);
+		//render(&window, media.images.at(0), 0, 120);
+		//render(&window, media.images.at(0), 120, 120, &cam);
+		render(&window, media.images.at(2), 120, 300);
 		
 		for(GameObject* obj : objects){
 			render(&window, obj, &cam);
@@ -697,7 +755,7 @@ int main(int argc, char *argv[]){
 		SDL_RenderPresent(window.render);
 	}
 
-	close(&window, media, objects);
+	close(&window, media, objects, &currClick);
 
 	return 0;
 }

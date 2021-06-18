@@ -112,7 +112,7 @@ struct Sound {
 struct IsClickable {
 	SDL_Rect area; //Area that is clickable
 	void(*function)(void*); //The function being called when clicked
-	void* data; //The data sent into the function
+	void* data = nullptr; //The data sent into the function
 
 	// Destructor to delete the data, as it needs to be put on the heap (I think in most cases)
 	virtual ~IsClickable() {
@@ -120,17 +120,6 @@ struct IsClickable {
 		data = nullptr;
 		printf("Data for a clickable thing has been freed!\n");
 	}
-};
-
-struct ClickArea{
-	SDL_Rect area;
-	std::vector<IsClickable*> clicks;
-};
-
-struct CurrentClick {
-	std::vector<ClickArea> UI;
-	std::vector<ClickArea> Popup;
-	std::vector<ClickArea> Game;
 };
 
 struct GameObject {
@@ -150,8 +139,37 @@ struct GameObject {
 	A clickable version of GameObject
 */
 struct GameObjClick : GameObject, IsClickable {
+	GameObjClick(int xPos, int yPos, Image *img, void(*func)(void*), void* d) {
+		x = xPos;
+		y = yPos;
+		image = img;
+		
+		area = SDL_Rect{x, y, image->width, image->height};
+		function = func;
+		data = d;
+	}
+	GameObjClick(int xPos, int yPos, Image *img, SDL_Rect ar, void(*func)(void*), void* d) {
+		x = xPos;
+		y = yPos;
+		image = img;
 
+		area = ar;
+		function = func;
+		data = d;
+	}
 };
+
+struct ClickArea {
+	SDL_Rect area;
+	std::vector<IsClickable*> clicks;
+};
+
+struct CurrentClick {
+	std::vector<ClickArea*> UI;
+	std::vector<ClickArea*> Popup;
+	std::vector<ClickArea*> Game;
+};
+
 
 /*
 	An object contain all information about the mouse.
