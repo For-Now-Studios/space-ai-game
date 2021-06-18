@@ -1,5 +1,5 @@
 #include "structs.h"
-#include "config.h"
+#include "globals.h"
 
 int masterVolume = MIX_MAX_VOLUME / 2; //The baseline volume
 

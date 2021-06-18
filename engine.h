@@ -23,3 +23,7 @@ int playSound(Sound *sound, int loops, double volume, int fadeTime);
 int playSound(Sound *sound, int loops, double volume);
 int playSound(Sound *sound, int loops);
 int playSound(Sound *sound);
+
+// Camera.cpp
+SDL_Rect translateToGame(const Camera *camera, const SDL_Rect *obj);
+SDL_Rect translateToCamera(const Camera *camera, const SDL_Rect *obj);
