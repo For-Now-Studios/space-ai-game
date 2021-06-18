@@ -127,7 +127,7 @@ struct GameObject {
 	int x;
 	int y;
 
-	void moveBy(int xDir, int yDir) {
+	virtual void moveBy(int xDir, int yDir) {
 		x += xDir;
 		y += yDir;
 	}
@@ -177,6 +177,8 @@ struct ClickArea {
 };
 
 struct CurrentClick {
+	int numChars[2];
+	std::vector<IsClickable*> Characters;
 	std::vector<ClickArea*> UI;
 	std::vector<ClickArea*> Popup;
 	std::vector<ClickArea*> Game;

@@ -28,6 +28,10 @@ void btnHello(void *cntxt)
 }
 
 void buildClickAreas(CurrentClick *cc, vector<IsClickable*> clickable) {
+	cc->Characters.push_back(clickable.at(1));
+	cc->numChars[0] = 1;
+	cc->numChars[1] = 0;
+
 	//UI
 	ClickArea *UI = new ClickArea;
 	UI->area = SDL_Rect{0, 420, SCREEN_WIDTH, 60};
@@ -45,10 +49,10 @@ void buildClickAreas(CurrentClick *cc, vector<IsClickable*> clickable) {
 	S0->clicks.push_back(clickable.at(1));
 
 	ClickArea *S1 = new ClickArea;
-	S1->area = SDL_Rect{0, SCREEN_WIDTH/2, SCREEN_WIDTH/2,SCREEN_HEIGHT};
-
-	cc->Game.push_back(S1);
+	S1->area = SDL_Rect{SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT};
+	
 	cc->Game.push_back(S0);
+	cc->Game.push_back(S1);
 }
 
 void cleanClickAreas(CurrentClick *cc) {
@@ -81,20 +85,36 @@ void closePopup(CurrentClick *cc, int index, vector<GameObject *>* objects, int 
 	}
 }
 
+void addCharacters(CurrentClick *cc, IsClickable* character) {
+	for (int i = 0; i < cc->Game.size(); i++) {
+		if (SDL_HasIntersection(&cc->Game.at(i)->area, &character->area)) {
+			cc->Game.at(i)->clicks.push_back(character);
+			cc->numChars[i]++;
+		}
+	}
+}
 void updateClickAreas(CurrentClick *cc) {
-
+	for(int i = 0; i < cc->Game.size(); i++) {
+		for (int j = 0; j < cc->numChars[i]; j++) {
+			cc->Game.at(i)->clicks.pop_back();
+		}
+		cc->numChars[i] = 0;
+	}
+	for (IsClickable* character : cc->Characters) {
+		addCharacters(cc, character);
+	}
 }
 
 IsClickable* checkCord(CurrentClick *cc, int x, int y) {
 	//bool found = false;
 	for (vector<ClickArea*>::reverse_iterator it = cc->UI.rbegin(); it != cc->UI.rend(); ++it) {
-		ClickArea* cc = *it;
-		printf("check00\n");
-		if (cc->area.x < x && x < cc->area.x + cc->area.w &&
-			cc->area.y < y && y < cc->area.y + cc->area.h) {
-			for (vector<IsClickable*>::reverse_iterator jt = cc->clicks.rbegin(); jt != cc->clicks.rend(); ++jt) {
+		ClickArea* ca = *it;
+		//printf("check00\n");
+		if (ca->area.x < x && x < ca->area.x + ca->area.w &&
+			ca->area.y < y && y < ca->area.y + ca->area.h) {
+			for (vector<IsClickable*>::reverse_iterator jt = ca->clicks.rbegin(); jt != ca->clicks.rend(); ++jt) {
 				IsClickable* ic = *jt;
-				printf("check01\n");
+				//printf("check01\n");
 				if (ic->area.x < x && x < ic->area.x + ic->area.w &&
 					ic->area.y < y && y < ic->area.y + ic->area.h) {
 					return ic;
@@ -106,13 +126,13 @@ IsClickable* checkCord(CurrentClick *cc, int x, int y) {
 	}
 
 	for (vector<ClickArea*>::reverse_iterator it = cc->Popup.rbegin(); it != cc->Popup.rend(); ++it) {
-		ClickArea* cc = *it;
-		printf("check10\n");
-		if (cc->area.x < x && x < cc->area.x + cc->area.w &&
-			cc->area.y < y && y < cc->area.y + cc->area.h) {
-			for (vector<IsClickable*>::reverse_iterator jt = cc->clicks.rbegin(); jt != cc->clicks.rend(); ++jt) {
+		ClickArea* ca = *it;
+		//printf("check10\n");
+		if (ca->area.x < x && x < ca->area.x + ca->area.w &&
+			ca->area.y < y && y < ca->area.y + ca->area.h) {
+			for (vector<IsClickable*>::reverse_iterator jt = ca->clicks.rbegin(); jt != ca->clicks.rend(); ++jt) {
 				IsClickable* ic = *jt;
-				printf("check11\n");
+				//printf("check11\n");
 				if (ic->area.x < x && x < ic->area.x + ic->area.w &&
 					ic->area.y < y && y < ic->area.y + ic->area.h) {
 					return ic;
@@ -125,13 +145,13 @@ IsClickable* checkCord(CurrentClick *cc, int x, int y) {
 
 	// TODO: Make the coordinates game coordinates.
 	for (vector<ClickArea*>::reverse_iterator it = cc->Game.rbegin(); it != cc->Game.rend(); ++it) {
-		ClickArea* cc = *it;
-		printf("check20\n");
-		if (cc->area.x < x && x < cc->area.x + cc->area.w &&
-			cc->area.y < y && y < cc->area.y + cc->area.h) {
-			for (vector<IsClickable*>::reverse_iterator jt = cc->clicks.rbegin(); jt != cc->clicks.rend(); ++jt) {
+		ClickArea* ca = *it;
+		//printf("check20\n");
+		if (ca->area.x < x && x < ca->area.x + ca->area.w &&
+			ca->area.y < y && y < ca->area.y + ca->area.h) {
+			for (vector<IsClickable*>::reverse_iterator jt = ca->clicks.rbegin(); jt != ca->clicks.rend(); ++jt) {
 				IsClickable* ic = *jt;
-				printf("check21\n");
+				//printf("check21\n");
 				if (ic->area.x < x && x < ic->area.x + ic->area.w &&
 					ic->area.y < y && y < ic->area.y + ic->area.h) {
 					return ic;
@@ -695,6 +715,8 @@ int main(int argc, char *argv[]){
 
 	printf("Initialization done\n");
 
+	int speed = 5; //For testing characters
+
 	// The Loop
 	int ticks = 0;
 	while(running){
@@ -784,10 +806,17 @@ int main(int argc, char *argv[]){
 				clicked->function(clicked->data);
 			}
 		}
-		
+
+		// Testing moving characters
+		objects.at(3)->moveBy(speed, 0);
+		if (objects.at(3)->x > SCREEN_WIDTH - 60 || objects.at(3)->x < 1) {
+			speed *= -1;
+		}
+		updateClickAreas(&currClick);
+		//printf("S0: %d, S1: %d\n", currClick.numChars[0], currClick.numChars[1]); //Prints the amount of characters for each part of the screen
 
 		objects.at(0)->x = mouse.x - objects.at(0)->image->width / 2;
-		objects.at(0)->y = mouse.y -  objects.at(0)->image->height / 2;
+		objects.at(0)->y = mouse.y - objects.at(0)->image->height / 2;
 
 		//render(&window, media.images.at(0), 0, 120);
 		//render(&window, media.images.at(0), 120, 120, &cam);
