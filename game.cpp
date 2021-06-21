@@ -20,13 +20,230 @@ void btnHello(void *cntxt)
 }
 
 /*
+	Builds the clickable areas.
+*/
+void buildClickAreas(CurrentClick *cc, vector<IsClickable*> clickable) {
+	cc->Characters.push_back(clickable.at(1));
+	cc->numChars[0] = 1;
+	cc->numChars[1] = 0;
+
+	//UI
+	ClickArea *UI = new ClickArea;
+	UI->area = SDL_Rect{0, 420, SCREEN_WIDTH, 60};
+	UI->clicks.push_back(clickable.at(2));
+
+	cc->UI.push_back(UI);
+
+	//Popup
+	//nothign in the start
+
+	//Game
+	ClickArea *S0 = new ClickArea;
+	S0->area = SDL_Rect{0, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT};
+	S0->clicks.push_back(clickable.at(0));
+	S0->clicks.push_back(clickable.at(1));
+
+	ClickArea *S1 = new ClickArea;
+	S1->area = SDL_Rect{SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT};
+	
+	cc->Game.push_back(S0);
+	cc->Game.push_back(S1);
+}
+
+/*
+	Cleans the memory of the clickable areas.
+*/
+void cleanClickAreas(CurrentClick *cc) {
+	for (ClickArea* ca : cc->UI) {
+		delete ca;
+	}
+	for (ClickArea* ca : cc->Popup) {
+		delete ca;
+	}
+	for (ClickArea* ca : cc->Game) {
+		delete ca;
+	}
+}
+
+/*
+	Adds a popup to the game.
+	Returns the index.
+*/
+int addPopup(CurrentClick *cc, ClickArea* area) {
+	cc->Popup.push_back(area);
+	return cc->Popup.size() - 1;
+}
+
+/*
+	Closes specified popup and deletes the objects from the game.
+*/
+void closePopup(CurrentClick *cc, int index, vector<GameObject *>* objects, int first, int last) {
+	delete (*cc->Popup.erase(cc->Popup.begin() + index));
+	vector<GameObject *>::iterator buttons = objects->erase(objects->begin() + first, objects->begin() + last + 1);
+	for (int i = first; i < last+1; i++)
+	{
+		delete (*buttons);
+		buttons++;
+	}
+}
+
+/*
+	Adds a character and technically anything moving.
+*/
+void addCharacters(CurrentClick *cc, IsClickable* character) {
+	for (int i = 0; i < cc->Game.size(); i++) {
+		if (SDL_HasIntersection(&cc->Game.at(i)->area, &character->area)) {
+			cc->Game.at(i)->clicks.push_back(character);
+			cc->numChars[i]++;
+		}
+	}
+}
+
+/*
+	Updates all moving clickable things.
+*/
+void updateClickAreas(CurrentClick *cc) {
+	for(int i = 0; i < cc->Game.size(); i++) {
+		for (int j = 0; j < cc->numChars[i]; j++) {
+			cc->Game.at(i)->clicks.pop_back();
+		}
+		cc->numChars[i] = 0;
+	}
+	for (IsClickable* character : cc->Characters) {
+		addCharacters(cc, character);
+	}
+}
+
+/*
+	Checks specified coordinates on current clickable area.
+	It checks for one item only and check in this order
+	1: UI
+	2: Popup
+	3: Game
+	TODO: Have focused popups be on top and test it
+*/
+IsClickable* checkCord(CurrentClick *cc, int x, int y) {
+	for (vector<ClickArea*>::reverse_iterator it = cc->UI.rbegin(); it != cc->UI.rend(); ++it) {
+		ClickArea* ca = *it;
+		//printf("check00\n");
+		if (ca->area.x < x && x < ca->area.x + ca->area.w &&
+			ca->area.y < y && y < ca->area.y + ca->area.h) {
+			for (vector<IsClickable*>::reverse_iterator jt = ca->clicks.rbegin(); jt != ca->clicks.rend(); ++jt) {
+				IsClickable* ic = *jt;
+				//printf("check01\n");
+				if (ic->area.x < x && x < ic->area.x + ic->area.w &&
+					ic->area.y < y && y < ic->area.y + ic->area.h) {
+					return ic;
+					break;
+				}
+			}
+			break;
+		}
+	}
+
+	for (vector<ClickArea*>::reverse_iterator it = cc->Popup.rbegin(); it != cc->Popup.rend(); ++it) {
+		ClickArea* ca = *it;
+		//printf("check10\n");
+		if (ca->area.x < x && x < ca->area.x + ca->area.w &&
+			ca->area.y < y && y < ca->area.y + ca->area.h) {
+			for (vector<IsClickable*>::reverse_iterator jt = ca->clicks.rbegin(); jt != ca->clicks.rend(); ++jt) {
+				IsClickable* ic = *jt;
+				//printf("check11\n");
+				if (ic->area.x < x && x < ic->area.x + ic->area.w &&
+					ic->area.y < y && y < ic->area.y + ic->area.h) {
+					return ic;
+					break;
+				}
+			}
+			break;
+		}
+	}
+
+	// TODO: Make the coordinates game coordinates.
+	for (vector<ClickArea*>::reverse_iterator it = cc->Game.rbegin(); it != cc->Game.rend(); ++it) {
+		ClickArea* ca = *it;
+		//printf("check20\n");
+		if (ca->area.x < x && x < ca->area.x + ca->area.w &&
+			ca->area.y < y && y < ca->area.y + ca->area.h) {
+			for (vector<IsClickable*>::reverse_iterator jt = ca->clicks.rbegin(); jt != ca->clicks.rend(); ++jt) {
+				IsClickable* ic = *jt;
+				//printf("check21\n");
+				if (ic->area.x < x && x < ic->area.x + ic->area.w &&
+					ic->area.y < y && y < ic->area.y + ic->area.h) {
+					return ic;
+					break;
+				}
+			}
+			break;
+		}
+	}
+
+	return nullptr;
+}
+
+/*
+	Test popup
+*/
+struct popPopUpPars {
+	CurrentClick *cc;
+	bool poppedUp;
+	vector<GameObject *>* objects;
+	Media* media;
+};
+struct closePopUpPars {
+	int index;
+	int first;
+	int last;
+	CurrentClick *cc;
+	popPopUpPars *pPUP;
+	vector<GameObject *>* objects;
+};
+void closePopUp(void *cntxt) {
+	closePopUpPars *pars = (closePopUpPars*)cntxt;
+	closePopup(pars->cc, pars->index, pars->objects, pars->first, pars->last);
+	printf("Hello %s!\n", "Closed a popup");
+	pars->pPUP->poppedUp = false;
+}
+void popPopUp(void *cntxt) {
+	popPopUpPars *pars = (popPopUpPars*)cntxt;
+	if (!pars->poppedUp) {
+		GameObjClick *p = new GameObjClick(200, 200, pars->media->images.at(0), btnHello,
+			(void*)(new btnHelloParameter{ "p!" }));
+
+		GameObjClick *p0 = new GameObjClick(200, 200, pars->media->images.at(1), btnHello,
+			(void*)(new btnHelloParameter{ "p0!" }));
+
+		closePopUpPars* cPUP = new closePopUpPars{0,0,0,pars->cc,pars};
+		GameObjClick *px = new GameObjClick(260, 200, pars->media->images.at(1), closePopUp,
+			(void*)(cPUP));
+
+		pars->objects->push_back(p);
+		cPUP->first = pars->objects->size() - 1;
+		pars->objects->push_back(p0);
+		pars->objects->push_back(px);
+		cPUP->last = pars->objects->size() - 1;
+
+		cPUP->objects = pars->objects;
+
+		ClickArea* P = new ClickArea;
+		P->area = SDL_Rect{ 200, 200, 120, 120 };
+		P->clicks.push_back(p);
+		P->clicks.push_back(p0);
+		P->clicks.push_back(px);
+		cPUP->index = addPopup(pars->cc, P);
+		printf("Hello %s!\n", "Made a popup");
+		pars->poppedUp = true;
+	}
+}
+
+/*
 	TODO: Maybe make this function load data from a level file?
 	
 	NOTE: Currently just a collection of used game objects collected in a singular
 	space for ease of use
 */
 bool loadLevel(vector<GameObject *>* objects, vector<IsClickable *>* clickable,
-							Media* media, const char *path){
+							Media* media, const char *path, CurrentClick* cc){
 	GameObject *obj = new GameObject;
 	obj->image = media->images.at(0);
 	obj->x = 0;
@@ -37,24 +254,25 @@ bool loadLevel(vector<GameObject *>* objects, vector<IsClickable *>* clickable,
 	obj2->x = 120;
 	obj2->y = 0;
 
-	/*	So we can go through all buttons alter on.
-		Also the destuctors are all called when the "button" object gets
-		destroyed, which is at the final return statement.*/
-	GameObjClick *button = new GameObjClick;
-	button->x = 0;
-	button->y = 0;
-	button->image = media->images.at(0);
-	button->area = SDL_Rect{ 0,0,media->images.at(0)->width,
-							media->images.at(0)->height};
+	/*	So we can go through all buttons later on.*/
+	GameObjClick *c0 = new GameObjClick(0, 200, media->images.at(1), btnHello,
+		(void*)(new btnHelloParameter{ "c0!" }));
+	
+	GameObjClick *button = new GameObjClick(0, 0, media->images.at(0), popPopUp,
+		(void*)(new popPopUpPars{cc, false, objects, media}));
 
-	button->function = btnHello;
-	button->data = (void*)(new btnHelloParameter{ "Alexander, Tim & Jacob!" });
+	GameObjClick *ui0 = new GameObjClick(0, 420, media->images.at(1), btnHello, //blaze it
+		(void*)(new btnHelloParameter{ "ui0!" }));
 
 	clickable->push_back(button);
+	clickable->push_back(c0);
+	clickable->push_back(ui0);
 
 	objects->push_back(obj);
 	objects->push_back(obj2);
 	objects->push_back(button);
+	objects->push_back(c0);
+	objects->push_back(ui0);
 	
 
 	return true;
@@ -119,7 +337,7 @@ bool init(WindowStruct *window) {
 	return true;
 }
 
-void close(WindowStruct *window, Media& media, vector<GameObject*>& objects){
+void close(WindowStruct *window, Media& media, vector<GameObject*>& objects, CurrentClick* cc){
 	for (Image* img : media.images)
 	{
 		img->~Image();
@@ -136,6 +354,8 @@ void close(WindowStruct *window, Media& media, vector<GameObject*>& objects){
 	for(Font* f : media.fonts){
 		f->~Font();
 	}
+
+	cleanClickAreas(cc);
 
 	for (GameObject* obj : objects) {
 		delete obj;
@@ -171,12 +391,13 @@ int main(int argc, char *argv[]){
 	Media media;
 	bool running = loadMedia(&media, "manifest", window.render);
 
+	CurrentClick currClick;
 	vector<IsClickable*> clickable;
 	vector<GameObject*> objects;
 
 	int channel; //MUSIC TEST
 	if(running){
-		if(loadLevel(&objects, &clickable, &media, "")){
+		if(loadLevel(&objects, &clickable, &media, "", &currClick)){
 			printf("Game object done!\n");
 
 			// MUSIC TEST
@@ -187,8 +408,13 @@ int main(int argc, char *argv[]){
 		
 			media.images.push_back(new Image(media.fonts.at(0),
 						"Hello Jacob!", {0,0,0}, window.render));
+			
+			//Clickable areas
+			buildClickAreas(&currClick, clickable);
 		}
 	}
+	//Pause the music & sound
+	pauseAll();
 
 	Camera cam;
 	cam.x = 0;
@@ -204,6 +430,8 @@ int main(int argc, char *argv[]){
 
 	printf("Initialization done\n");
 
+	int speed = 5; //For testing characters
+
 	// The Loop
 	int ticks = 0;
 	while(running){
@@ -215,7 +443,7 @@ int main(int argc, char *argv[]){
 		mouse.scrollUp = 0;
 
 		// Fading out of continous sound test 
-		if(ticks == 180){
+		/*if(ticks == 180){
 			pauseAllSound();
 		}
 		if(ticks == 240){
@@ -246,7 +474,7 @@ int main(int argc, char *argv[]){
 		else if(ticks == 1300){
 			resumeAll();
 		}
-		ticks++;
+		ticks++;*/
 
 		//Start handling events.
 		SDL_Event event;
@@ -286,28 +514,33 @@ int main(int argc, char *argv[]){
 			}
 		}
 
-		//Simple button test
-		if (mouse.buttons[0].isReleased)
-		{
-			for(const IsClickable* c : clickable) {
-				SDL_Rect rec = translateToCamera(&cam, &c->area);
-				if (rec.x < mouse.x && mouse.x < rec.x + rec.w &&
-					rec.y < mouse.y && mouse.y < rec.y + rec.h) {
-					c->function(c->data);
-				}
+		//More advanced simple button test
+		if (mouse.buttons[0].isReleased) {
+			IsClickable* clicked = checkCord(&currClick, mouse.x, mouse.y);
+			if (clicked != nullptr) {
+				clicked->function(clicked->data);
 			}
 		}
+
+		// Testing moving characters
+		objects.at(3)->moveBy(speed, 0);
+		if (objects.at(3)->x > SCREEN_WIDTH - 60 || objects.at(3)->x < 1) {
+			speed *= -1;
+		}
+		updateClickAreas(&currClick);
+    //Prints the amount of characters for each part of the screen
+		//printf("S0: %d, S1: %d\n", currClick.numChars[0], currClick.numChars[1]);
 
 		SDL_Rect temp = {mouse.x, mouse.y, 1, 1};
 		SDL_Rect trans = translateToGame(&cam, &temp);
 		objects.at(0)->x = trans.x - objects.at(0)->image->width / 2;
 		objects.at(0)->y = trans.y -  objects.at(0)->image->height / 2;
 
-		render(&window, media.images.at(0), 0, 120);
-		render(&window, media.images.at(0), 120, 120, &cam);
-		render(&window, media.images.at(1), 120, 300);
+		//render(&window, media.images.at(0), 0, 120);
+		//render(&window, media.images.at(0), 120, 120, &cam);
+		render(&window, media.images.at(2), 120, 300);
 		
-		for(GameObject* obj : objects){
+		for(GameObject* obj : objects) {
 			render(&window, obj, &cam);
 		}
 
@@ -322,7 +555,7 @@ int main(int argc, char *argv[]){
 		SDL_RenderPresent(window.render);
 	}
 
-	close(&window, media, objects);
+	close(&window, media, objects, &currClick);
 
 	return 0;
 }

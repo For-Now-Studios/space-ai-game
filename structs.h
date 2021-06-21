@@ -114,7 +114,7 @@ struct Sound {
 struct IsClickable {
 	SDL_Rect area; //Area that is clickable
 	void(*function)(void*); //The function being called when clicked
-	void* data; //The data sent into the function
+	void* data = nullptr; //The data sent into the function
 
 	// Destructor to delete the data, as it needs to be put on the heap (I think in most cases)
 	virtual ~IsClickable() {
@@ -128,6 +128,12 @@ struct GameObject {
 	//Game Coordinates
 	int x;
 	int y;
+	
+	// Function to move the object, implemented mostly because so children can make their own move functions and be run.
+	virtual void moveBy(int xDir, int yDir) { 
+		x += xDir;
+		y += yDir;
+	}
 
 	//Images
 	Image *image;
@@ -141,8 +147,55 @@ struct GameObject {
 	A clickable version of GameObject
 */
 struct GameObjClick : GameObject, IsClickable {
+	GameObjClick(int xPos, int yPos, Image *img, void(*func)(void*), void* d) {
+		x = xPos;
+		y = yPos;
+		image = img;
+		
+		area = SDL_Rect{x, y, image->width, image->height};
+		function = func;
+		data = d;
+	}
+	GameObjClick(int xPos, int yPos, Image *img, SDL_Rect ar, void(*func)(void*), void* d) {
+		x = xPos;
+		y = yPos;
+		image = img;
 
+		area = ar;
+		function = func;
+		data = d;
+	}
+
+	void moveBy(int xDir, int yDir) {
+		x += xDir;
+		y += yDir;
+		area.x += xDir;
+		area.y += yDir;
+	}
 };
+
+/*
+	A clickable area with a vector containing things that are clickable.
+*/
+struct ClickArea {
+	SDL_Rect area;
+	std::vector<IsClickable*> clicks;
+};
+
+/*
+	Struct for the object that builds up the clickable objects on the screen.
+*/
+struct CurrentClick {
+	//Number of characters per each divide up part of the game.
+	int numChars[2];
+
+	//All clickable characters, though it could be anything moving.
+	std::vector<IsClickable*> Characters; 
+	std::vector<ClickArea*> UI;
+	std::vector<ClickArea*> Popup;
+	std::vector<ClickArea*> Game;
+};
+
 
 /*
 	An object contain all information about the mouse.
