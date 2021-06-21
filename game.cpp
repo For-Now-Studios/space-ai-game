@@ -386,9 +386,17 @@ int main(int argc, char *argv[]){
 	CurrentClick currClick;
 	vector<IsClickable*> clickable;
 	vector<GameObject*> objects;
+	
+	vector<char *> *genders;
+	vector<affectionTrait *> *romance;
+	vector<affectionTrait *> *sexuality;
 
 	int channel; //MUSIC TEST
 	if(running){
+		genders = loadGender("gender.jpeg");
+		romance = loadAffectionTrait("romance.jpeg");
+		sexuality = loadAffectionTrait("sexuality.jpeg");
+
 		if(loadLevel(&objects, &clickable, &media, "", &currClick)){
 			printf("Game object done!\n");
 
@@ -434,40 +442,6 @@ int main(int argc, char *argv[]){
 		mouse.scrollRight = 0;
 		mouse.scrollUp = 0;
 
-		// Fading out of continous sound test 
-		/*if(ticks == 180){
-			pauseAllSound();
-		}
-		if(ticks == 240){
-			resumeAllSound();
-		}
-		else if(ticks == 360){
-			stopSound(channel, 1000);
-		}
-		else if(ticks == 640){
-			switchMusic(media.music.at(1), 0, 1000, 1000);
-		}
-		else if(ticks == 820){
-			pauseMusic();
-		}
-		else if(ticks == 940){
-			resumeMusic();
-			playSound(media.sounds.at(0));
-		}
-		else if(ticks == 1000){
-			pauseAll();
-		}
-		else if(ticks == 1060){
-			resumeAllSound();
-		}
-		else if(ticks == 1180){
-			pauseAll();
-		}
-		else if(ticks == 1300){
-			resumeAll();
-		}
-		ticks++;*/
-
 		//Start handling events.
 		SDL_Event event;
 		while(SDL_PollEvent(&event) != 0){
@@ -508,7 +482,8 @@ int main(int argc, char *argv[]){
 
 		//More advanced simple button test
 		if (mouse.buttons[0].isReleased) {
-			IsClickable* clicked = checkCord(&currClick, mouse.x, mouse.y);
+			IsClickable* clicked = checkCord(&currClick, mouse.x, mouse.y,
+										&cam);
 			if (clicked != nullptr) {
 				clicked->function(clicked->data);
 			}
@@ -520,7 +495,7 @@ int main(int argc, char *argv[]){
 			speed *= -1;
 		}
 		updateClickAreas(&currClick);
-    //Prints the amount of characters for each part of the screen
+		//Prints the amount of characters for each part of the screen
 		//printf("S0: %d, S1: %d\n", currClick.numChars[0], currClick.numChars[1]);
 
 		SDL_Rect temp = {mouse.x, mouse.y, 1, 1};

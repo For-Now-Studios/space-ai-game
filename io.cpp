@@ -2,6 +2,8 @@
 #include "structs.h"
 #include "globals.h"
 
+const int MAX_LINE_LENGTH = 1024;
+
 /*
 	Read the next line of text from the specified open file stream.
 	At max maxLength text can be read, but the actual size of the line is stored
@@ -54,22 +56,101 @@ char **splitString(char *string, int &len, int maxLength){
 }
 
 /*
+	Reads in a list of affection traits from the specified file
+*/
+vector<affectionTrait *> *loadAffectionTrait(const char *path){
+	vector<affectionTrait *> *traits = new vector<affectionTrait *>;
+
+	fstream fs;
+	fs.open(path, fstream::in);
+
+	char buf[MAX_LINE_LENGTH];
+	int len;
+	if(!fileReadLine(&fs, buf, &len, MAX_LINE_LENGTH)){
+		printf("Error whilst reading affection trait from %s!\n", path);
+		traits = nullptr;
+		len = 0;
+	}
+	while(len > 0){
+		int num;
+
+		char **parts = splitString(buf, num, len);
+
+		affectionTrait *t = new affectionTrait;
+		t->name = new char[strlen(parts[0])];
+		t->genders = nullptr;
+		if(num > 1){
+			t->genders = new char *[num - 1];
+			for(int i = 1; i < num; i++){
+				int l = strlen(parts[i]);
+				t->genders[i-1] = new char[l];
+
+				strncpy(t->genders[i-1], parts[i], l);
+			}
+		}
+		t->n = num - 1;
+
+		traits->push_back(t);
+				
+		if(!fileReadLine(&fs, buf, &len, MAX_LINE_LENGTH)){
+			printf("Error whilst reading affection trait from %s!\n", path);
+			traits = nullptr;
+			len = 0;
+		}
+	}
+	
+	fs.close();
+
+	return traits;
+}
+
+/*
+	Reads in all the genders listed in the specified gender file, returning
+	a vector containing them all
+*/
+vector<char *> *loadGender(const char *path){
+	vector<char *> *genders = new vector<char *>();
+
+	fstream fs;
+	fs.open(path, fstream::in);
+
+	char buf[MAX_LINE_LENGTH];
+	int len;
+	if(!fileReadLine(&fs, buf, &len, MAX_LINE_LENGTH)){
+		printf("Error whilst reading genders from %s!\n", path);
+		genders = nullptr;
+		len = 0;
+	}
+	while(len > 0){
+		genders->push_back(buf);
+				
+		if(!fileReadLine(&fs, buf, &len, MAX_LINE_LENGTH)){
+			printf("Error whilst reading genders from %s!\n", path);
+			genders = nullptr;
+			len = 0;
+		}
+	}
+	
+	fs.close();
+
+	return genders;
+}
+
+/*
 	Initializes the specified media object by loading all the media which filepath
 	is specified in the specified manifest file. Returns true if all media was
 	loaded correctly, or false if an error was encountered
 */
 bool loadMedia(Media *media, const char *path, SDL_Renderer *render){
-	const int MAX_FILE_NAME_LENGTH = 1024;
-
 	bool result = true;
 
 	fstream fs;
 	fs.open(path, fstream::in);
 
-	char text[MAX_FILE_NAME_LENGTH];
+	char text[MAX_LINE_LENGTH];
 	int mode = 0;
 	int len;
-	if(!fileReadLine(&fs, text, &len, MAX_FILE_NAME_LENGTH)){
+	if(!fileReadLine(&fs, text, &len, MAX_LINE_LENGTH)){
 		printf("Error reading file paths from file %s!\n", path);
 		result = false;
 		len = 0;
@@ -130,7 +211,7 @@ bool loadMedia(Media *media, const char *path, SDL_Renderer *render){
 			delete parts;
 		}
 
-		if(!fileReadLine(&fs, text, &len, MAX_FILE_NAME_LENGTH)){
+		if(!fileReadLine(&fs, text, &len, MAX_LINE_LENGTH)){
 			printf("Error reading file paths from file %s!\n", path);
 			result = false;
 			break;

@@ -40,3 +40,5 @@ SDL_Rect translateToCamera(const Camera *camera, const SDL_Rect *obj);
 bool fileReadLine(fstream *fs, char *line, int *len, int maxLength);
 char **splitString(char *string, int &len, int maxLength);
 bool loadMedia(Media *media, const char *path, SDL_Renderer *render);
+vector<char *> *loadGender(const char *path);
+vector<affectionTrait *> *loadAffectionTrait(const char *path);

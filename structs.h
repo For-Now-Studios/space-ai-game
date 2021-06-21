@@ -244,3 +244,9 @@ struct Media{
 	std::vector<Music*> music;
 	std::vector<Font*> fonts;
 };
+
+struct affectionTrait{
+	char *name;
+	char **genders;
+	int n;
+};
