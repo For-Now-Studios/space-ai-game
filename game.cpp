@@ -33,7 +33,7 @@ bool loadLevel(vector<GameObject *>* objects, vector<IsClickable *>* clickable,
 	GameObjClick *c0 = new GameObjClick(0, 200, media->images.at(1), btnHello,
 		(void*)(new btnHelloParameter{ "c0!" }));
 	
-	GameObjClick *button = new GameObjClick(0, 0, media->images.at(0), popPopUp,
+	GameObjClick *button = new GameObjClick(0, 0, media->images.at(0), testPopPopUp,
 		(void*)(new popPopUpPars{cc, false, objects, media}));
 
 	GameObjClick *ui0 = new GameObjClick(0, 420, media->images.at(1), btnHello, //blaze it

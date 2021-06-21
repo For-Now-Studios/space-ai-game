@@ -15,13 +15,12 @@ struct popPopUpPars {
 	vector<GameObject *>* objects;
 	Media* media;
 };
+
+
 struct closePopUpPars {
-	int index;
-	int first;
-	int last;
-	CurrentClick *cc;
 	popPopUpPars *pPUP;
-	vector<GameObject *>* objects;
+	ClickReciept *cr;
 };
-void closePopUp(void*);
-void popPopUp(void*);
+
+void testClosePopUp(void*);
+void testPopPopUp(void*);

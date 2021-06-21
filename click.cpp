@@ -3,9 +3,6 @@
 #include "globals.h"
 #include "click.h"
 
-/*
-	Builds the clickable areas.
-*/
 void buildClickAreas(CurrentClick *cc, vector<IsClickable*> clickable) {
 	cc->Characters.push_back(clickable.at(1));
 	cc->numChars[0] = 1;
@@ -34,9 +31,6 @@ void buildClickAreas(CurrentClick *cc, vector<IsClickable*> clickable) {
 	cc->Game.push_back(S1);
 }
 
-/*
-	Cleans the memory of the clickable areas.
-*/
 void cleanClickAreas(CurrentClick *cc) {
 	for (ClickArea* ca : cc->UI) {
 		delete ca;
@@ -49,31 +43,11 @@ void cleanClickAreas(CurrentClick *cc) {
 	}
 }
 
-/*
-	Adds a popup to the game.
-	Returns the index.
-*/
 int addPopup(CurrentClick *cc, ClickArea* area) {
 	cc->Popup.push_back(area);
 	return cc->Popup.size() - 1;
 }
 
-/*
-	Closes specified popup and deletes the objects from the game.
-*/
-void closePopup(CurrentClick *cc, int index, vector<GameObject *>* objects, int first, int last) {
-	delete (*cc->Popup.erase(cc->Popup.begin() + index));
-	vector<GameObject *>::iterator buttons = objects->erase(objects->begin() + first, objects->begin() + last + 1);
-	for (int i = first; i < last + 1; i++)
-	{
-		delete (*buttons);
-		buttons++;
-	}
-}
-
-/*
-	Adds a character and technically anything moving.
-*/
 void addCharacters(CurrentClick *cc, IsClickable* character) {
 	for (int i = 0; i < cc->Game.size(); i++) {
 		if (SDL_HasIntersection(&cc->Game.at(i)->area, &character->area)) {
@@ -83,9 +57,32 @@ void addCharacters(CurrentClick *cc, IsClickable* character) {
 	}
 }
 
-/*
-	Updates all moving clickable things.
-*/
+ClickReciept* createPopup(const vector<IsClickable*>& clicks, const vector<GameObject*>& objs, vector<GameObject*>* currentObjects, CurrentClick *cc, const SDL_Rect& area) {
+	ClickReciept* cr = new ClickReciept;
+	cr->objs[0] = currentObjects->size();
+	for (GameObject* obj : objs) {
+		currentObjects->push_back(obj);
+	}
+	cr->objs[1] = currentObjects->size()-1;
+
+	ClickArea* P = new ClickArea;
+	P->area = area;
+	for (IsClickable* cl : clicks) {
+		P->clicks.push_back(cl);
+	}
+	cr->index = addPopup(cc, P);
+	printf("Hello %s!\n", "Made a popup");
+
+	cr->objects = currentObjects;
+	cr->cc = cc;
+	return cr;
+}
+
+void closePopup(ClickReciept* cr) {
+	delete (*cr->cc->Popup.erase(cr->cc->Popup.begin() + cr->index));
+	cr->objects->erase(cr->objects->begin() + cr->objs[0], cr->objects->begin() + cr->objs[1] + 1);
+}
+
 void updateClickAreas(CurrentClick *cc) {
 	for (int i = 0; i < cc->Game.size(); i++) {
 		for (int j = 0; j < cc->numChars[i]; j++) {
@@ -120,14 +117,6 @@ IsClickable* checkArea(CurrentClick *cc, int x, int y, ClickArea* ca) {
 	return nullptr;
 }
 
-/*
-	Checks specified coordinates on current clickable area.
-	It checks for one item only and check in this order
-	1: UI
-	2: Popup
-	3: Game
-	TODO: Have focused popups be on top and test it
-*/
 IsClickable* checkCord(CurrentClick *cc, int x, int y, Camera* cam) {
 	for (vector<ClickArea*>::reverse_iterator it = cc->UI.rbegin(); it != cc->UI.rend(); ++it) {
 		ClickArea* ca = *it;
