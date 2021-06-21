@@ -122,7 +122,12 @@ IsClickable* checkArea(CurrentClick *cc, int x, int y, ClickArea* ca) {
 	}
 	return nullptr;
 }
-
+/*
+	Focuses the specific ClickAreaPopup.
+	It needs to search throught the other popups for the right one.
+	But only thourgh the popups, so it only increases in time when there is A LOT of popups
+	and you either close or press one that isn't already on top.
+*/
 void focusPopup(CurrentClick *cc, ClickAreaPopup* ca) {
 	for (int i = 0; i < cc->Popup.size(); i++)
 	{

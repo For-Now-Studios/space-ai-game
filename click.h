@@ -63,6 +63,7 @@ struct ClickAreaPopup : ClickArea {
 
 struct ClickReciept {
 	ClickAreaPopup* ca;
+	//Pointer to a vector of objects that need to be rendered for this popup.
 	vector<GameObject*>* renderObjs;
 	CurrentClick *cc;
 	vector<GameObject*>* objects;
@@ -77,9 +78,11 @@ struct CurrentClick {
 
 	//All clickable characters, though it could be anything moving.
 	std::vector<IsClickable*> Characters;
+	//The clickable things on the screen
 	std::vector<ClickArea*> UI;
 	std::vector<ClickAreaPopup*> Popup;
 	std::vector<ClickArea*> Game;
+	//Pointer to a vector of objects that need to be rendered for all popups.
 	std::vector<vector<GameObject*>*> toRender;
 };
 
