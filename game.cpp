@@ -114,6 +114,28 @@ void updateClickAreas(CurrentClick *cc) {
 	}
 }
 
+IsClickable* checkArea(CurrentClick *cc, int x, int y, ClickArea* ca, Camera *cam) {
+	for (vector<IsClickable*>::reverse_iterator jt = ca->clicks.rbegin(); jt != ca->clicks.rend(); ++jt) {
+		IsClickable* ic = *jt;
+		SDL_Rect rec = translateToCamera(cam, &ic->area);
+		if (rec.x < x && x < rec.x + rec.w &&
+			rec.y < y && y < rec.y + rec.h) {
+			return ic;
+		}
+	}
+	return nullptr;
+}
+IsClickable* checkArea(CurrentClick *cc, int x, int y, ClickArea* ca) {
+	for (vector<IsClickable*>::reverse_iterator jt = ca->clicks.rbegin(); jt != ca->clicks.rend(); ++jt) {
+		IsClickable* ic = *jt;
+		if (ic->area.x < x && x < ic->area.x + ic->area.w &&
+			ic->area.y < y && y < ic->area.y + ic->area.h) {
+			return ic;
+		}
+	}
+	return nullptr;
+}
+
 /*
 	Checks specified coordinates on current clickable area.
 	It checks for one item only and check in this order
@@ -122,59 +144,29 @@ void updateClickAreas(CurrentClick *cc) {
 	3: Game
 	TODO: Have focused popups be on top and test it
 */
-IsClickable* checkCord(CurrentClick *cc, int x, int y) {
+IsClickable* checkCord(CurrentClick *cc, int x, int y, Camera* cam) {
 	for (vector<ClickArea*>::reverse_iterator it = cc->UI.rbegin(); it != cc->UI.rend(); ++it) {
 		ClickArea* ca = *it;
-		//printf("check00\n");
 		if (ca->area.x < x && x < ca->area.x + ca->area.w &&
 			ca->area.y < y && y < ca->area.y + ca->area.h) {
-			for (vector<IsClickable*>::reverse_iterator jt = ca->clicks.rbegin(); jt != ca->clicks.rend(); ++jt) {
-				IsClickable* ic = *jt;
-				//printf("check01\n");
-				if (ic->area.x < x && x < ic->area.x + ic->area.w &&
-					ic->area.y < y && y < ic->area.y + ic->area.h) {
-					return ic;
-					break;
-				}
-			}
-			break;
+			return checkArea(cc, x, y, ca);
 		}
 	}
 
 	for (vector<ClickArea*>::reverse_iterator it = cc->Popup.rbegin(); it != cc->Popup.rend(); ++it) {
 		ClickArea* ca = *it;
-		//printf("check10\n");
 		if (ca->area.x < x && x < ca->area.x + ca->area.w &&
 			ca->area.y < y && y < ca->area.y + ca->area.h) {
-			for (vector<IsClickable*>::reverse_iterator jt = ca->clicks.rbegin(); jt != ca->clicks.rend(); ++jt) {
-				IsClickable* ic = *jt;
-				//printf("check11\n");
-				if (ic->area.x < x && x < ic->area.x + ic->area.w &&
-					ic->area.y < y && y < ic->area.y + ic->area.h) {
-					return ic;
-					break;
-				}
-			}
-			break;
+			return checkArea(cc, x, y, ca);
 		}
 	}
 
-	// TODO: Make the coordinates game coordinates.
 	for (vector<ClickArea*>::reverse_iterator it = cc->Game.rbegin(); it != cc->Game.rend(); ++it) {
 		ClickArea* ca = *it;
-		//printf("check20\n");
-		if (ca->area.x < x && x < ca->area.x + ca->area.w &&
-			ca->area.y < y && y < ca->area.y + ca->area.h) {
-			for (vector<IsClickable*>::reverse_iterator jt = ca->clicks.rbegin(); jt != ca->clicks.rend(); ++jt) {
-				IsClickable* ic = *jt;
-				//printf("check21\n");
-				if (ic->area.x < x && x < ic->area.x + ic->area.w &&
-					ic->area.y < y && y < ic->area.y + ic->area.h) {
-					return ic;
-					break;
-				}
-			}
-			break;
+		SDL_Rect rec = translateToCamera(cam, &ca->area);
+		if (rec.x < x && x < rec.x + rec.w &&
+			rec.y < y && y < rec.y + rec.h) {
+			return checkArea(cc, x, y, ca, cam);
 		}
 	}
 
