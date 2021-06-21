@@ -112,8 +112,10 @@ bool init(WindowStruct *window) {
 	return true;
 }
 
-void close(WindowStruct *window, Media& media, vector<GameObject*>& objects, CurrentClick* cc){
-	for (Image* img : media.images)
+void close(WindowStruct *window, Media& media, vector<GameObject*>& objects,
+	CurrentClick* cc, vector<char *> *genders, vector<affectionTrait *> *romance,
+						vector<affectionTrait *> *sexuality){
+	for(Image* img : media.images)
 	{
 		img->~Image();
 	}
@@ -132,9 +134,36 @@ void close(WindowStruct *window, Media& media, vector<GameObject*>& objects, Cur
 
 	cleanClickAreas(cc);
 
-	for (GameObject* obj : objects) {
+	for(GameObject* obj : objects) {
 		delete obj;
 	}
+
+	for(char *t : *genders){
+		delete t;
+	}
+	printf("Freed the genders!\n");
+	
+	for(affectionTrait *t : *romance){
+		delete t->name;
+		for(int i = 0; i < t->n; i++){
+			delete t->genders[i];
+		}
+		delete t->genders;
+
+		delete t;
+	}
+	printf("Freed the romances!\n");
+
+	for(affectionTrait *t : *sexuality){
+		delete t->name;
+		for(int i = 0; i < t->n; i++){
+			delete t->genders[i];
+		}
+		delete t->genders;
+
+		delete t;
+	}
+	printf("Freed the sexuality!\n");
 
 	SDL_DestroyRenderer(window->render);
 	SDL_DestroyWindow(window->window);
@@ -169,9 +198,17 @@ int main(int argc, char *argv[]){
 	CurrentClick currClick;
 	vector<IsClickable*> clickable;
 	vector<GameObject*> objects;
+	
+	vector<char *> *genders;
+	vector<affectionTrait *> *romance;
+	vector<affectionTrait *> *sexuality;
 
 	int channel; //MUSIC TEST
 	if(running){
+		genders = loadGender("gender.jpeg");
+		romance = loadAffectionTrait("romance.jpeg");
+		sexuality = loadAffectionTrait("sexuality.jpeg");
+
 		if(loadLevel(&objects, &clickable, &media, "", &currClick)){
 			printf("Game object done!\n");
 
@@ -207,6 +244,29 @@ int main(int argc, char *argv[]){
 
 	int speed = 5; //For testing characters
 
+	printf("\nFeatures the genders of:\n");
+	for(char *t : *genders){
+		printf("%s\n", t);
+	}
+
+	printf("With a slice of:\n");
+	for(affectionTrait *t : *romance){
+		printf("%s\n", t->name);
+
+		for(int i = 0; i < t->n; i++){
+			printf("\t%s\n", t->genders[i]);
+		}
+	}
+
+	printf("And some casual:\n");
+	for(affectionTrait *t : *sexuality){
+		printf("%s\n", t->name);
+
+		for(int i = 0; i < t->n; i++){
+			printf("\t%s\n", t->genders[i]);
+		}
+	}
+
 	// The Loop
 	int ticks = 0;
 	while(running){
@@ -216,40 +276,6 @@ int main(int argc, char *argv[]){
 		for(MouseStruct::Button& button : mouse.buttons) button.isReleased = 0;
 		mouse.scrollRight = 0;
 		mouse.scrollUp = 0;
-
-		// Fading out of continous sound test 
-		/*if(ticks == 180){
-			pauseAllSound();
-		}
-		if(ticks == 240){
-			resumeAllSound();
-		}
-		else if(ticks == 360){
-			stopSound(channel, 1000);
-		}
-		else if(ticks == 640){
-			switchMusic(media.music.at(1), 0, 1000, 1000);
-		}
-		else if(ticks == 820){
-			pauseMusic();
-		}
-		else if(ticks == 940){
-			resumeMusic();
-			playSound(media.sounds.at(0));
-		}
-		else if(ticks == 1000){
-			pauseAll();
-		}
-		else if(ticks == 1060){
-			resumeAllSound();
-		}
-		else if(ticks == 1180){
-			pauseAll();
-		}
-		else if(ticks == 1300){
-			resumeAll();
-		}
-		ticks++;*/
 
 		//Start handling events.
 		SDL_Event event;
@@ -291,7 +317,8 @@ int main(int argc, char *argv[]){
 
 		//More advanced simple button test
 		if (mouse.buttons[0].isReleased) {
-			IsClickable* clicked = checkCord(&currClick, mouse.x, mouse.y, &cam);
+			IsClickable* clicked = checkCord(&currClick, mouse.x, mouse.y,
+										&cam);
 			if (clicked != nullptr) {
 				clicked->function(clicked->data);
 			}
@@ -303,7 +330,7 @@ int main(int argc, char *argv[]){
 			speed *= -1;
 		}
 		updateClickAreas(&currClick);
-    //Prints the amount of characters for each part of the screen
+		//Prints the amount of characters for each part of the screen
 		//printf("S0: %d, S1: %d\n", currClick.numChars[0], currClick.numChars[1]);
 
 		SDL_Rect temp = {mouse.x, mouse.y, 1, 1};
@@ -330,7 +357,7 @@ int main(int argc, char *argv[]){
 		SDL_RenderPresent(window.render);
 	}
 
-	close(&window, media, objects, &currClick);
+	close(&window, media, objects, &currClick, genders, romance, sexuality);
 
 	return 0;
 }
