@@ -329,8 +329,10 @@ bool init(WindowStruct *window) {
 	return true;
 }
 
-void close(WindowStruct *window, Media& media, vector<GameObject*>& objects, CurrentClick* cc){
-	for (Image* img : media.images)
+void close(WindowStruct *window, Media& media, vector<GameObject*>& objects,
+	CurrentClick* cc, vector<char *> *genders, vector<affectionTrait *> *romance,
+						vector<affectionTrait *> *sexuality){
+	for(Image* img : media.images)
 	{
 		img->~Image();
 	}
@@ -349,9 +351,36 @@ void close(WindowStruct *window, Media& media, vector<GameObject*>& objects, Cur
 
 	cleanClickAreas(cc);
 
-	for (GameObject* obj : objects) {
+	for(GameObject* obj : objects) {
 		delete obj;
 	}
+
+	for(char *t : *genders){
+		delete t;
+	}
+	printf("Freed the genders!\n");
+	
+	for(affectionTrait *t : *romance){
+		delete t->name;
+		for(int i = 0; i < t->n; i++){
+			delete t->genders[i];
+		}
+		delete t->genders;
+
+		delete t;
+	}
+	printf("Freed the romances!\n");
+
+	for(affectionTrait *t : *sexuality){
+		delete t->name;
+		for(int i = 0; i < t->n; i++){
+			delete t->genders[i];
+		}
+		delete t->genders;
+
+		delete t;
+	}
+	printf("Freed the sexuality!\n");
 
 	SDL_DestroyRenderer(window->render);
 	SDL_DestroyWindow(window->window);
@@ -431,6 +460,29 @@ int main(int argc, char *argv[]){
 	printf("Initialization done\n");
 
 	int speed = 5; //For testing characters
+
+	printf("\nFeatures the genders of:\n");
+	for(char *t : *genders){
+		printf("%s\n", t);
+	}
+
+	printf("With a slice of:\n");
+	for(affectionTrait *t : *romance){
+		printf("%s\n", t->name);
+
+		for(int i = 0; i < t->n; i++){
+			printf("\t%s\n", t->genders[i]);
+		}
+	}
+
+	printf("And some casual:\n");
+	for(affectionTrait *t : *sexuality){
+		printf("%s\n", t->name);
+
+		for(int i = 0; i < t->n; i++){
+			printf("\t%s\n", t->genders[i]);
+		}
+	}
 
 	// The Loop
 	int ticks = 0;
@@ -522,7 +574,7 @@ int main(int argc, char *argv[]){
 		SDL_RenderPresent(window.render);
 	}
 
-	close(&window, media, objects, &currClick);
+	close(&window, media, objects, &currClick, genders, romance, sexuality);
 
 	return 0;
 }

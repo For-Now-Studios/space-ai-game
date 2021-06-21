@@ -77,12 +77,13 @@ vector<affectionTrait *> *loadAffectionTrait(const char *path){
 		char **parts = splitString(buf, num, len);
 
 		affectionTrait *t = new affectionTrait;
-		t->name = new char[strlen(parts[0])];
+		t->name = new char[strlen(parts[0]) + 1];
+		strncpy(t->name, parts[0], strlen(parts[0]) + 1);
 		t->genders = nullptr;
 		if(num > 1){
 			t->genders = new char *[num - 1];
 			for(int i = 1; i < num; i++){
-				int l = strlen(parts[i]);
+				int l = strlen(parts[i]) + 1;
 				t->genders[i-1] = new char[l];
 
 				strncpy(t->genders[i-1], parts[i], l);
@@ -122,8 +123,10 @@ vector<char *> *loadGender(const char *path){
 		len = 0;
 	}
 	while(len > 0){
-		genders->push_back(buf);
-				
+		char *t = new char[len];
+		strncpy(t, buf, len);
+		genders->push_back(t);
+		
 		if(!fileReadLine(&fs, buf, &len, MAX_LINE_LENGTH)){
 			printf("Error whilst reading genders from %s!\n", path);
 			genders = nullptr;
