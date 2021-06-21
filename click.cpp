@@ -1,3 +1,5 @@
+#include<algorithm>
+
 #include "structs.h"
 #include "engine.h"
 #include "globals.h"
@@ -22,6 +24,7 @@ void buildClickAreas(CurrentClick *cc, vector<IsClickable*> clickable) {
 	ClickArea *S0 = new ClickArea;
 	S0->area = SDL_Rect{ 0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT };
 	S0->clicks.push_back(clickable.at(0));
+	S0->clicks.push_back(clickable.at(3));
 	S0->clicks.push_back(clickable.at(1));
 
 	ClickArea *S1 = new ClickArea;
@@ -43,11 +46,6 @@ void cleanClickAreas(CurrentClick *cc) {
 	}
 }
 
-int addPopup(CurrentClick *cc, ClickArea* area) {
-	cc->Popup.push_back(area);
-	return cc->Popup.size() - 1;
-}
-
 void addCharacters(CurrentClick *cc, IsClickable* character) {
 	for (int i = 0; i < cc->Game.size(); i++) {
 		if (SDL_HasIntersection(&cc->Game.at(i)->area, &character->area)) {
@@ -59,18 +57,16 @@ void addCharacters(CurrentClick *cc, IsClickable* character) {
 
 ClickReciept* createPopup(const vector<IsClickable*>& clicks, const vector<GameObject*>& objs, vector<GameObject*>* currentObjects, CurrentClick *cc, const SDL_Rect& area) {
 	ClickReciept* cr = new ClickReciept;
-	cr->objs[0] = currentObjects->size();
-	for (GameObject* obj : objs) {
-		currentObjects->push_back(obj);
-	}
-	cr->objs[1] = currentObjects->size()-1;
+	cr->renderObjs = new vector<GameObject*>(objs);
+	cc->toRender.push_back(cr->renderObjs);
 
-	ClickArea* P = new ClickArea;
-	P->area = area;
+	cr->ca = new ClickAreaPopup;
+	cr->ca->area = area;
+	cr->ca->cr = cr;
 	for (IsClickable* cl : clicks) {
-		P->clicks.push_back(cl);
+		cr->ca->clicks.push_back(cl);
 	}
-	cr->index = addPopup(cc, P);
+	cc->Popup.push_back(cr->ca);
 	printf("Hello %s!\n", "Made a popup");
 
 	cr->objects = currentObjects;
@@ -79,8 +75,18 @@ ClickReciept* createPopup(const vector<IsClickable*>& clicks, const vector<GameO
 }
 
 void closePopup(ClickReciept* cr) {
-	delete (*cr->cc->Popup.erase(cr->cc->Popup.begin() + cr->index));
-	cr->objects->erase(cr->objects->begin() + cr->objs[0], cr->objects->begin() + cr->objs[1] + 1);
+	for (int i = 0; i < cr->cc->Popup.size(); i++)
+	{
+		if (cr->cc->Popup.at(i) == cr->ca) {
+			delete (*cr->cc->Popup.erase(cr->cc->Popup.begin() + i));
+		}
+	}
+	for (int i = 0; i < cr->cc->toRender.size(); i++)
+	{
+		if (cr->cc->toRender.at(i) == cr->renderObjs) {
+			delete (*cr->cc->toRender.erase(cr->cc->toRender.begin() + i));
+		}
+	}
 }
 
 void updateClickAreas(CurrentClick *cc) {
@@ -117,6 +123,24 @@ IsClickable* checkArea(CurrentClick *cc, int x, int y, ClickArea* ca) {
 	return nullptr;
 }
 
+void focusPopup(CurrentClick *cc, ClickAreaPopup* ca) {
+	for (int i = 0; i < cc->Popup.size(); i++)
+	{
+		if (cc->Popup.at(i) == ca) {
+			cc->Popup.erase(cc->Popup.begin() + i);
+		}
+	}
+	cc->Popup.push_back(ca);
+	for (int i = 0; i < cc->toRender.size(); i++)
+	{
+		if (cc->toRender.at(i) == ca->cr->renderObjs) {
+			vector<GameObject*>* temp = cc->toRender.at(i);
+			cc->toRender.at(i) = cc->toRender.back();
+			cc->toRender.back() = temp;
+		}
+	}
+}
+
 IsClickable* checkCord(CurrentClick *cc, int x, int y, Camera* cam) {
 	for (vector<ClickArea*>::reverse_iterator it = cc->UI.rbegin(); it != cc->UI.rend(); ++it) {
 		ClickArea* ca = *it;
@@ -126,10 +150,13 @@ IsClickable* checkCord(CurrentClick *cc, int x, int y, Camera* cam) {
 		}
 	}
 
-	for (vector<ClickArea*>::reverse_iterator it = cc->Popup.rbegin(); it != cc->Popup.rend(); ++it) {
-		ClickArea* ca = *it;
+	for (vector<ClickAreaPopup*>::reverse_iterator it = cc->Popup.rbegin(); it != cc->Popup.rend(); ++it) {
+		ClickAreaPopup* ca = *it;
 		if (ca->area.x < x && x < ca->area.x + ca->area.w &&
 			ca->area.y < y && y < ca->area.y + ca->area.h) {
+			if (cc->Popup.back() != ca) {
+				focusPopup(cc, ca);
+			}
 			return checkArea(cc, x, y, ca);
 		}
 	}

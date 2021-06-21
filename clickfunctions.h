@@ -15,8 +15,6 @@ struct popPopUpPars {
 	vector<GameObject *>* objects;
 	Media* media;
 };
-
-
 struct closePopUpPars {
 	popPopUpPars *pPUP;
 	ClickReciept *cr;
@@ -24,3 +22,4 @@ struct closePopUpPars {
 
 void testClosePopUp(void*);
 void testPopPopUp(void*);
+void testPopPopUp0(void*);
