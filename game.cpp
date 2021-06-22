@@ -39,15 +39,20 @@ bool loadLevel(vector<GameObject *>* objects, vector<IsClickable *>* clickable,
 	GameObjClick *ui0 = new GameObjClick(0, 420, media->images.at(1), btnHello, //blaze it
 		(void*)(new btnHelloParameter{ "ui0!" }));
 
+	GameObjClick *button0 = new GameObjClick(0, 120, media->images.at(0), testPopPopUp0,
+		(void*)(new popPopUpPars{cc, false, objects, media}));
+
 	clickable->push_back(button);
 	clickable->push_back(c0);
 	clickable->push_back(ui0);
+	clickable->push_back(button0);
 
 	objects->push_back(obj);
 	objects->push_back(obj2);
 	objects->push_back(button);
 	objects->push_back(c0);
 	objects->push_back(ui0);
+	objects->push_back(button0);
 	
 
 	return true;
@@ -132,6 +137,13 @@ void close(WindowStruct *window, Media& media, vector<GameObject*>& objects,
 		f->~Font();
 	}
 
+	for (vector<GameObject*>* vec : cc->toRender)
+	{
+		for (GameObject* obj : *vec) {
+			delete obj;
+		}
+	}
+
 	cleanClickAreas(cc);
 
 	for(GameObject* obj : objects) {
@@ -199,9 +211,9 @@ int main(int argc, char *argv[]){
 	vector<IsClickable*> clickable;
 	vector<GameObject*> objects;
 	
-	vector<char *> *genders;
-	vector<affectionTrait *> *romance;
-	vector<affectionTrait *> *sexuality;
+	vector<char *> *genders = nullptr;
+	vector<affectionTrait *> *romance = nullptr;
+	vector<affectionTrait *> *sexuality = nullptr;
 
 	int channel; //MUSIC TEST
 	if(running){
@@ -344,6 +356,12 @@ int main(int argc, char *argv[]){
 		
 		for(GameObject* obj : objects) {
 			render(&window, obj, &cam);
+		}
+		for (vector<GameObject*>* vec : currClick.toRender)
+		{
+			for (GameObject* obj : *vec) {
+				render(&window, obj, &cam);
+			}
 		}
 
 		// If we were too quick, wait until it is time
