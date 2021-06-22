@@ -7,8 +7,9 @@
 
 void buildClickAreas(CurrentClick *cc, vector<IsClickable*> clickable) {
 	cc->Characters.push_back(clickable.at(1));
+	cc->Characters.push_back(clickable.at(4));
 	cc->numChars[0] = 1;
-	cc->numChars[1] = 0;
+	cc->numChars[1] = 1;
 
 	//UI
 	ClickArea *UI = new ClickArea;
@@ -29,6 +30,7 @@ void buildClickAreas(CurrentClick *cc, vector<IsClickable*> clickable) {
 
 	ClickArea *S1 = new ClickArea;
 	S1->area = SDL_Rect{ SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT };
+	S1->clicks.push_back(clickable.at(4));
 
 	cc->Game.push_back(S0);
 	cc->Game.push_back(S1);

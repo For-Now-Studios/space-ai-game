@@ -244,7 +244,7 @@ int main(int argc, char *argv[]){
 			
 			//Clickable areas
 			buildClickAreas(&currClick, clickable);
-			addCharacters(&currClick, clickable.at(3));
+			//addCharacters(&currClick, clickable.at(4));
 		}
 	}
 	//Pause the music & sound
