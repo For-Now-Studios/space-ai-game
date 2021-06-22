@@ -12,13 +12,17 @@ void btnHello(void *cntxt)
 
 void testClosePopUp(void *cntxt) {
 	closePopUpPars *pars = (closePopUpPars*)cntxt;
+
+	pars->pPUP->poppedUp = false;
+	ClickReciept *cr = pars->cr;
+
 	//Delete necessary GameObejcts and IsClickable objects.
+	//NOTE: This deletes the button which we were called from
 	for (GameObject* obj : *pars->cr->renderObjs) {
 		delete obj;
 	}
-	closePopup(pars->cr);
+	closePopup(cr);
 	printf("Hello %s!\n", "Closed a popup");
-	pars->pPUP->poppedUp = false;
 }
 
 void testPopPopUp(void *cntxt) {
