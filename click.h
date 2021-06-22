@@ -1,4 +1,6 @@
 #pragma once
+struct CurrentClick;
+struct ClickReciept;
 
 /*
 	A clickable area with a vector containing things that are clickable.
@@ -6,6 +8,20 @@
 struct ClickArea {
 	SDL_Rect area;
 	std::vector<IsClickable*> clicks;
+};
+
+
+
+struct ClickAreaPopup : ClickArea {
+	ClickReciept *cr;
+};
+
+struct ClickReciept {
+	ClickAreaPopup* ca;
+	//Pointer to a vector of objects that need to be rendered for this popup.
+	vector<GameObject*>* renderObjs;
+	CurrentClick *cc;
+	vector<GameObject*>* objects;
 };
 
 /*
@@ -17,17 +33,15 @@ struct CurrentClick {
 
 	//All clickable characters, though it could be anything moving.
 	std::vector<IsClickable*> Characters;
+	//The clickable things on the screen
 	std::vector<ClickArea*> UI;
-	std::vector<ClickArea*> Popup;
+	std::vector<ClickAreaPopup*> Popup;
 	std::vector<ClickArea*> Game;
+	//Pointer to a vector of objects that need to be rendered for all popups.
+	std::vector<vector<GameObject*>*> toRender;
 };
 
-struct ClickReciept {
-	int index;
-	int objs[2];
-	CurrentClick *cc;
-	vector<GameObject*>* objects;
-};
+
 
 /*
 	Builds the clickable areas.
@@ -37,11 +51,6 @@ void buildClickAreas(CurrentClick*, vector<IsClickable*>);
 	Cleans the memory of the clickable areas.
 */
 void cleanClickAreas(CurrentClick*);
-/*
-	Adds a popup to the game.
-	Returns the index.
-*/
-int addPopup(CurrentClick*, ClickArea*);
 /*
 	Adds a character and technically anything moving.
 */
