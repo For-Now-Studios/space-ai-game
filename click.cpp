@@ -87,6 +87,8 @@ void closePopup(ClickReciept* cr) {
 			delete (*cr->cc->toRender.erase(cr->cc->toRender.begin() + i));
 		}
 	}
+
+	delete cr;
 }
 
 void updateClickAreas(CurrentClick *cc) {
