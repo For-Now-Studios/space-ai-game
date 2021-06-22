@@ -1,50 +1,5 @@
 #pragma once
 
-//Struct that can be added to make an object clickable.
-struct IsClickable {
-	SDL_Rect area; //Area that is clickable
-	void(*function)(void*); //The function being called when clicked
-	void* data = nullptr; //The data sent into the function
-
-	// Destructor to delete the data, as it needs to be put on the heap (I think in most cases)
-	virtual ~IsClickable() {
-		delete data;
-		data = nullptr;
-		printf("Data for a clickable thing has been freed!\n");
-	}
-};
-
-/*
-	A clickable version of GameObject
-*/
-struct GameObjClick : GameObject, IsClickable {
-	GameObjClick(int xPos, int yPos, Image *img, void(*func)(void*), void* d) {
-		x = xPos;
-		y = yPos;
-		image = img;
-
-		area = SDL_Rect{ x, y, image->width, image->height };
-		function = func;
-		data = d;
-	}
-	GameObjClick(int xPos, int yPos, Image *img, SDL_Rect ar, void(*func)(void*), void* d) {
-		x = xPos;
-		y = yPos;
-		image = img;
-
-		area = ar;
-		function = func;
-		data = d;
-	}
-
-	void moveBy(int xDir, int yDir) {
-		x += xDir;
-		y += yDir;
-		area.x += xDir;
-		area.y += yDir;
-	}
-};
-
 /*
 	A clickable area with a vector containing things that are clickable.
 */

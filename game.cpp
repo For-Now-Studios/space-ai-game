@@ -18,7 +18,7 @@ const int SCREEN_HEIGHT = 480;
 	space for ease of use
 */
 bool loadLevel(vector<GameObject *>* objects, vector<IsClickable *>* clickable,
-							Media* media, const char *path, CurrentClick* cc){
+				Media* media, const char *path, CurrentClick* cc){
 	GameObject *obj = new GameObject;
 	obj->image = media->images.at(0);
 	obj->x = 0;
@@ -210,6 +210,15 @@ int main(int argc, char *argv[]){
 		sexuality = loadAffectionTrait("sexuality.jpeg");
 
 		if(loadLevel(&objects, &clickable, &media, "", &currClick)){
+			CharacterObject *paul = new CharacterObject(420, 300,
+			media.images.at(1), btnHello,
+			(void *)(new btnHelloParameter{"Come on mr tally man, tally my\
+			banana!"}), "Paul", intersex, genders->at(0), romance->at(0),
+			sexuality->at(0));
+
+			clickable.push_back(paul);
+			objects.push_back(paul);
+
 			printf("Game object done!\n");
 
 			// MUSIC TEST
@@ -223,6 +232,7 @@ int main(int argc, char *argv[]){
 			
 			//Clickable areas
 			buildClickAreas(&currClick, clickable);
+			addCharacters(&currClick, clickable.at(3));
 		}
 	}
 	//Pause the music & sound
@@ -266,6 +276,7 @@ int main(int argc, char *argv[]){
 			printf("\t%s\n", t->genders[i]);
 		}
 	}
+
 
 	// The Loop
 	int ticks = 0;
