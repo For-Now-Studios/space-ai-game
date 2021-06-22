@@ -349,6 +349,7 @@ int main(int argc, char *argv[]){
 
 		// Testing moving characters
 		objects.at(3)->moveBy(speed, 0);
+		objects.at(6)->moveBy(speed, speed/3);
 		if (objects.at(3)->x > SCREEN_WIDTH - 60 || objects.at(3)->x < 1) {
 			speed *= -1;
 		}
