@@ -184,7 +184,7 @@ struct IsClickable {
 	void* data = nullptr; //The data sent into the function
 
 	// Destructor to delete the data, as it needs to be put on the heap (I think in most cases)
-	virtual ~IsClickable() {
+	~IsClickable() {
 		delete data;
 		data = nullptr;
 		printf("Data for a clickable thing has been freed!\n");
@@ -264,5 +264,30 @@ struct CharacterObject : GameObjClick{
 
 		stress = 0;
 		loyalty = 100;
+	}
+};
+
+#define STORAGE = 1 << 0;
+#define MEDBAY = 1 << 1;
+#define BEDROOM = 1 << 2;
+#define HALL = 1 << 3;
+#define PRIVATE = 1 << 4;
+#define TOILET = 1 << 5;
+#define KITCHEN = 1 << 6;
+#define AICORE = 1 << 7;
+#define BRIDGE = 1 << 8;
+#define CLEARLYFATAL = 1 << 9;
+struct Room : GameObjClick {
+	int flag;
+	const char* name;
+
+	Room(int xPos, int yPos, Image *img, void(*func)(void*), void* d, int f)
+		: flag{ f }, GameObjClick(xPos, yPos, img, func, d) {
+
+	}
+
+	Room(int xPos, int yPos, Image *img, SDL_Rect ar, void(*func)(void*), void* d, int f)
+		: flag{ f }, GameObjClick(xPos, yPos, img, ar, func, d) {
+
 	}
 };

@@ -20,6 +20,13 @@ struct closePopUpPars {
 	ClickReciept *cr;
 };
 
+struct roomPopupPars {
+	vector<GameObjClick*> buttons;
+	CurrentClick *cc;
+	bool poppedUp;
+	vector<GameObject *>* objects;
+};
+
 void testClosePopUp(void*);
 void testPopPopUp(void*);
 void testPopPopUp0(void*);

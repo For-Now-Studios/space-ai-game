@@ -84,3 +84,33 @@ void testPopPopUp0(void *cntxt) {
 		pars->poppedUp = true;
 	}
 }
+
+void roomPopup(void *cntxt) {
+	roomPopupPars *pars = (roomPopupPars*)cntxt;
+	if (!pars->poppedUp) {
+		vector<GameObject*> objs;
+		vector<IsClickable*> clicks;
+
+		GameObjClick *p = new GameObjClick(260, 260, pars->media->images.at(0), btnHello,
+			(void*)(new btnHelloParameter{ "p!" }));
+
+		GameObjClick *p0 = new GameObjClick(260, 260, pars->media->images.at(1), btnHello,
+			(void*)(new btnHelloParameter{ "p0!" }));
+
+		closePopUpPars* cPUP = new closePopUpPars;
+		cPUP->pPUP = pars;
+		GameObjClick *px = new GameObjClick(320, 260, pars->media->images.at(1), testClosePopUp,
+			(void*)(cPUP));
+
+		objs.push_back(p);
+		objs.push_back(p0);
+		objs.push_back(px);
+		clicks.push_back(p);
+		clicks.push_back(p0);
+		clicks.push_back(px);
+
+		cPUP->cr = createPopup(clicks, objs, pars->objects, pars->cc, SDL_Rect{ 260, 260, 120, 120 });
+		printf("Called testPopPopUp0\n");
+		pars->poppedUp = true;
+	}
+}
