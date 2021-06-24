@@ -42,10 +42,29 @@ bool loadLevel(vector<GameObject *>* objects, vector<IsClickable *>* clickable,
 	GameObjClick *button0 = new GameObjClick(0, 120, media->images.at(0), testPopPopUp0,
 		(void*)(new popPopUpPars{cc, false, objects, media}));
 
+	roomPopupPars* rPUP = new roomPopupPars(popPopUpPars{ cc, false, objects, media });
+	
+	rPUP->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello, //blaze it
+		(void*)(new btnHelloParameter{ "room option 0!" })));
+	rPUP->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello, //blaze it
+		(void*)(new btnHelloParameter{ "room option 1!" })));
+	rPUP->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello, //blaze it
+		(void*)(new btnHelloParameter{ "room option 2!" })));
+	rPUP->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello, //blaze it
+		(void*)(new btnHelloParameter{ "room option 3!" })));
+	rPUP->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello, //blaze it
+		(void*)(new btnHelloParameter{ "room option 4!" })));
+	Room *roomTest = new Room(120, 120, media->images.at(0), roomPopup,
+		(void*)(rPUP),
+		TOILET | AICORE | CLEARLYFATAL
+	);
+
+
 	clickable->push_back(button);
 	clickable->push_back(c0);
 	clickable->push_back(ui0);
 	clickable->push_back(button0);
+	clickable->push_back(roomTest);
 
 	objects->push_back(obj);
 	objects->push_back(obj2);
@@ -53,6 +72,7 @@ bool loadLevel(vector<GameObject *>* objects, vector<IsClickable *>* clickable,
 	objects->push_back(c0);
 	objects->push_back(ui0);
 	objects->push_back(button0);
+	objects->push_back(roomTest);
 	
 
 	return true;

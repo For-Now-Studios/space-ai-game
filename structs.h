@@ -267,16 +267,19 @@ struct CharacterObject : GameObjClick{
 	}
 };
 
-#define STORAGE = 1 << 0;
-#define MEDBAY = 1 << 1;
-#define BEDROOM = 1 << 2;
-#define HALL = 1 << 3;
-#define PRIVATE = 1 << 4;
-#define TOILET = 1 << 5;
-#define KITCHEN = 1 << 6;
-#define AICORE = 1 << 7;
-#define BRIDGE = 1 << 8;
-#define CLEARLYFATAL = 1 << 9;
+#define STORAGE (1 << 0)
+#define MEDBAY (1 << 1)
+#define BEDROOM (1 << 2)
+#define HALL (1 << 3)
+#define PRIVATE (1 << 4)
+#define TOILET (1 << 5)
+#define KITCHEN (1 << 6)
+#define AICORE (1 << 7)
+#define BRIDGE (1 << 8)
+#define CLEARLYFATAL (1 << 9)
+#define CREWQUARTERS (1 << 10)
+#define LUNCHROOM (1 << 11)
+#define RECREATIONALCENTER (1 << 12)
 struct Room : GameObjClick {
 	int flag;
 	const char* name;

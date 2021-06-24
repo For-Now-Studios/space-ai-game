@@ -24,6 +24,7 @@ void buildClickAreas(CurrentClick *cc, vector<IsClickable*> clickable) {
 	ClickArea *S0 = new ClickArea;
 	S0->area = SDL_Rect{ 0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT };
 	S0->clicks.push_back(clickable.at(0));
+	S0->clicks.push_back(clickable.at(4));
 	S0->clicks.push_back(clickable.at(3));
 	S0->clicks.push_back(clickable.at(1));
 
@@ -163,6 +164,7 @@ IsClickable* checkCord(CurrentClick *cc, int x, int y, Camera* cam) {
 			ca->area.y < y && y < ca->area.y + ca->area.h) {
 			if (cc->Popup.back() != ca) {
 				focusPopup(cc, ca);
+				printf("Focusing\n");
 			}
 			return checkArea(cc, x, y, ca);
 		}
