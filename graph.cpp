@@ -77,8 +77,6 @@ template<class N, class V> class Node{
 			t = it->second;
 		}
 
-		printf("%p\n", t);
-
 		return t;
 	}
 	// Add a preexisting edge to this nodes list (mainly for undirected graphs)
@@ -182,8 +180,6 @@ template<class N, class V> class Graph{
 			}
 		}
 		vectorErase<Edge<N, V> *>(edges, e);*/
-		
-		printf("%p\n", e);
 
 		delete e;
 	}
@@ -251,7 +247,7 @@ int main(){
 
 	g->print();
 
-	for(int i = 0; i < 0; i++){
+	for(int i = 0; i < 5000; i++){
 		g->addNode(i);
 	}
 	printf("Done with adding nodes!\n");
@@ -263,24 +259,35 @@ int main(){
 	}
 	printf("Done with adding edges!\n");
 
-	//g->print();
-
-	/*for(Edge<int, int> *e : g.edges){
-		g.removeEdge(e);
-
-		//if(a % 10000 == 0) printf("%d\n", a);
-
-		a++;
-	}*/
-	/*while(g->edges.size() > 0){
-		g->removeEdge(g->edges.at(0));
-	}*/
-
 	for(int i = 0; i < g->nodes.size(); i++){
 		for(int j = i+1; j < g->nodes.size(); j++){
 			g->removeEdge(g->nodes.at(i)->data, g->nodes.at(j)->data);
 		}
 	}
+
+	//delete g;
+	printf("Done with removing edges!\n");
+
+	printf("\nSecond run!\n");
+	//g = new Graph<int, int>();
+
+	for(int i = 0; i < 5000; i++){
+		g->addNode(i);
+	}
+	printf("Done with adding nodes!\n");
+
+	for(int i = 0; i < g->nodes.size(); i++){
+		for(int j = i+1; j < g->nodes.size(); j++){
+			g->addEdge(g->nodes.at(i), g->nodes.at(j), 1);
+		}
+	}
+	printf("Done with adding edges!\n");
+
+	/*for(int i = 0; i < g->nodes.size(); i++){
+		for(int j = i+1; j < g->nodes.size(); j++){
+			g->removeEdge(g->nodes.at(i)->data, g->nodes.at(j)->data);
+		}
+	}*/
 
 	delete g;
 	printf("Done with removing edges!\n");
