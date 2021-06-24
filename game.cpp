@@ -43,21 +43,21 @@ bool loadLevel(vector<GameObject *>* objects, vector<IsClickable *>* clickable,
 		(void*)(new popPopUpPars{cc, false, objects, media}));
 
 	roomPopupPars* rPUP = new roomPopupPars(popPopUpPars{ cc, false, objects, media });
-	
-	rPUP->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello, //blaze it
-		(void*)(new btnHelloParameter{ "room option 0!" })));
-	rPUP->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello, //blaze it
-		(void*)(new btnHelloParameter{ "room option 1!" })));
-	rPUP->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello, //blaze it
-		(void*)(new btnHelloParameter{ "room option 2!" })));
-	rPUP->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello, //blaze it
-		(void*)(new btnHelloParameter{ "room option 3!" })));
-	rPUP->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello, //blaze it
-		(void*)(new btnHelloParameter{ "room option 4!" })));
 	Room *roomTest = new Room(120, 120, media->images.at(0), roomPopup,
 		(void*)(rPUP),
 		TOILET | AICORE | CLEARLYFATAL
 	);
+	rPUP->room = roomTest;
+	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello, //blaze it
+		(void*)(new btnHelloParameter{ "room option 0!" })));
+	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello, //blaze it
+		(void*)(new btnHelloParameter{ "room option 1!" })));
+	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello, //blaze it
+		(void*)(new btnHelloParameter{ "room option 2!" })));
+	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello, //blaze it
+		(void*)(new btnHelloParameter{ "room option 3!" })));
+	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello, //blaze it
+		(void*)(new btnHelloParameter{ "room option 4!" })));
 
 
 	clickable->push_back(button);
@@ -155,13 +155,6 @@ void close(WindowStruct *window, Media& media, vector<GameObject*>& objects,
 
 	for(Font* f : media.fonts){
 		f->~Font();
-	}
-
-	for (vector<GameObject*>* vec : cc->toRender)
-	{
-		for (GameObject* obj : *vec) {
-			delete obj;
-		}
 	}
 
 	cleanClickAreas(cc);

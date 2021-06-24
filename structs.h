@@ -285,6 +285,7 @@ struct CharacterObject : GameObjClick{
 struct Room : GameObjClick {
 	int flag;
 	const char* name;
+	std::vector<GameObjClick*> buttons;
 
 	Room(int xPos, int yPos, Image *img, void(*func)(void*), void* d, int f)
 		: flag{ f }, GameObjClick(xPos, yPos, img, func, d) {
@@ -294,11 +295,5 @@ struct Room : GameObjClick {
 	Room(int xPos, int yPos, Image *img, SDL_Rect ar, void(*func)(void*), void* d, int f)
 		: flag{ f }, GameObjClick(xPos, yPos, img, ar, func, d) {
 
-	}
-	~Room() {
-		vector<GameObjClick*> buttons = ((roomPopupPars*)data)->buttons;
-		for (GameObjClick* obj : buttons) {
-			delete obj;
-		}
 	}
 };

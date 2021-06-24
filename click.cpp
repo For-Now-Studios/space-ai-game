@@ -4,6 +4,7 @@
 #include "engine.h"
 #include "globals.h"
 #include "click.h"
+#include "clickfunctions.h"
 
 void buildClickAreas(CurrentClick *cc, vector<IsClickable*> clickable) {
 	cc->Characters.push_back(clickable.at(1));
@@ -36,6 +37,11 @@ void buildClickAreas(CurrentClick *cc, vector<IsClickable*> clickable) {
 }
 
 void cleanClickAreas(CurrentClick *cc) {
+	for (Room* r : cc->rooms) {
+		if (((roomPopupPars*)r->data)->poppedUp) {
+			closeRoomPopup(((roomPopupPars*)r->data)->close);
+		}
+	}
 	for (ClickArea* ca : cc->UI) {
 		delete ca;
 	}
@@ -44,6 +50,12 @@ void cleanClickAreas(CurrentClick *cc) {
 	}
 	for (ClickArea* ca : cc->Game) {
 		delete ca;
+	}
+	for (vector<GameObject*>* vec : cc->toRender)
+	{
+		for (GameObject* obj : *vec) {
+			delete obj;
+		}
 	}
 }
 

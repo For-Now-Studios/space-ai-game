@@ -98,6 +98,12 @@ void closeRoomPopup(void *cntxt) {
 	//NOTE: This deletes the button which we were called from
 	delete cr->renderObjs->at(0);
 	delete cr->renderObjs->back();
+	/*int i = 0;
+	for (GameObject* obj : *cr->renderObjs) {
+		printf("num: %d, p: %p\n", i, obj);
+		delete obj;
+		i++;
+	}*/
 	closePopup(cr);
 	printf("Hello %s!\n", "Closed a popup");
 }
@@ -121,13 +127,15 @@ void roomPopup(void *cntxt) {
 		clicks.push_back(p);
 		
 		int yLength = 0;
-		for (GameObjClick* goc : pars->buttons) {
+		for (GameObjClick* goc : pars->room->buttons) {
 			goc->x = x;
 			goc->y = y + 60*yLength;
 			goc->area.x = x;
 			goc->area.y = goc->y;
+
 			//GameObjClick* copy = new GameObjClick{ *goc };
 			printf("And this %p\n", goc);
+			//printf("And this2 %p\n", copy);
 			clicks.push_back(goc);
 			objs.push_back(goc);
 			yLength++;
@@ -141,5 +149,6 @@ void roomPopup(void *cntxt) {
 		cPUP->cr = createPopup(clicks, objs, pars->objects, pars->cc, SDL_Rect{ x, y, 120, 60 * yLength });
 		printf("Called roomPopup\n");
 		pars->poppedUp = true;
+		pars->close = cPUP;
 	}
 }

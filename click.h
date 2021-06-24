@@ -33,6 +33,7 @@ struct CurrentClick {
 
 	//All clickable characters, though it could be anything moving.
 	std::vector<IsClickable*> Characters;
+	std::vector<Room*> rooms;
 	//The clickable things on the screen
 	std::vector<ClickArea*> UI;
 	std::vector<ClickAreaPopup*> Popup;
