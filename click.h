@@ -39,6 +39,7 @@ struct CurrentClick {
 	std::vector<ClickArea*> Game;
 	//Pointer to a vector of objects that need to be rendered for all popups.
 	std::vector<vector<GameObject*>*> toRender;
+	ClickAreaPopup* currentlySelected;
 };
 
 
@@ -75,7 +76,7 @@ IsClickable* checkArea(CurrentClick*, int, int, ClickArea*);
 	3: Game
 	TODO: Have focused popups be on top and test it
 */
-IsClickable* checkCord(CurrentClick*, int, int, Camera*);
+IsClickable* checkCord(CurrentClick*, MouseStruct&, Camera*);
 /*
 	Closes specified popup and deletes the objects from the game.
 	Send in the reciept for the specific popup to close it.

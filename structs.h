@@ -133,10 +133,12 @@ struct GameObject {
 	An object contain all information about the mouse.
 */
 struct MouseStruct {
-	//Game coordinates.
+	//Screen coordinates.
 	int x;
 	int y;
 
+	int relX;
+	int relY;
 
 	int scrollUp; //1 scrolling up, -1 down, 0 no scrolling
 	int scrollRight; //1 scrolling right, -1 left, 0 no scrolling
@@ -292,5 +294,11 @@ struct Room : GameObjClick {
 	Room(int xPos, int yPos, Image *img, SDL_Rect ar, void(*func)(void*), void* d, int f)
 		: flag{ f }, GameObjClick(xPos, yPos, img, ar, func, d) {
 
+	}
+	~Room() {
+		vector<GameObjClick*> buttons = ((roomPopupPars*)data)->buttons;
+		for (GameObjClick* obj : buttons) {
+			delete obj;
+		}
 	}
 };

@@ -319,6 +319,8 @@ int main(int argc, char *argv[]){
 		for(MouseStruct::Button& button : mouse.buttons) button.isReleased = 0;
 		mouse.scrollRight = 0;
 		mouse.scrollUp = 0;
+		mouse.relX = 0;
+		mouse.relY = 0;
 
 		//Start handling events.
 		SDL_Event event;
@@ -331,6 +333,8 @@ int main(int argc, char *argv[]){
 				case SDL_MOUSEMOTION:
 					mouse.x = event.motion.x;
 					mouse.y = event.motion.y;
+					mouse.relX = event.motion.xrel;
+					mouse.relY = event.motion.yrel;
 					break;
 				case SDL_MOUSEBUTTONUP:
 				case SDL_MOUSEBUTTONDOWN:
@@ -359,12 +363,10 @@ int main(int argc, char *argv[]){
 		}
 
 		//More advanced simple button test
-		if (mouse.buttons[0].isReleased) {
-			IsClickable* clicked = checkCord(&currClick, mouse.x, mouse.y,
-										&cam);
-			if (clicked != nullptr) {
-				clicked->function(clicked->data);
-			}
+		IsClickable* clicked = checkCord(&currClick, mouse, &cam);
+		if (mouse.buttons[0].isReleased && clicked != nullptr) {
+			clicked->function(clicked->data);
+			currClick.currentlySelected = nullptr;
 		}
 
 		// Testing moving characters
