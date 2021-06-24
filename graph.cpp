@@ -1,7 +1,9 @@
 //#include "graph.h"
 #include <vector>
 #include <unordered_map>
+#include <queue>
 #include <stdio.h>
+#include <limits.h>
 
 using namespace std;
 
@@ -18,6 +20,12 @@ struct pairHash {
 		
 		return hash<int>{}(t);
     }
+};
+
+struct pairCmp{
+	template<class N> bool operator () (pair<N, int> a, pair<N, int> b){
+		return a.second < b.second;
+	}
 };
 
 template<class N> void vectorErase(vector<N> &v, N e){
@@ -228,6 +236,65 @@ template<class N, class V> class Graph{
 		}*/
 	}
 };
+
+/*
+	Finds the shortest path from point a to point b in a undirected graph, where the
+	edges are assumed to be positive integers
+*/
+template<class N> vector<N> *dijkstra(Graph<N, int> *g, N a, N b){
+	unordered_map<N, int> dist();
+	unordered_map<N, N> prev();
+	dist.reserve(g->nodes.size());
+	prev.reserve(g->nodes.size());
+
+	//Initialize the cost of reaching a node to "infinity"
+	for(pair<N, Node<N, int> *> p : g->nodes){
+		dist.at(p.second->data) = INT_MAX;
+		prev.at(p.second->data) = p.second->data;
+	}
+
+	priority_queue<pair<N, int>, vector<pair<N, int>>, pairCmp> q();
+	dist.at(a) = 0;
+	q.push(pair<N, int>(a, dist.at(a)));
+
+	while(!q.empty()){
+		//Check if the queued element has been updated (hence outdated)
+		if(dist.at(q.top().second) != q.top().first){
+			q.pop();
+			continue;
+		}
+
+		N cur = q.top().second;
+		q.pop();
+
+		if(cur == b) break; //The node with lowest cost is our target, hence done
+
+		for(pair<pair<N, N>, Edge<N, int> *> p : g->nodes.at(cur)->edges){
+			N neighbour = p.second->to;
+			int weight = p.second->value;
+
+			if(dist.at(neighbour) > dist.at(cur) + weight){
+				dist.at(neighbour) = dist.at(cur) + weight;
+				prev.at(neighbour) = cur;
+
+				q.push(pair<N, int>(dist.at(neighbour), neighbour));
+			}
+		}
+	}
+
+	if(prev.at(b) == b) return nullptr;
+
+	vector<N> *path = new vector<N>();
+	path->push_back(b);
+
+	N pre = prev.at(b);
+	while(pre != a){
+		path->push_back(pre);
+		pre = prev.at(pre);
+	}
+
+	return path;
+}
 
 int main(){
 	Graph<int, int> *g = new Graph<int, int>();
