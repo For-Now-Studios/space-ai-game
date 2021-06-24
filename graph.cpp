@@ -24,7 +24,7 @@ struct pairHash {
 
 struct pairCmp{
 	template<class N> bool operator () (pair<N, int> a, pair<N, int> b){
-		return a.second < b.second;
+		return a.second > b.second;
 	}
 };
 
@@ -242,18 +242,18 @@ template<class N, class V> class Graph{
 	edges are assumed to be positive integers
 */
 template<class N> vector<N> *dijkstra(Graph<N, int> *g, N a, N b){
-	unordered_map<N, int> dist();
-	unordered_map<N, N> prev();
+	unordered_map<N, int> dist;
+	unordered_map<N, N> prev;
 	dist.reserve(g->nodes.size());
 	prev.reserve(g->nodes.size());
 
 	//Initialize the cost of reaching a node to "infinity"
 	for(pair<N, Node<N, int> *> p : g->nodes){
-		dist.at(p.second->data) = INT_MAX;
-		prev.at(p.second->data) = p.second->data;
+		dist.emplace(p.first, INT_MAX);
+		prev.emplace(p.first, p.first);
 	}
 
-	priority_queue<pair<N, int>, vector<pair<N, int>>, pairCmp> q();
+	priority_queue<pair<N, int>, vector<pair<N, int>>, pairCmp> q;
 	dist.at(a) = 0;
 	q.push(pair<N, int>(a, dist.at(a)));
 
@@ -270,7 +270,7 @@ template<class N> vector<N> *dijkstra(Graph<N, int> *g, N a, N b){
 		if(cur == b) break; //The node with lowest cost is our target, hence done
 
 		for(pair<pair<N, N>, Edge<N, int> *> p : g->nodes.at(cur)->edges){
-			N neighbour = p.second->to;
+			N neighbour = p.second->to->data;
 			int weight = p.second->value;
 
 			if(dist.at(neighbour) > dist.at(cur) + weight){
@@ -298,71 +298,31 @@ template<class N> vector<N> *dijkstra(Graph<N, int> *g, N a, N b){
 
 int main(){
 	Graph<int, int> *g = new Graph<int, int>();
-	g->addNode(0);
-	g->addNode(1);
-	g->addEdge(0, 1, 1);
-	
-	g->print();
 
-	g->updateEdge(0, 1, 5);
-	g->print();
-
-	g->updateEdge(0, 1, g->getEdgeValue(0, 1) + 1);
-	g->print();
-
-	g->removeEdge(0, 1);
-
-	g->print();
-
-	for(int i = 0; i < 5000; i++){
+	for(int i = 0; i < 100; i++){
 		g->addNode(i);
 	}
-	printf("Done with adding nodes!\n");
+	printf("Added all nodes!\n");
 
 	for(int i = 0; i < g->nodes.size(); i++){
 		for(int j = i+1; j < g->nodes.size(); j++){
-			g->addEdge(g->nodes.at(i), g->nodes.at(j), 1);
+			g->addEdge(i, j, (i+1)*100 + j);
+			g->addEdge(j, i, (i+1)*100 + j);
 		}
 	}
-	printf("Done with adding edges!\n");
+	printf("Added all edges!\n");
 
-	for(int i = 0; i < g->nodes.size(); i++){
-		for(int j = i+1; j < g->nodes.size(); j++){
-			g->removeEdge(g->nodes.at(i)->data, g->nodes.at(j)->data);
-		}
+	for(int i = 0; i < g->nodes.size() - 1; i++){
+		g->updateEdge(i, i+1, 0);
+		g->updateEdge(i+1, i, 0);
 	}
+	printf("Added a best path! \n");
 
-	//delete g;
-	printf("Done with removing edges!\n");
+	vector<int> *path = dijkstra(g, 0, (int)g->nodes.size()-1);
 
-	printf("\nSecond run!\n");
-	//g = new Graph<int, int>();
-
-	for(int i = 0; i < 5000; i++){
-		g->addNode(i);
-	}
-	printf("Done with adding nodes!\n");
-
-	for(int i = 0; i < g->nodes.size(); i++){
-		for(int j = i+1; j < g->nodes.size(); j++){
-			g->addEdge(g->nodes.at(i), g->nodes.at(j), 1);
-		}
-	}
-	printf("Done with adding edges!\n");
-
-	/*for(int i = 0; i < g->nodes.size(); i++){
-		for(int j = i+1; j < g->nodes.size(); j++){
-			g->removeEdge(g->nodes.at(i)->data, g->nodes.at(j)->data);
-		}
+	/*for(int n : *path){
+		printf("%d\n", n);
 	}*/
-
-	delete g;
-	printf("Done with removing edges!\n");
-
-	int a = 0;
-	for(int i = 0; i < 10000000000000000; i++){
-		a += 1;
-	}
 
 	return 0;
 }
