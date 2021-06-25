@@ -52,9 +52,13 @@ void buildClickAreas(CurrentClick *cc, initializer_list<IsClickable*> characters
 	initializer_list<IsClickable*> UIElems, initializer_list<IsClickable*> popupElems, initializer_list<IsClickable*> gameElems) {
 
 	//## UI ##
-	ClickArea *UI = new ClickArea(SDL_Rect{ 0, 420, SCREEN_WIDTH, 60 });
-	addClickablesToAreas({ UI }, UIElems);
-	cc->UI.push_back(UI);
+	initializer_list<ClickArea*> UIAreas = {
+		new ClickArea(SDL_Rect{ 0, 420, SCREEN_WIDTH, 60 })
+	};
+	addClickablesToAreas(UIAreas, UIElems);
+	for (ClickArea* ca : UIAreas) {
+		cc->UI.push_back(ca);
+	}
 
 	//## Popup ##
 		//nothing in the start
@@ -68,17 +72,21 @@ void buildClickAreas(CurrentClick *cc, initializer_list<IsClickable*> characters
 		cc->numChars[i] = 0;
 	}
 		//The game part areas
-	ClickArea *S0 = new ClickArea(SDL_Rect{ 0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT });
-	ClickArea *S1 = new ClickArea(SDL_Rect{ SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT });
+	initializer_list<ClickArea*> gameAreas = {
+		new ClickArea(SDL_Rect{ 0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT }),
+		new ClickArea(SDL_Rect{ SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT })
+	};
 		//Add them rooms to rooms vector and the correct part of the game.
 	for (Room* room : rooms) {
 		cc->rooms.push_back(room);
-		addClickableToAreas({ S0, S1 }, (IsClickable*)room);
+		addClickableToAreas(gameAreas, (IsClickable*)room);
 	}
 		//Add the usual elements
-	addClickablesToAreas({ S0, S1 }, gameElems);
-	cc->Game.push_back(S0);
-	cc->Game.push_back(S1);
+	addClickablesToAreas(gameAreas, gameElems);
+		//Add the areas
+	for (ClickArea* ca : gameAreas) {
+		cc->Game.push_back(ca);
+	}
 		//Add them characters to characters vector and game.
 	for (IsClickable* character : characters) {
 		cc->Characters.push_back(character);
