@@ -148,3 +148,22 @@ void roomPopup(void *cntxt) {
 		pars->close = cPUP;
 	}
 }
+
+void doorClick(void *cntxt) {
+	DoorClickPars *pars = (DoorClickPars*)cntxt;
+	if (pars->mouse->buttons[0].isReleased) {
+		pars->door->IsOpen = !pars->door->IsOpen;
+		if (pars->door->IsOpen) pars->door->IsLocked = false;
+	} else if(pars->mouse->buttons[2].isReleased) {
+		pars->door->IsLocked = !pars->door->IsLocked;
+	}
+
+	if (pars->door->IsLocked) {
+		pars->door->IsOpen = false;
+		pars->door->image = pars->locked;
+	} else if (pars->door->IsOpen) {
+		pars->door->image = pars->open;
+	} else {
+		pars->door->image = pars->closed;
+	}
+}
