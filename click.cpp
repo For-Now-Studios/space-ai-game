@@ -4,39 +4,102 @@
 #include "engine.h"
 #include "globals.h"
 #include "click.h"
+#include "clickfunctions.h"
 
-void buildClickAreas(CurrentClick *cc, vector<IsClickable*> clickable) {
-	cc->Characters.push_back(clickable.at(1));
-	cc->Characters.push_back(clickable.at(4));
-	cc->numChars[0] = 1;
-	cc->numChars[1] = 1;
+/*
+	Adds a SINGLE IsClickable to a list of areas.
+	NOTICE: It is only a single clickable object.
+*/
+void addClickableToAreas(initializer_list<ClickArea*> areas, IsClickable* ic) {
+	for (ClickArea* area : areas) {
+		if (SDL_HasIntersection(&area->area, &ic->area)) {
+			area->clicks.push_back(ic);
+		}
+	}
+}
 
-	//UI
-	ClickArea *UI = new ClickArea;
-	UI->area = SDL_Rect{ 0, 420, SCREEN_WIDTH, 60 };
-	UI->clicks.push_back(clickable.at(2));
+/*
+	Adds IsClickable:s to a list of areas.
+	NOTICE: It is a list of clickables.
+*/
+void addClickablesToAreas(initializer_list<ClickArea*> areas, initializer_list<IsClickable*> clickables) {
+	for (IsClickable* ic : clickables) {
+		addClickableToAreas(areas, ic);
+	}	
+}
 
-	cc->UI.push_back(UI);
+/*
+	Adds a character and technically anything moving.
+	Currently only used inside of the buildClickable areas.
+	However, this version could probably add a character in the middle of game running or whenever,
+	as long it is after we bult the clickable area.
+	**BUT** This is not tested yet, so it is *theoretically* possible.
+	Also I removed from the header so it can be accessed outside this area of the code,
+	just to avoid confusion.
+	But right now please don't use this function to add new characters.
+	Instead, put it in the correct initializer_list in loadLevel.
+*/
+void addCharacter(CurrentClick *cc, IsClickable* character) {
+	for (int i = 0; i < cc->Game.size(); i++) {
+		if (SDL_HasIntersection(&cc->Game.at(i)->area, &character->area)) {
+			cc->Game.at(i)->clicks.push_back(character);
+			cc->numChars[i]++;
+		}
+	}
+}
 
-	//Popup
-	//nothign in the start
+void buildClickAreas(CurrentClick *cc, initializer_list<IsClickable*> characters, initializer_list<Room*> rooms,
+	initializer_list<IsClickable*> UIElems, initializer_list<IsClickable*> popupElems, initializer_list<IsClickable*> gameElems) {
 
-	//Game
-	ClickArea *S0 = new ClickArea;
-	S0->area = SDL_Rect{ 0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT };
-	S0->clicks.push_back(clickable.at(0));
-	S0->clicks.push_back(clickable.at(3));
-	S0->clicks.push_back(clickable.at(1));
+	//## UI ##
+	initializer_list<ClickArea*> UIAreas = {
+		new ClickArea(SDL_Rect{ 0, 420, SCREEN_WIDTH, 60 })
+	};
+	addClickablesToAreas(UIAreas, UIElems);
+	for (ClickArea* ca : UIAreas) {
+		cc->UI.push_back(ca);
+	}
 
-	ClickArea *S1 = new ClickArea;
-	S1->area = SDL_Rect{ SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT };
-	S1->clicks.push_back(clickable.at(4));
+	//## Popup ##
+		//nothing in the start
 
-	cc->Game.push_back(S0);
-	cc->Game.push_back(S1);
+	//## Game ##
+		//The number of game parts in the game part of the heirchy of clickable things.
+	const int numGameParts = 2;
+	cc->numChars = new int[numGameParts];
+	for (int i = 0; i < numGameParts; i++)
+	{
+		cc->numChars[i] = 0;
+	}
+		//The game part areas
+	initializer_list<ClickArea*> gameAreas = {
+		new ClickArea(SDL_Rect{ 0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT }),
+		new ClickArea(SDL_Rect{ SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT })
+	};
+		//Add them rooms to rooms vector and the correct part of the game.
+	for (Room* room : rooms) {
+		cc->rooms.push_back(room);
+		addClickableToAreas(gameAreas, (IsClickable*)room);
+	}
+		//Add the usual elements
+	addClickablesToAreas(gameAreas, gameElems);
+		//Add the areas
+	for (ClickArea* ca : gameAreas) {
+		cc->Game.push_back(ca);
+	}
+		//Add them characters to characters vector and game.
+	for (IsClickable* character : characters) {
+		cc->Characters.push_back(character);
+		addCharacter(cc, character);
+	}
 }
 
 void cleanClickAreas(CurrentClick *cc) {
+	for (Room* r : cc->rooms) {
+		if (((roomPopupPars*)r->data)->poppedUp) {
+			closeRoomPopup(((roomPopupPars*)r->data)->close);
+		}
+	}
 	for (ClickArea* ca : cc->UI) {
 		delete ca;
 	}
@@ -46,15 +109,13 @@ void cleanClickAreas(CurrentClick *cc) {
 	for (ClickArea* ca : cc->Game) {
 		delete ca;
 	}
-}
-
-void addCharacters(CurrentClick *cc, IsClickable* character) {
-	for (int i = 0; i < cc->Game.size(); i++) {
-		if (SDL_HasIntersection(&cc->Game.at(i)->area, &character->area)) {
-			cc->Game.at(i)->clicks.push_back(character);
-			cc->numChars[i]++;
+	for (vector<GameObject*>* vec : cc->toRender)
+	{
+		for (GameObject* obj : *vec) {
+			delete obj;
 		}
 	}
+	delete cc->numChars;
 }
 
 ClickReciept* createPopup(const vector<IsClickable*>& clicks, const vector<GameObject*>& objs, vector<GameObject*>* currentObjects, CurrentClick *cc, const SDL_Rect& area) {
@@ -62,8 +123,7 @@ ClickReciept* createPopup(const vector<IsClickable*>& clicks, const vector<GameO
 	cr->renderObjs = new vector<GameObject*>(objs);
 	cc->toRender.push_back(cr->renderObjs);
 
-	cr->ca = new ClickAreaPopup;
-	cr->ca->area = area;
+	cr->ca = new ClickAreaPopup(area);
 	cr->ca->cr = cr;
 	for (IsClickable* cl : clicks) {
 		cr->ca->clicks.push_back(cl);
@@ -80,13 +140,15 @@ void closePopup(ClickReciept* cr) {
 	for (int i = 0; i < cr->cc->Popup.size(); i++)
 	{
 		if (cr->cc->Popup.at(i) == cr->ca) {
-			delete (*cr->cc->Popup.erase(cr->cc->Popup.begin() + i));
+			delete cr->ca;
+			cr->cc->Popup.erase(cr->cc->Popup.begin() + i);
 		}
 	}
 	for (int i = 0; i < cr->cc->toRender.size(); i++)
 	{
 		if (cr->cc->toRender.at(i) == cr->renderObjs) {
-			delete (*cr->cc->toRender.erase(cr->cc->toRender.begin() + i));
+			delete cr->renderObjs;
+			cr->cc->toRender.erase(cr->cc->toRender.begin() + i);
 		}
 	}
 
@@ -101,7 +163,7 @@ void updateClickAreas(CurrentClick *cc) {
 		cc->numChars[i] = 0;
 	}
 	for (IsClickable* character : cc->Characters) {
-		addCharacters(cc, character);
+		addCharacter(cc, character);
 	}
 }
 
@@ -137,6 +199,7 @@ void focusPopup(CurrentClick *cc, ClickAreaPopup* ca) {
 	{
 		if (cc->Popup.at(i) == ca) {
 			cc->Popup.erase(cc->Popup.begin() + i);
+			break;
 		}
 	}
 	cc->Popup.push_back(ca);
@@ -146,11 +209,39 @@ void focusPopup(CurrentClick *cc, ClickAreaPopup* ca) {
 			vector<GameObject*>* temp = cc->toRender.at(i);
 			cc->toRender.at(i) = cc->toRender.back();
 			cc->toRender.back() = temp;
+			break;
 		}
 	}
 }
 
-IsClickable* checkCord(CurrentClick *cc, int x, int y, Camera* cam) {
+void movePopup(CurrentClick *cc, ClickAreaPopup* ca, MouseStruct& mouse) {
+	ca->area.x += mouse.relX;
+	ca->area.y += mouse.relY;
+
+	for (IsClickable* ic : ca->clicks)
+	{
+		ic->area.x += mouse.relX;
+		ic->area.y += mouse.relY;
+	}
+
+	for (int i = 0; i < cc->toRender.size(); i++)
+	{
+		if (cc->toRender.at(i) == ca->cr->renderObjs) {
+			vector<GameObject*> temp = *(cc->toRender.at(i));
+			for (GameObject* obj : temp)
+			{
+				obj->x += mouse.relX;
+				obj->y += mouse.relY;
+			}
+			break;
+		}
+	}
+}
+
+IsClickable* checkCord(CurrentClick *cc, MouseStruct& mouse, Camera* cam) {
+	int x = mouse.x;
+	int y = mouse.y;
+
 	for (vector<ClickArea*>::reverse_iterator it = cc->UI.rbegin(); it != cc->UI.rend(); ++it) {
 		ClickArea* ca = *it;
 		if (ca->area.x < x && x < ca->area.x + ca->area.w &&
@@ -159,12 +250,21 @@ IsClickable* checkCord(CurrentClick *cc, int x, int y, Camera* cam) {
 		}
 	}
 
+
 	for (vector<ClickAreaPopup*>::reverse_iterator it = cc->Popup.rbegin(); it != cc->Popup.rend(); ++it) {
 		ClickAreaPopup* ca = *it;
 		if (ca->area.x < x && x < ca->area.x + ca->area.w &&
 			ca->area.y < y && y < ca->area.y + ca->area.h) {
 			if (cc->Popup.back() != ca) {
 				focusPopup(cc, ca);
+			}
+			if (mouse.buttons[0].isPressed)
+			{
+				if (cc->currentlySelected == ca)
+				{
+					movePopup(cc, ca, mouse);
+				}
+				cc->currentlySelected = ca;
 			}
 			return checkArea(cc, x, y, ca);
 		}

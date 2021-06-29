@@ -20,6 +20,14 @@ struct closePopUpPars {
 	ClickReciept *cr;
 };
 
+struct roomPopupPars : popPopUpPars {
+	roomPopupPars(popPopUpPars pPUP) : popPopUpPars{pPUP} {}
+	Room *room;
+	closePopUpPars *close;
+};
+
 void testClosePopUp(void*);
 void testPopPopUp(void*);
 void testPopPopUp0(void*);
+void roomPopup(void*);
+void closeRoomPopup(void*);

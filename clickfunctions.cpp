@@ -18,8 +18,10 @@ void testClosePopUp(void *cntxt) {
 
 	//Delete necessary GameObejcts and IsClickable objects.
 	//NOTE: This deletes the button which we were called from
-	for (GameObject* obj : *pars->cr->renderObjs) {
+	int i = 0;
+	for (GameObject* obj : *cr->renderObjs) {
 		delete obj;
+		i++;
 	}
 	closePopup(cr);
 	printf("Hello %s!\n", "Closed a popup");
@@ -82,5 +84,67 @@ void testPopPopUp0(void *cntxt) {
 		cPUP->cr = createPopup(clicks, objs, pars->objects, pars->cc, SDL_Rect{260, 260, 120, 120 });
 		printf("Called testPopPopUp0\n");
 		pars->poppedUp = true;
+	}
+}
+
+void closeRoomPopup(void *cntxt) {
+	closePopUpPars *pars = (closePopUpPars*)cntxt;
+
+	pars->pPUP->poppedUp = false;
+	ClickReciept *cr = pars->cr;
+
+	//Delete necessary GameObejcts and IsClickable objects.
+	//NOTE: This deletes the button which we were called from
+	delete cr->renderObjs->at(0);
+	delete cr->renderObjs->back();
+	/*int i = 0;
+	for (GameObject* obj : *cr->renderObjs) {
+		printf("num: %d, p: %p\n", i, obj);
+		delete obj;
+		i++;
+	}*/
+	closePopup(cr);
+	printf("Hello %s!\n", "Closed a popup");
+}
+
+void roomPopup(void *cntxt) {
+	roomPopupPars *pars = (roomPopupPars*)cntxt;
+	if (!pars->poppedUp) {
+		vector<GameObject*> objs;
+		vector<IsClickable*> clicks;
+		int x = 320;
+		int y = 200;
+		GameObjClick *p = new GameObjClick(x, y, pars->media->images.at(0), btnHello,
+			(void*)(new btnHelloParameter{ "p!" }));
+
+		closePopUpPars* cPUP = new closePopUpPars;
+		cPUP->pPUP = pars;
+		GameObjClick *px = new GameObjClick(x+60, y, pars->media->images.at(1), closeRoomPopup,
+			(void*)(cPUP));
+		objs.push_back(p);
+		clicks.push_back(p);
+		
+		int yLength = 0;
+		for (GameObjClick* goc : pars->room->buttons) {
+			goc->x = x;
+			goc->y = y + 60*yLength;
+			goc->area.x = x;
+			goc->area.y = goc->y;
+
+			//GameObjClick* copy = new GameObjClick{ *goc };
+			//printf("And this2 %p\n", copy);
+			clicks.push_back(goc);
+			objs.push_back(goc);
+			yLength++;
+		}
+		yLength = yLength < 2 ? 2 : yLength;
+
+		//Close button need to be pushed last, so it is deleted last.
+		clicks.push_back(px);
+		objs.push_back(px);
+		cPUP->cr = createPopup(clicks, objs, pars->objects, pars->cc, SDL_Rect{ x, y, 120, 60 * yLength });
+		printf("Called roomPopup\n");
+		pars->poppedUp = true;
+		pars->close = cPUP;
 	}
 }
