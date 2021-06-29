@@ -289,11 +289,20 @@ struct Room : GameObjClick {
 
 	Room(int xPos, int yPos, Image *img, void(*func)(void*), void* d, int f)
 		: flag{ f }, GameObjClick(xPos, yPos, img, func, d) {
-
 	}
 
 	Room(int xPos, int yPos, Image *img, SDL_Rect ar, void(*func)(void*), void* d, int f)
 		: flag{ f }, GameObjClick(xPos, yPos, img, ar, func, d) {
 
 	}
+};
+
+/*
+	Door struct for doors
+*/
+struct Door : GameObjClick {
+	bool IsLocked = false;
+	bool IsOpen = false;
+	Door(int xPos, int yPos, Image *img, void(*func)(void*), void* d)
+		: GameObjClick(xPos, yPos, img, func, d) {}
 };

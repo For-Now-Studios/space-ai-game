@@ -27,7 +27,7 @@ struct Labels {
 	space for ease of use
 */
 bool loadLevel(vector<GameObject *>* objects, Media* media,
-	const char *path, CurrentClick* cc, Labels* labels){
+	const char *path, CurrentClick* cc, Labels* labels, MouseStruct* mouse){
 	GameObject *obj = new GameObject;
 	obj->image = media->images.at(0);
 	obj->x = 0;
@@ -87,8 +87,16 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 			banana!" }), "Paul", intersex, labels->genders->at(0), labels->romance->at(0),
 		labels->sexuality->at(0));
 
+	DoorClickPars* DCP = new DoorClickPars;
+	Door *doorTest = new Door(600, 300, media->images.at(2), doorClick, DCP);
+	DCP->door = doorTest;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+
 	//Build clickable areas
-	buildClickAreas(cc, { c0, paul }, { roomTest, roomTest2, roomTest3, roomTest4 }, { ui0 }, {}, {button, button0});
+	buildClickAreas(cc, { c0, paul }, { roomTest, roomTest2, roomTest3, roomTest4 }, { ui0 }, {}, {button, button0, doorTest});
 
 	objects->push_back(obj);
 	objects->push_back(obj2);
@@ -101,6 +109,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	objects->push_back(roomTest3);
 	objects->push_back(roomTest4);
 	objects->push_back(paul);
+	objects->push_back(doorTest);
 
 	return true;
 }
@@ -263,7 +272,7 @@ int main(int argc, char *argv[]){
 		labels.romance = romance;
 		labels.sexuality = sexuality;
 
-		if(loadLevel(&objects, &media, "", &currClick, &labels)){
+		if(loadLevel(&objects, &media, "", &currClick, &labels, &mouse)){
 			printf("Game object done!\n");
 
 			// MUSIC TEST
@@ -399,7 +408,7 @@ int main(int argc, char *argv[]){
 		if (mouse.buttons[0].isPressed) {
 			checkCord(&currClick, mouse, &cam);
 		}
-		if (mouse.buttons[0].isReleased) {
+		if (mouse.buttons[0].isReleased || mouse.buttons[2].isReleased) {
 			IsClickable* clicked = checkCord(&currClick, mouse, &cam);
 			if (clicked != nullptr) {
 				clicked->function(clicked->data);
@@ -440,7 +449,7 @@ int main(int argc, char *argv[]){
 
 		//render(&window, media.images.at(0), 0, 120);
 		//render(&window, media.images.at(0), 120, 120, &cam);
-		render(&window, media.images.at(2), 120, 300);
+		render(&window, media.images.at(1), 120, 300);
 		
 		for(GameObject* obj : objects) {
 			render(&window, obj, &cam);
