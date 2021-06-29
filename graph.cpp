@@ -1,41 +1,25 @@
-//#include "graph.h"
-#include <vector>
-#include <unordered_map>
-#include <queue>
-#include <stdio.h>
-#include <limits.h>
+#include "graph.h"
 
 using namespace std;
-
-template<class N, class V> class Edge;
-template<class N, class V> class Node;
 
 // NOTE: A very collision prone hash function that hashes the class pair
 // TODO: Make this less collision prone
 struct pairHash {
 	template<class A, class B> size_t operator () (const pair<A, B> &p) const {
-		//size_t h1 = hash<A>{}(p.first);
-		//size_t h2 = hash<B>{}(p.second);
 		size_t t = (size_t)(p.first)*10000 + (size_t)(p.second);
 		
 		return hash<int>{}(t);
     }
 };
 
+/*
+	Utility function to allow Pairs to be used within a priority queue
+*/
 struct pairCmp{
 	template<class N> bool operator () (pair<N, int> a, pair<N, int> b){
 		return a.second > b.second;
 	}
 };
-
-template<class N> void vectorErase(vector<N> &v, N e){
-	for(typename vector<N>::iterator it = v.begin(); it != v.end(); it++){
-		if(*it == e){
-			v.erase(it);
-			break;
-		}
-	}	
-}
 
 template<class N, class V> class Edge{
 	public:
@@ -94,7 +78,6 @@ template<class N, class V> class Node{
 
 	void removeEdge(Edge<N, V> *e){
 		// Remove the edge from the graphs list
-		//vectorErase<Edge<N, V> *>(edges, e);
 		auto r = edges.find(pair<N, N>(e->from->data, e->to->data));
 		if(r != edges.end()) edges.erase(r);
 	}
@@ -159,9 +142,6 @@ template<class N, class V> class Graph{
 	void removeEdge(Edge<N, V> *e){
 		edges.erase(edges.find(pair<N, N>(e->to->data, e->from->data)));
 
-		// Remove the edge from the graphs list
-		//vectorErase<Edge<N, V> *>(edges, e);
-
 		// Remove the edge from the lists of nodes it goes between
 		e->from->removeEdge(e);
 		e->to->removeEdge(e);
@@ -176,47 +156,15 @@ template<class N, class V> class Graph{
 		e->from->removeEdge(e);
 		e->to->removeEdge(e);
 
-		/*for(typename vector<Edge<N, V> *>::iterator it =
-				nodes.at(from)->edges.begin();
-					it != nodes.at(from)->edges.end(); it++){
-			Edge<N, V> *t = *it;
-
-			if(t->to->data == to){
-				nodes.at(from)->edges.erase(it);
-				e = t;
-				break;
-			}
-		}
-		vectorErase<Edge<N, V> *>(edges, e);*/
-
 		delete e;
 	}
 
 	//Updates the value connected to the edge going between the two specified nodes
 	void updateEdge(N from, N to, V value){
-		/*for(typename vector<Edge<N, V> *>::iterator it =
-				nodes.at(from)->edges.begin();
-					it != nodes.at(from)->edges.end(); it++){
-			Edge<N, V> *t = *it;
-
-			if(t->to->data == to){
-				t->value = value;
-				break;
-			}
-		}*/
 		edges.at(pair<N, N>(from, to))->value = value;
 	}
 
 	N getEdgeValue(N from, N to){
-		/*for(typename vector<Edge<N, V> *>::iterator it =
-				nodes.at(from)->edges.begin();
-					it != nodes.at(from)->edges.end(); it++){
-			Edge<N, V> *t = *it;
-
-			if(t->to->data == to){
-				return t->value;
-			}
-		}*/
 		return edges.at(pair<N, N>(from, to))->value;
 	}
 
@@ -231,9 +179,6 @@ template<class N, class V> class Graph{
 						edges.begin(); it != edges.end(); it++){
 			it->second->print();
 		}
-		/*for(Edge<N, V> *e : edges){
-			e->print();
-		}*/
 	}
 };
 
@@ -294,35 +239,4 @@ template<class N> vector<N> *dijkstra(Graph<N, int> *g, N a, N b){
 	}
 
 	return path;
-}
-
-int main(){
-	Graph<int, int> *g = new Graph<int, int>();
-
-	for(int i = 0; i < 100; i++){
-		g->addNode(i);
-	}
-	printf("Added all nodes!\n");
-
-	for(int i = 0; i < g->nodes.size(); i++){
-		for(int j = i+1; j < g->nodes.size(); j++){
-			g->addEdge(i, j, (i+1)*100 + j);
-			g->addEdge(j, i, (i+1)*100 + j);
-		}
-	}
-	printf("Added all edges!\n");
-
-	for(int i = 0; i < g->nodes.size() - 1; i++){
-		g->updateEdge(i, i+1, 0);
-		g->updateEdge(i+1, i, 0);
-	}
-	printf("Added a best path! \n");
-
-	vector<int> *path = dijkstra(g, 0, (int)g->nodes.size()-1);
-
-	/*for(int n : *path){
-		printf("%d\n", n);
-	}*/
-
-	return 0;
 }

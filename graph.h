@@ -1,44 +1,12 @@
 #pragma once
 #include <vector>
+#include <unordered_map>
+#include <queue>
+#include <stdio.h>
+#include <limits.h>
 
-using namespace std;
+template<class N, class V> class Edge;
+template<class N, class V> class Node;
+template<class N, class V> class Graph;
 
-template<class V, class N>
-class Graph{
-	Node<N> node;
-	Edge<V> edge;
-
-	class Edge{
-		Node *from;
-		Node *to;
-		V value;
-
-		Edge(Node *f, Node* t, V v){
-			value = v;
-			from = f;
-			to = t;
-		}
-	};
-
-	class Node{
-		N *data;
-		vector<Edge<V> *> edges;
-
-		Node(){
-			data = nullptr;
-		}
-		Node(N *d){
-			data = d;
-		}
-
-		addEdge(Edge<V> *edge){
-			edges.push_back(edge);
-		}
-		addEdge(Node *to){
-			addEdge(new Edge<V>(this, to, 0);
-		}
-		addEdge(Node *to, V val){
-			addEdge(new Edge<V>(this, to, val);
-		}
-	};
-};
+template<class N> std::vector<N> *dijkstra(Graph<N, int> *g, N a, N b);
