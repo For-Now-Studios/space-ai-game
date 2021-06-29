@@ -20,7 +20,6 @@ void testClosePopUp(void *cntxt) {
 	//NOTE: This deletes the button which we were called from
 	int i = 0;
 	for (GameObject* obj : *cr->renderObjs) {
-		printf("num: %d, p: %p\n", i, obj);
 		delete obj;
 		i++;
 	}
@@ -119,7 +118,6 @@ void roomPopup(void *cntxt) {
 			(void*)(new btnHelloParameter{ "p!" }));
 
 		closePopUpPars* cPUP = new closePopUpPars;
-		printf("Luke, remember this %p\n", cPUP);
 		cPUP->pPUP = pars;
 		GameObjClick *px = new GameObjClick(x+60, y, pars->media->images.at(1), closeRoomPopup,
 			(void*)(cPUP));
@@ -134,14 +132,12 @@ void roomPopup(void *cntxt) {
 			goc->area.y = goc->y;
 
 			//GameObjClick* copy = new GameObjClick{ *goc };
-			printf("And this %p\n", goc);
 			//printf("And this2 %p\n", copy);
 			clicks.push_back(goc);
 			objs.push_back(goc);
 			yLength++;
 		}
 		yLength = yLength < 2 ? 2 : yLength;
-		printf("yLength: %d\n", yLength);
 
 		//Close button need to be pushed last, so it is deleted last.
 		clicks.push_back(px);

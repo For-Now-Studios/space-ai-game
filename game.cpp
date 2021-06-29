@@ -11,14 +11,22 @@
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
+struct Labels {
+	vector<char *> *genders = nullptr;
+	vector<affectionTrait *> *romance = nullptr;
+	vector<affectionTrait *> *sexuality = nullptr;
+};
+
 /*
 	TODO: Maybe make this function load data from a level file?
+	TODO: Divide this function up to different functions that each return a vector/list_intializer,
+	that we finally put into the CreateClickableArea function and into the objects vector.
 	
 	NOTE: Currently just a collection of used game objects collected in a singular
 	space for ease of use
 */
-bool loadLevel(vector<GameObject *>* objects, vector<IsClickable *>* clickable,
-				Media* media, const char *path, CurrentClick* cc){
+bool loadLevel(vector<GameObject *>* objects, Media* media,
+	const char *path, CurrentClick* cc, Labels* labels){
 	GameObject *obj = new GameObject;
 	obj->image = media->images.at(0);
 	obj->x = 0;
@@ -48,23 +56,25 @@ bool loadLevel(vector<GameObject *>* objects, vector<IsClickable *>* clickable,
 		TOILET | AICORE | CLEARLYFATAL
 	);
 	rPUP->room = roomTest;
-	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello, //blaze it
+	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello,
 		(void*)(new btnHelloParameter{ "room option 0!" })));
-	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello, //blaze it
+	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello,
 		(void*)(new btnHelloParameter{ "room option 1!" })));
-	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello, //blaze it
+	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello,
 		(void*)(new btnHelloParameter{ "room option 2!" })));
-	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello, //blaze it
+	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello,
 		(void*)(new btnHelloParameter{ "room option 3!" })));
-	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello, //blaze it
+	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello,
 		(void*)(new btnHelloParameter{ "room option 4!" })));
 
+	CharacterObject *paul = new CharacterObject(420, 300,
+		media->images.at(1), btnHello,
+		(void *)(new btnHelloParameter{ "Come on mr tally man, tally my\
+			banana!" }), "Paul", intersex, labels->genders->at(0), labels->romance->at(0),
+		labels->sexuality->at(0));
 
-	clickable->push_back(button);
-	clickable->push_back(c0);
-	clickable->push_back(ui0);
-	clickable->push_back(button0);
-	clickable->push_back(roomTest);
+	//Build clickable areas
+	buildClickAreas(cc, { c0, paul }, { roomTest }, { ui0 }, {}, {button, button0});
 
 	objects->push_back(obj);
 	objects->push_back(obj2);
@@ -73,7 +83,7 @@ bool loadLevel(vector<GameObject *>* objects, vector<IsClickable *>* clickable,
 	objects->push_back(ui0);
 	objects->push_back(button0);
 	objects->push_back(roomTest);
-	
+	objects->push_back(paul);
 
 	return true;
 }
@@ -138,8 +148,7 @@ bool init(WindowStruct *window) {
 }
 
 void close(WindowStruct *window, Media& media, vector<GameObject*>& objects,
-	CurrentClick* cc, vector<char *> *genders, vector<affectionTrait *> *romance,
-						vector<affectionTrait *> *sexuality){
+	CurrentClick* cc, Labels *labels){
 	for(Image* img : media.images)
 	{
 		img->~Image();
@@ -163,12 +172,12 @@ void close(WindowStruct *window, Media& media, vector<GameObject*>& objects,
 		delete obj;
 	}
 
-	for(char *t : *genders){
+	for(char *t : *labels->genders){
 		delete t;
 	}
 	printf("Freed the genders!\n");
 	
-	for(affectionTrait *t : *romance){
+	for(affectionTrait *t : *labels->romance){
 		delete t->name;
 		for(int i = 0; i < t->n; i++){
 			delete t->genders[i];
@@ -179,7 +188,7 @@ void close(WindowStruct *window, Media& media, vector<GameObject*>& objects,
 	}
 	printf("Freed the romances!\n");
 
-	for(affectionTrait *t : *sexuality){
+	for(affectionTrait *t : *labels->sexuality){
 		delete t->name;
 		for(int i = 0; i < t->n; i++){
 			delete t->genders[i];
@@ -221,29 +230,23 @@ int main(int argc, char *argv[]){
 	bool running = loadMedia(&media, "manifest", window.render);
 
 	CurrentClick currClick;
-	vector<IsClickable*> clickable;
 	vector<GameObject*> objects;
 	
 	vector<char *> *genders = nullptr;
 	vector<affectionTrait *> *romance = nullptr;
 	vector<affectionTrait *> *sexuality = nullptr;
+	Labels labels;
 
 	int channel; //MUSIC TEST
 	if(running){
 		genders = loadGender("gender.jpeg");
 		romance = loadAffectionTrait("romance.jpeg");
 		sexuality = loadAffectionTrait("sexuality.jpeg");
+		labels.genders = genders;
+		labels.romance = romance;
+		labels.sexuality = sexuality;
 
-		if(loadLevel(&objects, &clickable, &media, "", &currClick)){
-			CharacterObject *paul = new CharacterObject(420, 300,
-			media.images.at(1), btnHello,
-			(void *)(new btnHelloParameter{"Come on mr tally man, tally my\
-			banana!"}), "Paul", intersex, genders->at(0), romance->at(0),
-			sexuality->at(0));
-
-			clickable.push_back(paul);
-			objects.push_back(paul);
-
+		if(loadLevel(&objects, &media, "", &currClick, &labels)){
 			printf("Game object done!\n");
 
 			// MUSIC TEST
@@ -254,10 +257,6 @@ int main(int argc, char *argv[]){
 		
 			media.images.push_back(new Image(media.fonts.at(0),
 						"Hello Jacob!", {0,0,0}, window.render));
-			
-			//Clickable areas
-			buildClickAreas(&currClick, clickable);
-			//addCharacters(&currClick, clickable.at(4));
 		}
 	}
 	//Pause the music & sound
@@ -356,9 +355,14 @@ int main(int argc, char *argv[]){
 		}
 
 		//More advanced simple button test
-		IsClickable* clicked = checkCord(&currClick, mouse, &cam);
-		if (mouse.buttons[0].isReleased && clicked != nullptr) {
-			clicked->function(clicked->data);
+		if (mouse.buttons[0].isPressed) {
+			checkCord(&currClick, mouse, &cam);
+		}
+		if (mouse.buttons[0].isReleased) {
+			IsClickable* clicked = checkCord(&currClick, mouse, &cam);
+			if (clicked != nullptr) {
+				clicked->function(clicked->data);
+			}
 			currClick.currentlySelected = nullptr;
 		}
 
@@ -402,7 +406,7 @@ int main(int argc, char *argv[]){
 		SDL_RenderPresent(window.render);
 	}
 
-	close(&window, media, objects, &currClick, genders, romance, sexuality);
+	close(&window, media, objects, &currClick, &labels);
 
 	return 0;
 }
