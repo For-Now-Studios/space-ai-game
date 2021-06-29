@@ -1,4 +1,11 @@
-#include "graph.h"
+#pragma once
+#include <vector>
+#include <unordered_map>
+#include <queue>
+#include <stdio.h>
+#include <limits.h>
+#include <cstddef>
+#include <utility>
 
 using namespace std;
 
@@ -58,7 +65,7 @@ template<class N, class V> class Node{
 
 	// Add a new edge going from this node to the specified node
 	Edge<N, V> *addEdge(Node<N, V> *to, V val){
-		Edge<N, V> *t = new Edge<V, N>(this, to, val);
+		Edge<N, V> *t = new Edge<N, V>(this, to, val);
 
 		auto r = edges.emplace(pair<N, N>(data, to->data), t);
 
@@ -186,7 +193,7 @@ template<class N, class V> class Graph{
 	Finds the shortest path from point a to point b in a undirected graph, where the
 	edges are assumed to be positive integers
 */
-template<class N> vector<N> *dijkstra(Graph<N, int> *g, N a, N b){
+template<class N> std::vector<N> *dijkstra(Graph<N, int> *g, N a, N b){
 	unordered_map<N, int> dist;
 	unordered_map<N, N> prev;
 	dist.reserve(g->nodes.size());
@@ -204,12 +211,12 @@ template<class N> vector<N> *dijkstra(Graph<N, int> *g, N a, N b){
 
 	while(!q.empty()){
 		//Check if the queued element has been updated (hence outdated)
-		if(dist.at(q.top().second) != q.top().first){
+		if(dist.at(q.top().first) != q.top().second){
 			q.pop();
 			continue;
 		}
 
-		N cur = q.top().second;
+		N cur = q.top().first;
 		q.pop();
 
 		if(cur == b) break; //The node with lowest cost is our target, hence done
@@ -222,7 +229,7 @@ template<class N> vector<N> *dijkstra(Graph<N, int> *g, N a, N b){
 				dist.at(neighbour) = dist.at(cur) + weight;
 				prev.at(neighbour) = cur;
 
-				q.push(pair<N, int>(dist.at(neighbour), neighbour));
+				q.push(pair<N, int>(neighbour, dist.at(neighbour)));
 			}
 		}
 	}

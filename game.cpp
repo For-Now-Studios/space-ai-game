@@ -7,6 +7,7 @@
 #include "globals.h"
 #include "click.h"
 #include "clickfunctions.h"
+#include "graph.h"
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
@@ -67,14 +68,27 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello,
 		(void*)(new btnHelloParameter{ "room option 4!" })));
 
-	CharacterObject *paul = new CharacterObject(420, 300,
+	Room *roomTest2 = new Room(240, 120, media->images.at(0), roomPopup,
+		(void*)(rPUP),
+		TOILET | AICORE | CLEARLYFATAL
+	);
+	Room *roomTest3 = new Room(120, 240, media->images.at(0), roomPopup,
+		(void*)(rPUP),
+		TOILET | AICORE | CLEARLYFATAL
+	);
+	Room *roomTest4 = new Room(240, 240, media->images.at(0), roomPopup,
+		(void*)(rPUP),
+		TOILET | AICORE | CLEARLYFATAL
+	);
+
+	CharacterObject *paul = new CharacterObject(120, 120,
 		media->images.at(1), btnHello,
 		(void *)(new btnHelloParameter{ "Come on mr tally man, tally my\
 			banana!" }), "Paul", intersex, labels->genders->at(0), labels->romance->at(0),
 		labels->sexuality->at(0));
 
 	//Build clickable areas
-	buildClickAreas(cc, { c0, paul }, { roomTest }, { ui0 }, {}, {button, button0});
+	buildClickAreas(cc, { c0, paul }, { roomTest, roomTest2, roomTest3, roomTest4 }, { ui0 }, {}, {button, button0});
 
 	objects->push_back(obj);
 	objects->push_back(obj2);
@@ -83,6 +97,9 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	objects->push_back(ui0);
 	objects->push_back(button0);
 	objects->push_back(roomTest);
+	objects->push_back(roomTest2);
+	objects->push_back(roomTest3);
+	objects->push_back(roomTest4);
 	objects->push_back(paul);
 
 	return true;
@@ -269,6 +286,29 @@ int main(int argc, char *argv[]){
 	cam.wndX = 0;
 	cam.wndY = 0;
 
+	//GRAPH TEST
+	Graph<GameObject *, int> g;
+	g.addNode(objects.at(6));
+	g.addNode(objects.at(7));
+	g.addNode(objects.at(8));
+	g.addNode(objects.at(9));
+
+	g.addEdge(objects.at(6), objects.at(7), 1);
+	g.addEdge(objects.at(7), objects.at(6), 1);
+	g.addEdge(objects.at(6), objects.at(8), 1);
+	g.addEdge(objects.at(8), objects.at(6), 1);
+	g.addEdge(objects.at(7), objects.at(9), 1);
+	g.addEdge(objects.at(9), objects.at(7), 1);
+	g.addEdge(objects.at(8), objects.at(9), 1);
+	g.addEdge(objects.at(9), objects.at(8), 1);
+
+	Room *start = whichRoom(&currClick.rooms, objects.at(10));
+	vector<Room *> *path = (vector<Room *> *) findPathTo(&g, start, objects.at(9));
+
+	for(Room *r : *path){
+		printf("%d, %d\n", r->x, r->y);
+	}
+
 	// Timing
 	unsigned int targetFrequency = 60;
 	Uint32 targetTime = 1000 / targetFrequency;
@@ -304,6 +344,7 @@ int main(int argc, char *argv[]){
 
 	// The Loop
 	int ticks = 0;
+
 	while(running){
 		SDL_RenderClear(window.render);
 
@@ -367,11 +408,27 @@ int main(int argc, char *argv[]){
 		}
 
 		// Testing moving characters
-		objects.at(3)->moveBy(speed, 0);
-		objects.at(6)->moveBy(speed, speed/3);
+		/*objects.at(3)->moveBy(speed, 0);
+		objects.at(10)->moveBy(speed, speed/3);
 		if (objects.at(3)->x > SCREEN_WIDTH - 60 || objects.at(3)->x < 1) {
 			speed *= -1;
+		}*/
+		SDL_Rect paulArea = {objects.at(10)->x, objects.at(10)->y, 1, 1};
+		if(!path->empty()){
+			if(SDL_HasIntersection(&path->back()->area, &paulArea)){
+				path->pop_back();
+			}
+			else{
+				int xSign = 1;
+				if(paulArea.x > path->back()->area.x) xSign = -1;
+
+				int ySign = 1;
+				if(paulArea.y > path->back()->area.y) ySign = -1;
+
+				objects.at(10)->moveBy(speed/5 * xSign, speed/5 * ySign);
+			}
 		}
+
 		updateClickAreas(&currClick);
 		//Prints the amount of characters for each part of the screen
 		//printf("S0: %d, S1: %d\n", currClick.numChars[0], currClick.numChars[1]);
