@@ -26,8 +26,25 @@ struct roomPopupPars : popPopUpPars {
 	closePopUpPars *close;
 };
 
+struct DoorClickPars {
+	Door *door;
+	MouseStruct *mouse;
+	Image *open;
+	Image *closed;
+	Image *locked;
+};
+
 void testClosePopUp(void*);
 void testPopPopUp(void*);
 void testPopPopUp0(void*);
 void roomPopup(void*);
 void closeRoomPopup(void*);
+/*
+ The function called when you click a door
+ If you left click it will open/close door
+ Right click lock/unlock door
+ A locked door is closed and can't be opened
+ Opening a locked door (as the AI) will unlock it and open it.
+ Has *pretty* graphics to show this
+*/
+void doorClick(void*);
