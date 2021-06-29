@@ -5,6 +5,7 @@
 #include<SDL2/SDL_ttf.h>
 #include<fstream>
 #include "structs.h"
+#include "graph.h"
 
 using namespace std;
 
@@ -42,3 +43,8 @@ char **splitString(char *string, int &len, int maxLength);
 bool loadMedia(Media *media, const char *path, SDL_Renderer *render);
 vector<char *> *loadGender(const char *path);
 vector<affectionTrait *> *loadAffectionTrait(const char *path);
+
+// Pathfinding.cpp
+Room *whichRoom(vector<Room *> *v, GameObject *obj);
+vector<GameObject *> *findPathTo(Graph<GameObject *, int> *g, GameObject *from,
+								GameObject *to);
