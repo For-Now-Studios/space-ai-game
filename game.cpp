@@ -42,10 +42,29 @@ bool loadLevel(vector<GameObject *>* objects, vector<IsClickable *>* clickable,
 	GameObjClick *button0 = new GameObjClick(0, 120, media->images.at(0), testPopPopUp0,
 		(void*)(new popPopUpPars{cc, false, objects, media}));
 
+	roomPopupPars* rPUP = new roomPopupPars(popPopUpPars{ cc, false, objects, media });
+	Room *roomTest = new Room(120, 120, media->images.at(0), roomPopup,
+		(void*)(rPUP),
+		TOILET | AICORE | CLEARLYFATAL
+	);
+	rPUP->room = roomTest;
+	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello, //blaze it
+		(void*)(new btnHelloParameter{ "room option 0!" })));
+	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello, //blaze it
+		(void*)(new btnHelloParameter{ "room option 1!" })));
+	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello, //blaze it
+		(void*)(new btnHelloParameter{ "room option 2!" })));
+	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello, //blaze it
+		(void*)(new btnHelloParameter{ "room option 3!" })));
+	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello, //blaze it
+		(void*)(new btnHelloParameter{ "room option 4!" })));
+
+
 	clickable->push_back(button);
 	clickable->push_back(c0);
 	clickable->push_back(ui0);
 	clickable->push_back(button0);
+	clickable->push_back(roomTest);
 
 	objects->push_back(obj);
 	objects->push_back(obj2);
@@ -53,6 +72,7 @@ bool loadLevel(vector<GameObject *>* objects, vector<IsClickable *>* clickable,
 	objects->push_back(c0);
 	objects->push_back(ui0);
 	objects->push_back(button0);
+	objects->push_back(roomTest);
 	
 
 	return true;
@@ -135,13 +155,6 @@ void close(WindowStruct *window, Media& media, vector<GameObject*>& objects,
 
 	for(Font* f : media.fonts){
 		f->~Font();
-	}
-
-	for (vector<GameObject*>* vec : cc->toRender)
-	{
-		for (GameObject* obj : *vec) {
-			delete obj;
-		}
 	}
 
 	cleanClickAreas(cc);
@@ -299,6 +312,8 @@ int main(int argc, char *argv[]){
 		for(MouseStruct::Button& button : mouse.buttons) button.isReleased = 0;
 		mouse.scrollRight = 0;
 		mouse.scrollUp = 0;
+		mouse.relX = 0;
+		mouse.relY = 0;
 
 		//Start handling events.
 		SDL_Event event;
@@ -311,6 +326,8 @@ int main(int argc, char *argv[]){
 				case SDL_MOUSEMOTION:
 					mouse.x = event.motion.x;
 					mouse.y = event.motion.y;
+					mouse.relX = event.motion.xrel;
+					mouse.relY = event.motion.yrel;
 					break;
 				case SDL_MOUSEBUTTONUP:
 				case SDL_MOUSEBUTTONDOWN:
@@ -339,12 +356,10 @@ int main(int argc, char *argv[]){
 		}
 
 		//More advanced simple button test
-		if (mouse.buttons[0].isReleased) {
-			IsClickable* clicked = checkCord(&currClick, mouse.x, mouse.y,
-										&cam);
-			if (clicked != nullptr) {
-				clicked->function(clicked->data);
-			}
+		IsClickable* clicked = checkCord(&currClick, mouse, &cam);
+		if (mouse.buttons[0].isReleased && clicked != nullptr) {
+			clicked->function(clicked->data);
+			currClick.currentlySelected = nullptr;
 		}
 
 		// Testing moving characters

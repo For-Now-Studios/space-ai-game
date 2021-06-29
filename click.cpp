@@ -4,6 +4,7 @@
 #include "engine.h"
 #include "globals.h"
 #include "click.h"
+#include "clickfunctions.h"
 
 void buildClickAreas(CurrentClick *cc, vector<IsClickable*> clickable) {
 	cc->Characters.push_back(clickable.at(1));
@@ -25,6 +26,7 @@ void buildClickAreas(CurrentClick *cc, vector<IsClickable*> clickable) {
 	ClickArea *S0 = new ClickArea;
 	S0->area = SDL_Rect{ 0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT };
 	S0->clicks.push_back(clickable.at(0));
+	S0->clicks.push_back(clickable.at(4));
 	S0->clicks.push_back(clickable.at(3));
 	S0->clicks.push_back(clickable.at(1));
 
@@ -37,6 +39,11 @@ void buildClickAreas(CurrentClick *cc, vector<IsClickable*> clickable) {
 }
 
 void cleanClickAreas(CurrentClick *cc) {
+	for (Room* r : cc->rooms) {
+		if (((roomPopupPars*)r->data)->poppedUp) {
+			closeRoomPopup(((roomPopupPars*)r->data)->close);
+		}
+	}
 	for (ClickArea* ca : cc->UI) {
 		delete ca;
 	}
@@ -45,6 +52,12 @@ void cleanClickAreas(CurrentClick *cc) {
 	}
 	for (ClickArea* ca : cc->Game) {
 		delete ca;
+	}
+	for (vector<GameObject*>* vec : cc->toRender)
+	{
+		for (GameObject* obj : *vec) {
+			delete obj;
+		}
 	}
 }
 
@@ -80,13 +93,15 @@ void closePopup(ClickReciept* cr) {
 	for (int i = 0; i < cr->cc->Popup.size(); i++)
 	{
 		if (cr->cc->Popup.at(i) == cr->ca) {
-			delete (*cr->cc->Popup.erase(cr->cc->Popup.begin() + i));
+			delete cr->ca;
+			cr->cc->Popup.erase(cr->cc->Popup.begin() + i);
 		}
 	}
 	for (int i = 0; i < cr->cc->toRender.size(); i++)
 	{
 		if (cr->cc->toRender.at(i) == cr->renderObjs) {
-			delete (*cr->cc->toRender.erase(cr->cc->toRender.begin() + i));
+			delete cr->renderObjs;
+			cr->cc->toRender.erase(cr->cc->toRender.begin() + i);
 		}
 	}
 
@@ -137,6 +152,7 @@ void focusPopup(CurrentClick *cc, ClickAreaPopup* ca) {
 	{
 		if (cc->Popup.at(i) == ca) {
 			cc->Popup.erase(cc->Popup.begin() + i);
+			break;
 		}
 	}
 	cc->Popup.push_back(ca);
@@ -146,11 +162,39 @@ void focusPopup(CurrentClick *cc, ClickAreaPopup* ca) {
 			vector<GameObject*>* temp = cc->toRender.at(i);
 			cc->toRender.at(i) = cc->toRender.back();
 			cc->toRender.back() = temp;
+			break;
 		}
 	}
 }
 
-IsClickable* checkCord(CurrentClick *cc, int x, int y, Camera* cam) {
+void movePopup(CurrentClick *cc, ClickAreaPopup* ca, MouseStruct& mouse) {
+	ca->area.x += mouse.relX;
+	ca->area.y += mouse.relY;
+
+	for (IsClickable* ic : ca->clicks)
+	{
+		ic->area.x += mouse.relX;
+		ic->area.y += mouse.relY;
+	}
+
+	for (int i = 0; i < cc->toRender.size(); i++)
+	{
+		if (cc->toRender.at(i) == ca->cr->renderObjs) {
+			vector<GameObject*> temp = *(cc->toRender.at(i));
+			for (GameObject* obj : temp)
+			{
+				obj->x += mouse.relX;
+				obj->y += mouse.relY;
+			}
+			break;
+		}
+	}
+}
+
+IsClickable* checkCord(CurrentClick *cc, MouseStruct& mouse, Camera* cam) {
+	int x = mouse.x;
+	int y = mouse.y;
+
 	for (vector<ClickArea*>::reverse_iterator it = cc->UI.rbegin(); it != cc->UI.rend(); ++it) {
 		ClickArea* ca = *it;
 		if (ca->area.x < x && x < ca->area.x + ca->area.w &&
@@ -159,12 +203,22 @@ IsClickable* checkCord(CurrentClick *cc, int x, int y, Camera* cam) {
 		}
 	}
 
+
 	for (vector<ClickAreaPopup*>::reverse_iterator it = cc->Popup.rbegin(); it != cc->Popup.rend(); ++it) {
 		ClickAreaPopup* ca = *it;
 		if (ca->area.x < x && x < ca->area.x + ca->area.w &&
 			ca->area.y < y && y < ca->area.y + ca->area.h) {
 			if (cc->Popup.back() != ca) {
 				focusPopup(cc, ca);
+				printf("Focusing\n");
+			}
+			if (mouse.buttons[0].isPressed)
+			{
+				if (cc->currentlySelected == ca)
+				{
+					movePopup(cc, ca, mouse);
+				}
+				cc->currentlySelected = ca;
 			}
 			return checkArea(cc, x, y, ca);
 		}
