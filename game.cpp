@@ -84,8 +84,18 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	CharacterObject *paul = new CharacterObject(120, 120,
 		media->images.at(1), btnHello,
 		(void *)(new btnHelloParameter{ "Come on mr tally man, tally my\
-			banana!" }), "Paul", intersex, labels->genders->at(0), labels->romance->at(0),
-		labels->sexuality->at(0));
+			banana!" }), "Paul", intersex, labels->genders->at(0),
+				labels->romance->at(0), labels->sexuality->at(0));
+	CharacterObject *paulette = new CharacterObject(240, 120,
+		media->images.at(1), btnHello,
+		(void *)(new btnHelloParameter{ "Glorious failure!"}), "Paulette",
+			intersex, labels->genders->at(3), labels->romance->at(1),
+							labels->sexuality->at(1));
+	CharacterObject *paulus = new CharacterObject(120, 240,
+		media->images.at(1), btnHello,
+		(void *)(new btnHelloParameter{ "Jolly cooperation!"}), "Paulus",
+				female, labels->genders->at(2), labels->romance->at(2),
+							labels->sexuality->at(2));
 
 	DoorClickPars* DCP = new DoorClickPars;
 	Door *doorTest = new Door(600, 300, media->images.at(2), doorClick, DCP);
@@ -96,7 +106,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->locked = media->images.at(4);
 
 	//Build clickable areas
-	buildClickAreas(cc, { c0, paul }, { roomTest, roomTest2, roomTest3, roomTest4 }, { ui0 }, {}, {button, button0, doorTest});
+	buildClickAreas(cc, { c0, paul, paulette, paulus }, { roomTest, roomTest2, roomTest3, roomTest4 }, { ui0 }, {}, {button, button0, doorTest});
 
 	objects->push_back(obj);
 	objects->push_back(obj2);
@@ -108,8 +118,10 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	objects->push_back(roomTest2);
 	objects->push_back(roomTest3);
 	objects->push_back(roomTest4);
-	objects->push_back(paul);
 	objects->push_back(doorTest);
+	objects->push_back(paul);
+	objects->push_back(paulette);
+	objects->push_back(paulus);
 
 	return true;
 }
@@ -262,6 +274,8 @@ int main(int argc, char *argv[]){
 	vector<affectionTrait *> *romance = nullptr;
 	vector<affectionTrait *> *sexuality = nullptr;
 	Labels labels;
+	Graph<CharacterObject *, Relation> *relGraph = nullptr;
+	vector<CharacterObject *> characters;
 
 	int channel; //MUSIC TEST
 	if(running){
@@ -283,6 +297,13 @@ int main(int argc, char *argv[]){
 		
 			media.images.push_back(new Image(media.fonts.at(0),
 						"Hello Jacob!", {0,0,0}, window.render));
+
+			for(int i = 1; i < currClick.Characters.size(); i++){
+				characters.push_back((CharacterObject *)
+							currClick.Characters.at(i));
+			}
+
+			relGraph = initRelations(&characters);
 		}
 	}
 	//Pause the music & sound
@@ -311,7 +332,7 @@ int main(int argc, char *argv[]){
 	g.addEdge(objects.at(8), objects.at(9), 1);
 	g.addEdge(objects.at(9), objects.at(8), 1);
 
-	Room *start = whichRoom(&currClick.rooms, objects.at(10));
+	Room *start = whichRoom(&currClick.rooms, objects.at(11));
 	vector<Room *> *path = (vector<Room *> *) findPathTo(&g, start, objects.at(9));
 
 	for(Room *r : *path){
@@ -349,6 +370,8 @@ int main(int argc, char *argv[]){
 			printf("\t%s\n", t->genders[i]);
 		}
 	}
+
+	relGraph->print();
 
 
 	// The Loop
@@ -422,7 +445,7 @@ int main(int argc, char *argv[]){
 		if (objects.at(3)->x > SCREEN_WIDTH - 60 || objects.at(3)->x < 1) {
 			speed *= -1;
 		}*/
-		SDL_Rect paulArea = {objects.at(10)->x, objects.at(10)->y, 1, 1};
+		SDL_Rect paulArea = {objects.at(11)->x, objects.at(11)->y, 1, 1};
 		if(!path->empty()){
 			if(SDL_HasIntersection(&path->back()->area, &paulArea)){
 				path->pop_back();
@@ -434,7 +457,7 @@ int main(int argc, char *argv[]){
 				int ySign = 1;
 				if(paulArea.y > path->back()->area.y) ySign = -1;
 
-				objects.at(10)->moveBy(speed/5 * xSign, speed/5 * ySign);
+				objects.at(11)->moveBy(speed/5 * xSign, speed/5 * ySign);
 			}
 		}
 
