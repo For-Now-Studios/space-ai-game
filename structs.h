@@ -114,15 +114,15 @@ struct GameObject {
 	//Game Coordinates
 	int x;
 	int y;
+
+	//Images
+	Image *image;
 	
 	// Function to move the object, implemented mostly because so children can make their own move functions and be run.
 	virtual void moveBy(int xDir, int yDir) { 
 		x += xDir;
 		y += yDir;
 	}
-
-	//Images
-	Image *image;
 
 	virtual ~GameObject() {
 
