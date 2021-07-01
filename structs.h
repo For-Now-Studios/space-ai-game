@@ -353,6 +353,13 @@ struct CharacterObject : GameObjClick{
 	void rethinkOrder() {
 		tasks.sort(compGreaterWithPrio);
 	}
+
+	~CharacterObject() {
+		for(Task* t : tasks) {
+			delete t;
+		}
+		printf("Deleted a task, for there is no need to do anything when you are heading to the void!\n");
+	}
 };
 
 #define STORAGE (1 << 0)
