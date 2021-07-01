@@ -85,17 +85,17 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 		media->images.at(1), btnHello,
 		(void *)(new btnHelloParameter{ "Come on mr tally man, tally my\
 			banana!" }), "Paul", intersex, labels->genders->at(0),
-				labels->romance->at(0), labels->sexuality->at(0));
+				labels->romance->at(0), labels->sexuality->at(0), captain);
 	CharacterObject *paulette = new CharacterObject(240, 120,
 		media->images.at(1), btnHello,
 		(void *)(new btnHelloParameter{ "Glorious failure!"}), "Paulette",
 			intersex, labels->genders->at(3), labels->romance->at(1),
-							labels->sexuality->at(1));
+							labels->sexuality->at(1), captain);
 	CharacterObject *paulus = new CharacterObject(120, 240,
 		media->images.at(1), btnHello,
 		(void *)(new btnHelloParameter{ "Jolly cooperation!"}), "Paulus",
 				female, labels->genders->at(2), labels->romance->at(2),
-							labels->sexuality->at(2));
+							labels->sexuality->at(2), captain);
 
 	DoorClickPars* DCP = new DoorClickPars;
 	Door *doorTest = new Door(600, 300, media->images.at(2), doorClick, DCP);

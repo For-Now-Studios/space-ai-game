@@ -4,6 +4,7 @@
 #include<SDL2/SDL_image.h>
 #include<SDL2/SDL_mixer.h>
 #include<SDL2/SDL_ttf.h>
+#include<list>
 
 struct WindowStruct {
 	SDL_Window *window;
@@ -224,6 +225,40 @@ struct GameObjClick : GameObject, IsClickable {
 	}
 };
 
+#define AIASSIGNED (1 << 0)
+#define SELFCARE (1 << 1)
+#define EMERGENCY (1 << 2)
+#define LIFEORDEATH (1 << 3) 
+#define FORFRIENDS (1 << 4)
+#define FORLOVE (1 << 5)
+#define FORENEMIES (1 << 6) 
+#define FORHATE (1 << 7)
+#define AGAINSTENEMY (1 << 8)
+#define AGAINSTLOVE (1 << 9)
+#define AGAINSTFRIENDS (1 << 10)
+
+struct Task {
+	// Location
+	int x;
+	int y;
+
+	// Effect
+	void(*function)(void*); //The function that does its effect
+	void* data = nullptr; //The data sent into the function
+	
+	int priority; //How important is this job?
+	int actualPrio; //How ACTUALLY important is this?
+	int waitTime;
+
+	int flag;
+
+	~Task() {
+		delete data;
+		data = nullptr;
+		printf("Data for a task has been freed!\n");
+	}
+};
+
 struct affectionTrait{
 	char *name;
 	char **genders;
@@ -236,6 +271,15 @@ enum Sex{
 	intersex
 };
 
+enum Role {
+	captain,
+	pilot,
+	doctor,x
+	engineer,
+	biologist,
+	generalist
+};
+
 struct CharacterObject : GameObjClick{
 	int stress;
 	int loyalty;
@@ -244,20 +288,22 @@ struct CharacterObject : GameObjClick{
 	char *gender;
 	affectionTrait *romance;
 	affectionTrait *sexuality;
+	Role role;
+	std::list<Task*> tasks;
 
 	CharacterObject(int xPos, int yPos, Image *img, void(*func)(void*), void* d,
-		const char *n, Sex s, char *g, affectionTrait *r, affectionTrait *se) :
+		const char *n, Sex s, char *g, affectionTrait *r, affectionTrait *se, Role roly) :
 						 GameObjClick(xPos, yPos, img, func, d){
-		setParam(n, s, g, r, se);
+		setParam(n, s, g, r, se, roly);
 	}
 	CharacterObject(int xPos, int yPos, Image *img, SDL_Rect ar, void(*func)(void*),
-	void* d, const char *n, Sex s, char *g, affectionTrait *r, affectionTrait *se) :
+	void* d, const char *n, Sex s, char *g, affectionTrait *r, affectionTrait *se, Role roly) :
 					 GameObjClick(xPos, yPos, img, ar, func, d){
-		setParam(n, s, g, r, se);
+		setParam(n, s, g, r, se, roly);
 	}
 	
 	void setParam(const char *n, Sex s, char *g, affectionTrait *r,
-								affectionTrait *se){
+						affectionTrait *se, Role roly){
 		name = n;
 		sex = s;
 		gender = g;
@@ -266,6 +312,46 @@ struct CharacterObject : GameObjClick{
 
 		stress = 0;
 		loyalty = 100;
+
+		role = roly;
+	}
+
+	//Function that compares should prolly be revised and tweaked, current numbers are placeholders
+	bool compGreaterWithPrio(Task* l, Task* r) {
+		Task* tasks[2] = { l, r };
+		int vals[2] = {
+			l->priority,
+			r->priority
+		};
+		for (int i = 0; i < 2; i++)
+		{
+			int flags = tasks[i]->flag;
+			vals[i] *= flags & AIASSIGNED ? loyalty / 100 : 1;
+			vals[i] += (flags & EMERGENCY != 0) * 100
+				+ (flags & (FORFRIENDS | FORHATE | FORLOVE | AGAINSTENEMY != 0)) * 69
+				+ (flags & (FORENEMIES | AGAINSTLOVE | AGAINSTFRIENDS)) * -96;
+		}
+		return vals[0] < vals[1];
+	}
+
+	bool compGreater(Task* l, Task* r) {
+		return l->actualPrio < r->actualPrio;
+	}
+
+	void addTask(Task* task) {
+		task->actualPrio = task->priority;
+		int flags = task->flag;
+		task->actualPrio *= flags & AIASSIGNED ? loyalty / 100 : 1;
+		task->actualPrio += (flags & EMERGENCY != 0) * 100
+			+ (flags & (FORFRIENDS | FORHATE | FORLOVE | AGAINSTENEMY != 0)) * 69
+			+ (flags & (FORENEMIES | AGAINSTLOVE | AGAINSTFRIENDS)) * -96;
+		tasks.push_back(task);
+		tasks.sort(compGreater);
+	}
+
+	//Currently calculates actual priority each time it compares
+	void rethinkOrder() {
+		tasks.sort(compGreaterWithPrio);
 	}
 };
 
