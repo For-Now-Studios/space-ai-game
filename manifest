@@ -7,6 +7,9 @@ doorLocked.png 32 64
 room1.png
 hall.png
 spaceman1.png
+hatchetOpen.png
+hatchetClosed.png
+hatchetLocked.png
 MUSIC:
 Space_Amb_2.wav
 testMusic.wav

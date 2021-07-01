@@ -113,8 +113,17 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(2);
 	DCP->closed = media->images.at(3);
 	DCP->locked = media->images.at(4);
-	Door * bridgeDoor= new Door(112, 0, media->images.at(3), doorClick, DCP);
+	Door *bridgeDoor = new Door(112, 0, media->images.at(3), doorClick, DCP);
 	DCP->door = bridgeDoor;
+
+	// Bridige Hall hatchet
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(8);
+	DCP->closed = media->images.at(9);
+	DCP->locked = media->images.at(10);
+	Door *hallHatch = new Door(172, 54, media->images.at(9), doorClick, DCP);
+	DCP->door = hallHatch;
 
 	// Bedroom 1 Door
 	DCP = new DoorClickPars;
@@ -168,7 +177,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 			kitchen},
 		{},
 		{},
-		{bridgeDoor, bRoom1Door, bRoom2Door, bRoom3Door, bRoom4Door, kitchenDoor}
+		{bridgeDoor, bRoom1Door, bRoom2Door, bRoom3Door, bRoom4Door, kitchenDoor,
+			hallHatch}
 	);
 
 	/* Add all objects to the objects list */
@@ -188,6 +198,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	objects->push_back(paulob);
 	// Doors
 	objects->push_back(bridgeDoor);
+	objects->push_back(hallHatch);
 	objects->push_back(bRoom1Door);
 	objects->push_back(bRoom2Door);
 	objects->push_back(bRoom3Door);
