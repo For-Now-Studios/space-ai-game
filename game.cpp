@@ -29,102 +29,6 @@ struct Labels {
 bool loadLevel(vector<GameObject *>* objects, Media* media,
 	const char *path, CurrentClick* cc, Labels* labels, MouseStruct* mouse){
 
-	/*GameObject *obj = new GameObject;
-	obj->image = media->images.at(0);
-	obj->x = 0;
-	obj->y = 0;
-
-	GameObject *obj2 = new GameObject;
-	obj2->image = media->images.at(0);
-	obj2->x = 120;
-	obj2->y = 0;
-
-	//	So we can go through all buttons later on.
-	GameObjClick *c0 = new GameObjClick(0, 200, media->images.at(1), btnHello,
-		(void*)(new btnHelloParameter{ "c0!" }));
-	
-	GameObjClick *button = new GameObjClick(0, 0, media->images.at(0), testPopPopUp,
-		(void*)(new popPopUpPars{cc, false, objects, media}));
-
-	GameObjClick *ui0 = new GameObjClick(0, 420, media->images.at(1), btnHello, //blaze it
-		(void*)(new btnHelloParameter{ "ui0!" }));
-
-	GameObjClick *button0 = new GameObjClick(0, 120, media->images.at(0), testPopPopUp0,
-		(void*)(new popPopUpPars{cc, false, objects, media}));
-
-	roomPopupPars* rPUP = new roomPopupPars(popPopUpPars{ cc, false, objects, media });
-	Room *roomTest = new Room(120, 120, media->images.at(0), roomPopup,
-		(void*)(rPUP),
-		TOILET | AICORE | CLEARLYFATAL
-	);
-	rPUP->room = roomTest;
-	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello,
-		(void*)(new btnHelloParameter{ "room option 0!" })));
-	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello,
-		(void*)(new btnHelloParameter{ "room option 1!" })));
-	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello,
-		(void*)(new btnHelloParameter{ "room option 2!" })));
-	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello,
-		(void*)(new btnHelloParameter{ "room option 3!" })));
-	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello,
-		(void*)(new btnHelloParameter{ "room option 4!" })));
-
-	Room *roomTest2 = new Room(240, 120, media->images.at(0), roomPopup,
-		(void*)(rPUP),
-		TOILET | AICORE | CLEARLYFATAL
-	);
-	Room *roomTest3 = new Room(120, 240, media->images.at(0), roomPopup,
-		(void*)(rPUP),
-		TOILET | AICORE | CLEARLYFATAL
-	);
-	Room *roomTest4 = new Room(240, 240, media->images.at(0), roomPopup,
-		(void*)(rPUP),
-		TOILET | AICORE | CLEARLYFATAL
-	);
-
-	CharacterObject *paul = new CharacterObject(120, 120,
-		media->images.at(1), btnHello,
-		(void *)(new btnHelloParameter{ "Come on mr tally man, tally my\
-			banana!" }), "Paul", intersex, labels->genders->at(0),
-				labels->romance->at(0), labels->sexuality->at(0));
-	CharacterObject *paulette = new CharacterObject(240, 120,
-		media->images.at(1), btnHello,
-		(void *)(new btnHelloParameter{ "Glorious failure!"}), "Paulette",
-			intersex, labels->genders->at(3), labels->romance->at(1),
-							labels->sexuality->at(1));
-	CharacterObject *paulus = new CharacterObject(120, 240,
-		media->images.at(1), btnHello,
-		(void *)(new btnHelloParameter{ "Jolly cooperation!"}), "Paulus",
-				female, labels->genders->at(2), labels->romance->at(2),
-							labels->sexuality->at(2));
-
-	DoorClickPars* DCP = new DoorClickPars;
-	Door *doorTest = new Door(600, 300, media->images.at(2), doorClick, DCP);
-	DCP->door = doorTest;
-	DCP->mouse = mouse;
-	DCP->open = media->images.at(2);
-	DCP->closed = media->images.at(3);
-	DCP->locked = media->images.at(4);
-
-	//Build clickable areas
-	buildClickAreas(cc, { c0, paul, paulette, paulus }, { roomTest, roomTest2, roomTest3, roomTest4 }, { ui0 }, {}, {button, button0, doorTest});
-
-	objects->push_back(obj);
-	objects->push_back(obj2);
-	objects->push_back(button);
-	objects->push_back(c0);
-	objects->push_back(ui0);
-	objects->push_back(button0);
-	objects->push_back(roomTest);
-	objects->push_back(roomTest2);
-	objects->push_back(roomTest3);
-	objects->push_back(roomTest4);
-	objects->push_back(doorTest);
-	objects->push_back(paul);
-	objects->push_back(paulette);
-	objects->push_back(paulus);*/
-
-
 	/* ROOMS */
 	// The bridge
 	roomPopupPars* rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
@@ -202,6 +106,61 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 		labels->genders->at(2), labels->romance->at(3),
 							labels->sexuality->at(3));
 
+	/* Doors */
+	// Bridge Door
+	DoorClickPars* DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door * bridgeDoor= new Door(112, 0, media->images.at(3), doorClick, DCP);
+	DCP->door = bridgeDoor;
+
+	// Bedroom 1 Door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *bRoom1Door = new Door(240, 0, media->images.at(3), doorClick, DCP);
+	DCP->door = bRoom1Door;
+
+	// Bedroom 2 Door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *bRoom2Door = new Door(368, 0, media->images.at(3), doorClick, DCP);
+	DCP->door = bRoom2Door;
+
+	// Bedroom 3 Door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *bRoom3Door = new Door(240, 64, media->images.at(3), doorClick, DCP);
+	DCP->door = bRoom3Door;
+
+	// Bedroom 4 Door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *bRoom4Door = new Door(368, 64, media->images.at(3), doorClick, DCP);
+	DCP->door = bRoom4Door;
+
+	// Kitchen Door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *kitchenDoor = new Door(112, 64, media->images.at(3), doorClick, DCP);
+	DCP->door = kitchenDoor;
+
 	// Add all clickable elements to the click system
 	buildClickAreas(cc,
 		{paul, paulette, paulus, paulob},
@@ -209,7 +168,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 			kitchen},
 		{},
 		{},
-		{}
+		{bridgeDoor, bRoom1Door, bRoom2Door, bRoom3Door, bRoom4Door, kitchenDoor}
 	);
 
 	/* Add all objects to the objects list */
@@ -227,6 +186,13 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	objects->push_back(paulette);
 	objects->push_back(paulus);
 	objects->push_back(paulob);
+	// Doors
+	objects->push_back(bridgeDoor);
+	objects->push_back(bRoom1Door);
+	objects->push_back(bRoom2Door);
+	objects->push_back(bRoom3Door);
+	objects->push_back(bRoom4Door);
+	objects->push_back(kitchenDoor);
 
 	return true;
 }
