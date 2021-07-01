@@ -5,6 +5,8 @@
 #include<SDL2/SDL_mixer.h>
 #include<SDL2/SDL_ttf.h>
 
+struct Room;
+
 struct WindowStruct {
 	SDL_Window *window;
 	SDL_Texture *screenTexture;
@@ -245,6 +247,12 @@ struct CharacterObject : GameObjClick{
 	affectionTrait *romance;
 	affectionTrait *sexuality;
 
+	//Pathfinding
+	std::vector<Room *> *path;
+	GameObject *goal;
+	GameObject *target;
+	int speed;
+
 	CharacterObject(int xPos, int yPos, Image *img, void(*func)(void*), void* d,
 		const char *n, Sex s, char *g, affectionTrait *r, affectionTrait *se) :
 						 GameObjClick(xPos, yPos, img, func, d){
@@ -266,7 +274,21 @@ struct CharacterObject : GameObjClick{
 
 		stress = 0;
 		loyalty = 100;
+		path = nullptr;
+		goal = nullptr;
+		target = nullptr;
+		speed = 1;
 	}
+};
+
+/*
+	Door struct for doors
+*/
+struct Door : GameObjClick {
+	bool IsLocked = false;
+	bool IsOpen = false;
+	Door(int xPos, int yPos, Image *img, void(*func)(void*), void* d)
+		: GameObjClick(xPos, yPos, img, func, d) {}
 };
 
 #define STORAGE (1 << 0)
@@ -286,6 +308,7 @@ struct Room : GameObjClick {
 	int flag;
 	const char* name;
 	std::vector<GameObjClick*> buttons;
+	std::vector<Door *> doors;
 
 	Room(int xPos, int yPos, Image *img, void(*func)(void*), void* d, int f)
 		: flag{ f }, GameObjClick(xPos, yPos, img, func, d) {
@@ -295,16 +318,6 @@ struct Room : GameObjClick {
 		: flag{ f }, GameObjClick(xPos, yPos, img, ar, func, d) {
 
 	}
-};
-
-/*
-	Door struct for doors
-*/
-struct Door : GameObjClick {
-	bool IsLocked = false;
-	bool IsOpen = false;
-	Door(int xPos, int yPos, Image *img, void(*func)(void*), void* d)
-		: GameObjClick(xPos, yPos, img, func, d) {}
 };
 
 enum Relation{
