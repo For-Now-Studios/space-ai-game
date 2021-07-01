@@ -250,6 +250,8 @@ struct Task {
 	int actualPrio; //How ACTUALLY important is this?
 	int waitTime;
 
+	char* name;
+
 	int flag;
 
 	~Task() {
@@ -274,7 +276,7 @@ enum Sex{
 enum Role {
 	captain,
 	pilot,
-	doctor,x
+	doctor,
 	engineer,
 	biologist,
 	generalist
@@ -316,42 +318,35 @@ struct CharacterObject : GameObjClick{
 		role = roly;
 	}
 
-	//Function that compares should prolly be revised and tweaked, current numbers are placeholders
-	bool compGreaterWithPrio(Task* l, Task* r) {
-		Task* tasks[2] = { l, r };
-		int vals[2] = {
-			l->priority,
-			r->priority
-		};
-		for (int i = 0; i < 2; i++)
-		{
-			int flags = tasks[i]->flag;
-			vals[i] *= flags & AIASSIGNED ? loyalty / 100 : 1;
-			vals[i] += (flags & EMERGENCY != 0) * 100
-				+ (flags & (FORFRIENDS | FORHATE | FORLOVE | AGAINSTENEMY != 0)) * 69
-				+ (flags & (FORENEMIES | AGAINSTLOVE | AGAINSTFRIENDS)) * -96;
-		}
-		return vals[0] < vals[1];
-	}
 
-	bool compGreater(Task* l, Task* r) {
-		return l->actualPrio < r->actualPrio;
+	void makeActualPriority(int &val, int flags)
+	{
+		val *= flags & AIASSIGNED ? loyalty / 100 : 1;
+		val += ((flags & EMERGENCY) != 0) * 100
+			+ (flags & ((FORFRIENDS | FORHATE | FORLOVE | AGAINSTENEMY) != 0)) * 69
+			+ (flags & ((FORENEMIES | AGAINSTLOVE | AGAINSTFRIENDS) != 0)) * -96;
 	}
+	struct compGreater {
+		bool operator()(const Task* l, const Task* r) {
+			return l->actualPrio < r->actualPrio;
+		}
+	};
+	
 
 	void addTask(Task* task) {
-		task->actualPrio = task->priority;
-		int flags = task->flag;
-		task->actualPrio *= flags & AIASSIGNED ? loyalty / 100 : 1;
-		task->actualPrio += (flags & EMERGENCY != 0) * 100
-			+ (flags & (FORFRIENDS | FORHATE | FORLOVE | AGAINSTENEMY != 0)) * 69
-			+ (flags & (FORENEMIES | AGAINSTLOVE | AGAINSTFRIENDS)) * -96;
+		makeActualPriority(task->actualPrio, task->flag);
 		tasks.push_back(task);
-		tasks.sort(compGreater);
+		tasks.sort(compGreater());
+		//tasks.sort();
 	}
 
 	//Currently calculates actual priority each time it compares
 	void rethinkOrder() {
-		tasks.sort(compGreaterWithPrio);
+		for (Task* t : tasks) {
+			makeActualPriority(t->actualPrio, t->flag);
+		}
+		tasks.sort(compGreater());
+		//tasks.sort();
 	}
 
 	~CharacterObject() {
