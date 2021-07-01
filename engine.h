@@ -48,3 +48,6 @@ vector<affectionTrait *> *loadAffectionTrait(const char *path);
 Room *whichRoom(vector<Room *> *v, GameObject *obj);
 vector<GameObject *> *findPathTo(Graph<GameObject *, int> *g, GameObject *from,
 								GameObject *to);
+
+// Relationships.cpp
+Graph<CharacterObject *, Relation> *initRelations(vector<CharacterObject *> *chars);

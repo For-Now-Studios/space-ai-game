@@ -392,3 +392,10 @@ struct Door : GameObjClick {
 	Door(int xPos, int yPos, Image *img, void(*func)(void*), void* d)
 		: GameObjClick(xPos, yPos, img, func, d) {}
 };
+
+enum Relation{
+	Neutral,
+	On_Bad_Terms,
+	Friends,
+	Dating
+};
