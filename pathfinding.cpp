@@ -86,20 +86,31 @@ void updateMovement(CharacterObject *object, vector<Room *> *rooms,
 		object->target = sharedDoor(start, object->path->back());
 	}
 
-	if(!object->path->empty()){
-		if(SDL_HasIntersection(&object->area, &object->path->back()->area)){
-			Room *current = object->path->back();
-			object->path->pop_back();
-
-			if(object->path->empty()) return;
-
-			object->target = sharedDoor(current, object->path->back());
+	if(object->target == nullptr){
+		if(!object->path->empty()){
+			if(SDL_HasIntersection(&object->area,
+							&object->path->back()->area)){
+				Room *current = object->path->back();
+				object->path->pop_back();
+	
+				if(object->path->empty()) return;
+	
+				//Find the next target door
+				object->target = sharedDoor(current,
+								object->path->back());
+			}
+			else{
+				//NOTE: SHOULDN'T TRIGGER AS LONG AS ONLY DOORS AND
+				//LADDERS ARE USED AS TARGETS, AND ARBITRARY ELEMENTS
+				//AS GOALS
+			}
+		}
+		else{
+			//The character is in the correct room, so walk to the goal
+			object->target = object->goal;
 		}
 	}
-	else{
-		//The character is in the correct room, so walk to the goal
-		object->target = object->goal;
-	}
+
 
 	int xSpeed = object->speed;
 	int ySpeed = 0;
@@ -127,12 +138,25 @@ void updateMovement(CharacterObject *object, vector<Room *> *rooms,
 		}
 	}
 
-	//Check if the goal has been reached
+	//Check if the current target has been reached
 	if(xSpeed == 0 && ySpeed == 0){
-		object->goal = nullptr;
-		delete object->path;
-		object->path = nullptr;
-		object->target = nullptr;
+		//If the target was the goal, then we are done
+		if(object->target == object->goal){
+			object->goal = nullptr;
+			delete object->path;
+			object->path = nullptr;
+			object->target = nullptr;
+		}
+		else{
+			//Check whether the target was a door
+			Door *d = dynamic_cast<Door *>(object->target);
+			if(d != nullptr){
+				object->target = d->bottom;
+			}
+			else{
+				object->target = nullptr;
+			}
+		}
 	}
 
 	object->moveBy(xSpeed, ySpeed);

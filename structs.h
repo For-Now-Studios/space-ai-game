@@ -119,15 +119,15 @@ struct GameObject {
 
 	//Images
 	Image *image;
+
+	virtual ~GameObject() {
+
+	}
 	
 	// Function to move the object, implemented mostly because so children can make their own move functions and be run.
 	virtual void moveBy(int xDir, int yDir) { 
 		x += xDir;
 		y += yDir;
-	}
-
-	virtual ~GameObject() {
-
 	}
 };
 
@@ -287,8 +287,12 @@ struct CharacterObject : GameObjClick{
 struct Door : GameObjClick {
 	bool IsLocked = false;
 	bool IsOpen = false;
+	GameObject *bottom; //TODO: Temp fix for ladders, could be revised
+
 	Door(int xPos, int yPos, Image *img, void(*func)(void*), void* d)
-		: GameObjClick(xPos, yPos, img, func, d) {}
+		: GameObjClick(xPos, yPos, img, func, d) {
+			bottom = nullptr;
+		}
 };
 
 #define STORAGE (1 << 0)

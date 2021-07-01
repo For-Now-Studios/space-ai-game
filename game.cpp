@@ -128,6 +128,12 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->door = hallHatch;
 	bridgeHall->doors.push_back(hallHatch);
 	kitchenHall->doors.push_back(hallHatch);
+	
+	GameObject *bot = new GameObject();
+	bot->x = 172;
+	bot->y = 64;
+	bot->image = media->images.at(11);
+	hallHatch->bottom = bot;
 
 	// Bedroom 1 Door
 	DCP = new DoorClickPars;
@@ -205,6 +211,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	objects->push_back(bRoom4);
 	objects->push_back(kitchenHall);
 	objects->push_back(kitchen);
+	//Ladders
+	objects->push_back(bot);
 	// Characters
 	objects->push_back(paul);
 	objects->push_back(paulette);
