@@ -124,6 +124,74 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	objects->push_back(paulette);
 	objects->push_back(paulus);*/
 
+	// The bridge
+	roomPopupPars* rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	Room *cockpit = new Room(0, 0, media->images.at(5), roomPopup, (void *)(rPup),
+										BRIDGE);
+	rPup->room = cockpit;
+
+	// Bridge hall
+	rPup = new roomPopupPars(popPopUpPars{ cc, false, objects, media});
+	Room *bridgeHall = new Room(128, 0, media->images.at(6), roomPopup,
+								(void *)(rPup), HALL);
+	rPup->room = bridgeHall;
+
+	// Bedroom 1
+	rPup = new roomPopupPars(popPopUpPars{ cc, false, objects, media});
+	Room *bRoom1 = new Room(256, 0, media->images.at(5), roomPopup, (void *)(rPup),
+										BEDROOM);
+	rPup->room = bRoom1;
+
+	// Bedroom 2
+	rPup = new roomPopupPars(popPopUpPars{ cc, false, objects, media});
+	Room *bRoom2 = new Room(384, 0, media->images.at(5), roomPopup, (void *)(rPup),
+										BEDROOM);
+	rPup->room = bRoom2;
+
+	// Bedroom 3
+	rPup = new roomPopupPars(popPopUpPars{ cc, false, objects, media});
+	Room *bRoom3 = new Room(256, 64, media->images.at(5), roomPopup, (void *)(rPup),
+										BEDROOM);
+	rPup->room = bRoom3;
+
+	// Bedroom 4
+	rPup = new roomPopupPars(popPopUpPars{ cc, false, objects, media});
+	Room *bRoom4 = new Room(384, 64, media->images.at(5), roomPopup, (void *)(rPup),
+										BEDROOM);
+	rPup->room = bRoom4;
+
+	// Kitchen Hall
+	rPup = new roomPopupPars(popPopUpPars{ cc, false, objects, media});
+	Room *kitchenHall = new Room(128, 64, media->images.at(6), roomPopup,
+								(void *)(rPup), HALL);
+	rPup->room = kitchenHall;
+
+	// Kitchen
+	rPup = new roomPopupPars(popPopUpPars{ cc, false, objects, media});
+	Room *kitchen = new Room(0, 64, media->images.at(5), roomPopup,
+								(void *)(rPup), KITCHEN);
+	rPup->room = kitchen;
+
+	// Add all clickable elements to the click system
+	buildClickAreas(cc,
+		{ },
+		{cockpit, bridgeHall, bRoom1, bRoom2, bRoom3, bRoom4, kitchenHall,
+			kitchen},
+		{},
+		{},
+		{}
+	);
+
+	// Add all objects to the objects list
+	objects->push_back(cockpit);
+	objects->push_back(bridgeHall);
+	objects->push_back(bRoom1);
+	objects->push_back(bRoom2);
+	objects->push_back(bRoom3);
+	objects->push_back(bRoom4);
+	objects->push_back(kitchenHall);
+	objects->push_back(kitchen);
+
 	return true;
 }
 
