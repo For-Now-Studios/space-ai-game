@@ -28,7 +28,8 @@ struct Labels {
 */
 bool loadLevel(vector<GameObject *>* objects, Media* media,
 	const char *path, CurrentClick* cc, Labels* labels, MouseStruct* mouse){
-	GameObject *obj = new GameObject;
+
+	/*GameObject *obj = new GameObject;
 	obj->image = media->images.at(0);
 	obj->x = 0;
 	obj->y = 0;
@@ -38,7 +39,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	obj2->x = 120;
 	obj2->y = 0;
 
-	/*	So we can go through all buttons later on.*/
+	//	So we can go through all buttons later on.
 	GameObjClick *c0 = new GameObjClick(0, 200, media->images.at(1), btnHello,
 		(void*)(new btnHelloParameter{ "c0!" }));
 	
@@ -121,7 +122,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	objects->push_back(doorTest);
 	objects->push_back(paul);
 	objects->push_back(paulette);
-	objects->push_back(paulus);
+	objects->push_back(paulus);*/
 
 	return true;
 }
@@ -270,33 +271,17 @@ int main(int argc, char *argv[]){
 	CurrentClick currClick;
 	vector<GameObject*> objects;
 	
-	vector<char *> *genders = nullptr;
-	vector<affectionTrait *> *romance = nullptr;
-	vector<affectionTrait *> *sexuality = nullptr;
 	Labels labels;
 	Graph<CharacterObject *, Relation> *relGraph = nullptr;
 	vector<CharacterObject *> characters;
 
-	int channel; //MUSIC TEST
 	if(running){
-		genders = loadGender("gender.jpeg");
-		romance = loadAffectionTrait("romance.jpeg");
-		sexuality = loadAffectionTrait("sexuality.jpeg");
-		labels.genders = genders;
-		labels.romance = romance;
-		labels.sexuality = sexuality;
+		labels.genders = loadGender("gender.jpeg");
+		labels.romance = loadAffectionTrait("romance.jpeg");
+		labels.sexuality = loadAffectionTrait("sexuality.jpeg");
 
 		if(loadLevel(&objects, &media, "", &currClick, &labels, &mouse)){
 			printf("Game object done!\n");
-
-			// MUSIC TEST
-			Mix_Volume(-1, masterVolume);
-			Mix_VolumeMusic(masterVolume);
-			switchMusic(media.music.at(0), -1, 0, 60000);
-			channel = playSound(media.sounds.at(0), -1, 2.0f, 1000);
-		
-			media.images.push_back(new Image(media.fonts.at(0),
-						"Hello Jacob!", {0,0,0}, window.render));
 
 			for(int i = 1; i < currClick.Characters.size(); i++){
 				characters.push_back((CharacterObject *)
@@ -306,8 +291,6 @@ int main(int argc, char *argv[]){
 			relGraph = initRelations(&characters);
 		}
 	}
-	//Pause the music & sound
-	pauseAll();
 
 	Camera cam;
 	cam.x = 0;
@@ -316,63 +299,12 @@ int main(int argc, char *argv[]){
 	cam.wndX = 0;
 	cam.wndY = 0;
 
-	//GRAPH TEST
-	Graph<GameObject *, int> g;
-	g.addNode(objects.at(6));
-	g.addNode(objects.at(7));
-	g.addNode(objects.at(8));
-	g.addNode(objects.at(9));
-
-	g.addEdge(objects.at(6), objects.at(7), 1);
-	g.addEdge(objects.at(7), objects.at(6), 1);
-	g.addEdge(objects.at(6), objects.at(8), 1);
-	g.addEdge(objects.at(8), objects.at(6), 1);
-	g.addEdge(objects.at(7), objects.at(9), 1);
-	g.addEdge(objects.at(9), objects.at(7), 1);
-	g.addEdge(objects.at(8), objects.at(9), 1);
-	g.addEdge(objects.at(9), objects.at(8), 1);
-
-	Room *start = whichRoom(&currClick.rooms, objects.at(11));
-	vector<Room *> *path = (vector<Room *> *) findPathTo(&g, start, objects.at(9));
-
-	for(Room *r : *path){
-		printf("%d, %d\n", r->x, r->y);
-	}
-
 	// Timing
 	unsigned int targetFrequency = 60;
 	Uint32 targetTime = 1000 / targetFrequency;
 	Uint32 startTime = SDL_GetTicks();
 
 	printf("Initialization done\n");
-
-	int speed = 5; //For testing characters
-
-	printf("\nFeatures the genders of:\n");
-	for(char *t : *genders){
-		printf("%s\n", t);
-	}
-
-	printf("With a slice of:\n");
-	for(affectionTrait *t : *romance){
-		printf("%s\n", t->name);
-
-		for(int i = 0; i < t->n; i++){
-			printf("\t%s\n", t->genders[i]);
-		}
-	}
-
-	printf("And some casual:\n");
-	for(affectionTrait *t : *sexuality){
-		printf("%s\n", t->name);
-
-		for(int i = 0; i < t->n; i++){
-			printf("\t%s\n", t->genders[i]);
-		}
-	}
-
-	relGraph->print();
-
 
 	// The Loop
 	int ticks = 0;
@@ -439,40 +371,7 @@ int main(int argc, char *argv[]){
 			currClick.currentlySelected = nullptr;
 		}
 
-		// Testing moving characters
-		/*objects.at(3)->moveBy(speed, 0);
-		objects.at(10)->moveBy(speed, speed/3);
-		if (objects.at(3)->x > SCREEN_WIDTH - 60 || objects.at(3)->x < 1) {
-			speed *= -1;
-		}*/
-		SDL_Rect paulArea = {objects.at(11)->x, objects.at(11)->y, 1, 1};
-		if(!path->empty()){
-			if(SDL_HasIntersection(&path->back()->area, &paulArea)){
-				path->pop_back();
-			}
-			else{
-				int xSign = 1;
-				if(paulArea.x > path->back()->area.x) xSign = -1;
-
-				int ySign = 1;
-				if(paulArea.y > path->back()->area.y) ySign = -1;
-
-				objects.at(11)->moveBy(speed/5 * xSign, speed/5 * ySign);
-			}
-		}
-
 		updateClickAreas(&currClick);
-		//Prints the amount of characters for each part of the screen
-		//printf("S0: %d, S1: %d\n", currClick.numChars[0], currClick.numChars[1]);
-
-		SDL_Rect temp = {mouse.x, mouse.y, 1, 1};
-		SDL_Rect trans = translateToGame(&cam, &temp);
-		objects.at(0)->x = trans.x - objects.at(0)->image->width / 2;
-		objects.at(0)->y = trans.y -  objects.at(0)->image->height / 2;
-
-		//render(&window, media.images.at(0), 0, 120);
-		//render(&window, media.images.at(0), 120, 120, &cam);
-		render(&window, media.images.at(1), 120, 300);
 		
 		for(GameObject* obj : objects) {
 			render(&window, obj, &cam);
