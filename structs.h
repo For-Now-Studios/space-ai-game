@@ -248,6 +248,7 @@ struct Task {
 	
 	int priority; //How important is this job?
 	int actualPrio; //How ACTUALLY important is this?
+	int waitTime;
 
 	int flag;
 
@@ -273,7 +274,7 @@ enum Sex{
 enum Role {
 	captain,
 	pilot,
-	doctor,
+	doctor,x
 	engineer,
 	biologist,
 	generalist
@@ -348,6 +349,7 @@ struct CharacterObject : GameObjClick{
 		tasks.sort(compGreater);
 	}
 
+	//Currently calculates actual priority each time it compares
 	void rethinkOrder() {
 		tasks.sort(compGreaterWithPrio);
 	}

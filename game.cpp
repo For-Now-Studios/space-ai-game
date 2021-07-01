@@ -85,7 +85,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 		media->images.at(1), btnHello,
 		(void *)(new btnHelloParameter{ "Come on mr tally man, tally my\
 			banana!" }), "Paul", intersex, labels->genders->at(0), labels->romance->at(0),
-		labels->sexuality->at(0));
+		labels->sexuality->at(0), captain);
 
 	DoorClickPars* DCP = new DoorClickPars;
 	Door *doorTest = new Door(600, 300, media->images.at(2), doorClick, DCP);
