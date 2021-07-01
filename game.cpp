@@ -124,6 +124,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	objects->push_back(paulette);
 	objects->push_back(paulus);*/
 
+
+	/* ROOMS */
 	// The bridge
 	roomPopupPars* rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *cockpit = new Room(0, 0, media->images.at(5), roomPopup, (void *)(rPup),
@@ -172,9 +174,37 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 								(void *)(rPup), KITCHEN);
 	rPup->room = kitchen;
 
+	/* CHARACTERS */
+	// Paul
+	CharacterObject *paul = new CharacterObject(320, 0,
+		media->images.at(7), btnHello, (void *)(new btnHelloParameter{"Paul"}),
+		"Paul", intersex, labels->genders->at(0), labels->romance->at(0),
+							labels->sexuality->at(0));
+
+	// Paulette
+	CharacterObject *paulette = new CharacterObject(400, 0,
+		media->images.at(7), btnHello,
+		(void *)(new btnHelloParameter{"Paulette"}), "Paulette", intersex,
+					labels->genders->at(3), labels->romance->at(1),
+							labels->sexuality->at(1));
+	
+	// Paulus
+	CharacterObject *paulus = new CharacterObject(310, 64,
+		media->images.at(7), btnHello,
+		(void *)(new btnHelloParameter{"Paulus"}), "Paulus", female,
+		labels->genders->at(2), labels->romance->at(2),
+							labels->sexuality->at(2));
+
+	// Paulob
+	CharacterObject *paulob = new CharacterObject(420, 64,
+		media->images.at(7), btnHello,
+		(void *)(new btnHelloParameter{"Paulob"}), "Paulob", male,
+		labels->genders->at(2), labels->romance->at(3),
+							labels->sexuality->at(3));
+
 	// Add all clickable elements to the click system
 	buildClickAreas(cc,
-		{ },
+		{paul, paulette, paulus, paulob},
 		{cockpit, bridgeHall, bRoom1, bRoom2, bRoom3, bRoom4, kitchenHall,
 			kitchen},
 		{},
@@ -182,7 +212,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 		{}
 	);
 
-	// Add all objects to the objects list
+	/* Add all objects to the objects list */
+	// Rooms
 	objects->push_back(cockpit);
 	objects->push_back(bridgeHall);
 	objects->push_back(bRoom1);
@@ -191,6 +222,11 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	objects->push_back(bRoom4);
 	objects->push_back(kitchenHall);
 	objects->push_back(kitchen);
+	// Characters
+	objects->push_back(paul);
+	objects->push_back(paulette);
+	objects->push_back(paulus);
+	objects->push_back(paulob);
 
 	return true;
 }
@@ -351,7 +387,7 @@ int main(int argc, char *argv[]){
 		if(loadLevel(&objects, &media, "", &currClick, &labels, &mouse)){
 			printf("Game object done!\n");
 
-			for(int i = 1; i < currClick.Characters.size(); i++){
+			for(int i = 0; i < currClick.Characters.size(); i++){
 				characters.push_back((CharacterObject *)
 							currClick.Characters.at(i));
 			}
