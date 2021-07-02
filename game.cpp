@@ -113,7 +113,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(2);
 	DCP->closed = media->images.at(3);
 	DCP->locked = media->images.at(4);
-	Door *bridgeDoor = new Door(112, 0, media->images.at(3), doorClick, DCP);
+	Door *bridgeDoor = new Door(128, 0, media->images.at(3), doorClick, DCP);
 	DCP->door = bridgeDoor;
 	cockpit->doors.push_back(bridgeDoor);
 	bridgeHall->doors.push_back(bridgeDoor);
@@ -141,7 +141,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(2);
 	DCP->closed = media->images.at(3);
 	DCP->locked = media->images.at(4);
-	Door *bRoom1Door = new Door(240, 0, media->images.at(3), doorClick, DCP);
+	Door *bRoom1Door = new Door(256, 0, media->images.at(3), doorClick, DCP);
 	DCP->door = bRoom1Door;
 	bridgeHall->doors.push_back(bRoom1Door);
 	bRoom1->doors.push_back(bRoom1Door);
@@ -152,7 +152,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(2);
 	DCP->closed = media->images.at(3);
 	DCP->locked = media->images.at(4);
-	Door *bRoom2Door = new Door(368, 0, media->images.at(3), doorClick, DCP);
+	Door *bRoom2Door = new Door(384, 0, media->images.at(3), doorClick, DCP);
 	DCP->door = bRoom2Door;
 	bRoom1->doors.push_back(bRoom2Door);
 	bRoom2->doors.push_back(bRoom2Door);
@@ -163,7 +163,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(2);
 	DCP->closed = media->images.at(3);
 	DCP->locked = media->images.at(4);
-	Door *bRoom3Door = new Door(240, 64, media->images.at(3), doorClick, DCP);
+	Door *bRoom3Door = new Door(256, 64, media->images.at(3), doorClick, DCP);
 	DCP->door = bRoom3Door;
 	kitchenHall->doors.push_back(bRoom3Door);
 	bRoom3->doors.push_back(bRoom3Door);
@@ -174,7 +174,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(2);
 	DCP->closed = media->images.at(3);
 	DCP->locked = media->images.at(4);
-	Door *bRoom4Door = new Door(368, 64, media->images.at(3), doorClick, DCP);
+	Door *bRoom4Door = new Door(384, 64, media->images.at(3), doorClick, DCP);
 	DCP->door = bRoom4Door;
 	bRoom3->doors.push_back(bRoom4Door);
 	bRoom4->doors.push_back(bRoom4Door);
@@ -185,7 +185,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(2);
 	DCP->closed = media->images.at(3);
 	DCP->locked = media->images.at(4);
-	Door *kitchenDoor = new Door(112, 64, media->images.at(3), doorClick, DCP);
+	Door *kitchenDoor = new Door(128, 64, media->images.at(3), doorClick, DCP);
 	DCP->door = kitchenDoor;
 	kitchen->doors.push_back(kitchenDoor);
 	kitchenHall->doors.push_back(kitchenDoor);
@@ -414,9 +414,6 @@ int main(int argc, char *argv[]){
 	// The Loop
 	int ticks = 0;
 
-	//TEST!!! TODO: REMOVE
-	characters.at(0)->goal = currClick.rooms.at(7);
-
 	while(running){
 		SDL_RenderClear(window.render);
 
@@ -471,6 +468,18 @@ int main(int argc, char *argv[]){
 		for(CharacterObject *c : characters){
 			updateMovement(c, &currClick.rooms, pathGraph);
 		}
+
+		//TEST!!! TODO: REMOVE!
+		if(characters.at(0)->goal == nullptr){
+			if(whichRoom(&currClick.rooms, characters.at(0)) !=
+								currClick.rooms.at(7)){
+				characters.at(0)->goal = currClick.rooms.at(7);
+			}
+			else{
+				characters.at(0)->goal = currClick.rooms.at(2);
+			}
+		}
+
 
 		//More advanced simple button test
 		if (mouse.buttons[0].isPressed) {

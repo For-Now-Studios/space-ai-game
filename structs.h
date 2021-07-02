@@ -251,6 +251,8 @@ struct CharacterObject : GameObjClick{
 	std::vector<Room *> *path;
 	GameObject *goal;
 	GameObject *target;
+	int xDist;
+	int yDist;
 	int speed;
 
 	CharacterObject(int xPos, int yPos, Image *img, void(*func)(void*), void* d,
@@ -277,6 +279,8 @@ struct CharacterObject : GameObjClick{
 		path = nullptr;
 		goal = nullptr;
 		target = nullptr;
+		xDist = 0;
+		yDist = 0;
 		speed = 1;
 	}
 };

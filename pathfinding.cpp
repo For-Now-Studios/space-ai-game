@@ -72,6 +72,67 @@ Door *sharedDoor(Room *a, Room *b){
 	return nullptr;
 }
 
+/*
+	Targets an arbitrary game object, making sure that the character so that the
+	lower left corners of the two align
+*/
+void targetGameObject(CharacterObject *c, GameObject *obj){
+		c->target = obj;
+		c->xDist = obj->x - c->x;
+		c->yDist = (obj->y + obj->image->height) - (c->y + c->area.h);
+}
+
+/*
+	Handles the targeting of doors and ladders
+*/
+void targetDoor(CharacterObject *c, Door *d){
+	c->target = d;
+
+	// Check if the door is a hatch
+	if(d->bottom != nullptr){
+		printf("Targeting a ladder! \n");
+		// Check if we are beneath the hatch
+		if(d->y < c->y){
+			//Have we arrived at the base of the ladder to the hatch?
+			if(d->bottom->x == c->x &&
+			(d->bottom->y + d->bottom->image->height) == (c->y + c->area.h)){
+				c->xDist = d->x - c->x;
+				c->yDist = d->y - (c->y + c->area.h);
+			}
+			else{
+				//Target the base of the ladder instead
+				c->target = d->bottom;
+				c->xDist = c->target->x - c->x;
+				c->yDist = c->target->y + c->target->image->height - 
+								(c->y + c->area.h);
+			}
+		}
+		else{
+			//Are we on top of the hatch yet?
+			if(d->x == c->x && d->y == c->y + c->area.h){
+				//Target the base of the ladder instead
+				c->target = d->bottom;
+				c->xDist = c->target->x - c->x;
+				c->yDist = c->target->y + c->target->image->height - 
+								(c->y + c->area.h);
+
+			}
+			else{
+				c->xDist = d->x - c->x;
+				c->yDist = d->y - (c->y + c->area.h);
+			}
+		}
+	}
+	else{ //Target the door
+		printf("Targeting a normie door! \n");
+		c->xDist = (d->x + d->area.w) - c->x;
+		if(c->xDist <= 0) c->xDist = d->x - (c->x + c->area.w);
+
+		c->yDist = (d->y + d->area.h) - (c->y + c->area.h);
+
+	}
+}
+
 void updateMovement(CharacterObject *object, vector<Room *> *rooms,
 						Graph<Room *, int> *g){
 	//Check if the character wants to move anywhere
@@ -83,11 +144,12 @@ void updateMovement(CharacterObject *object, vector<Room *> *rooms,
 		Room *end = whichRoom(rooms, object->goal);
 		object->path = (vector<Room *> *) findPathTo(
 					(Graph<GameObject *, int> *) g, start, end);
-		object->target = sharedDoor(start, object->path->back());
+		targetDoor(object, sharedDoor(start, object->path->back()));
 	}
 
 	if(object->target == nullptr){
 		if(!object->path->empty()){
+			//If we have arrived at the next target room
 			if(SDL_HasIntersection(&object->area,
 							&object->path->back()->area)){
 				Room *current = object->path->back();
@@ -96,47 +158,52 @@ void updateMovement(CharacterObject *object, vector<Room *> *rooms,
 				if(object->path->empty()) return;
 	
 				//Find the next target door
-				object->target = sharedDoor(current,
-								object->path->back());
+				targetDoor(object, sharedDoor(current,
+								object->path->back()));
 			}
 			else{
-				//NOTE: SHOULDN'T TRIGGER AS LONG AS ONLY DOORS AND
-				//LADDERS ARE USED AS TARGETS, AND ARBITRARY ELEMENTS
-				//AS GOALS
+				Room *start = whichRoom(rooms, object);
+				targetDoor(object, sharedDoor(start,
+								object->path->back()));
 			}
 		}
 		else{
 			//The character is in the correct room, so walk to the goal
-			object->target = object->goal;
+			targetGameObject(object, object->goal);
 		}
 	}
 
 
+	//TODO: REWORK THIS SECTION!!!!!!!
+	/*
+		When given a target, calculate the line to that target, store the
+		normalized speed in each direction, and then apply these until the
+		target is reached, or something.
+
+		Drawback: It won't properly hunt moving targets
+	*/
 	int xSpeed = object->speed;
-	int ySpeed = 0;
+	int ySpeed = object->speed;
+	
+	//Make sure the object is moving in the right direction
+	if(object->xDist < 0) xSpeed *= -1;
+	if(object->yDist < 0) ySpeed *= -1;
+	
 
-	//Controll that the speed isn't too high
-	if(abs(object->x - object->target->x) - xSpeed < 0){
-		xSpeed = abs(object->x - object->target->x);
-	}
+	//Don't move too far
+	if(abs(xSpeed) > abs(object->xDist)) xSpeed = object->xDist;
+	if(abs(ySpeed) > abs(object->yDist)) ySpeed = object->yDist;
 
-	//We are done moving in the xDirection, move in yDirection
-	if(xSpeed == 0){
-		ySpeed = object->speed;
-		//Controll that the speed isn't too high
-		if(abs(object->y - object->target->y) - ySpeed < 0){
-			ySpeed = abs(object->y - object->target->y);
-		}
+	object->moveBy(xSpeed, ySpeed);
 
-		if(object->y > object->target->y){
-			ySpeed *= -1;
-		}
+	//Handle collision correctly
+	Door *d = dynamic_cast<Door *>(object->target);
+	if(d != nullptr){
+		//TODO: HANDLE CHECKS FOR DOORS
 	}
-	else{
-		if(object->x > object->target->x){
-			xSpeed *= -1;
-		}
-	}
+	
+	object->xDist -= xSpeed;
+	object->yDist -= ySpeed;
 
 	//Check if the current target has been reached
 	if(xSpeed == 0 && ySpeed == 0){
@@ -148,16 +215,9 @@ void updateMovement(CharacterObject *object, vector<Room *> *rooms,
 			object->target = nullptr;
 		}
 		else{
-			//Check whether the target was a door
-			Door *d = dynamic_cast<Door *>(object->target);
-			if(d != nullptr){
-				object->target = d->bottom;
-			}
-			else{
-				object->target = nullptr;
-			}
+			object->target = nullptr;
 		}
 	}
 
-	object->moveBy(xSpeed, ySpeed);
+	//printf("%d, %d\n", xSpeed, ySpeed);
 }

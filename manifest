@@ -1,9 +1,9 @@
 IMAGES:
 hal9000.png 120 120
 hal9000.png 60 60
-doorOpen.png 32 64
-doorClosed.png 32 64
-doorLocked.png 32 64
+doorOpen.png
+doorClosed.png
+doorLocked.png
 room1.png
 hall.png
 spaceman1.png
