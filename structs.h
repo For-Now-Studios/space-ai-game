@@ -250,7 +250,7 @@ struct Task {
 	int actualPrio; //How ACTUALLY important is this?
 	int waitTime;
 
-	char* name;
+	const char* name;
 
 	int flag;
 

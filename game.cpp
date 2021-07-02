@@ -97,6 +97,16 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 				female, labels->genders->at(2), labels->romance->at(2),
 							labels->sexuality->at(2), captain);
 
+	//Add tasks for paulette:
+	paulette->addTask(new Task{ 120,120,btnHello,(void*)(new btnHelloParameter{"Start!"}),1,0,10,"Start",AIASSIGNED });
+	paulette->addTask(new Task{ 240,120,btnHello,(void*)(new btnHelloParameter{"Place0!"}),2,0,10,"Place0",AGAINSTFRIENDS });
+	paulette->addTask(new Task{ 240,240,btnHello,(void*)(new btnHelloParameter{"Place1!"}),3,0,10,"Place1",FORLOVE });
+	paulette->addTask(new Task{ 120,240,btnHello,(void*)(new btnHelloParameter{"Place2!"}),4,0,10,"Place2",FORENEMIES });
+	paulette->rethinkOrder();
+	for (Task* t : paulette->tasks) {
+		printf("%s \n", t->name);
+	}
+
 	DoorClickPars* DCP = new DoorClickPars;
 	Door *doorTest = new Door(600, 300, media->images.at(2), doorClick, DCP);
 	DCP->door = doorTest;
@@ -460,6 +470,24 @@ int main(int argc, char *argv[]){
 				objects.at(11)->moveBy(speed/5 * xSign, speed/5 * ySign);
 			}
 		}
+
+		//Testing task movement
+		/*CharacterObject* paulette = characters.at(1);
+		SDL_Rect charArea = { paulette->x, paulette->y, 1, 1 };
+		if (!paulette->tasks.empty()) {
+			if (SDL_HasIntersection(&path->back()->area, &charArea)) {
+				path->pop_back();
+			}
+			else {
+				int xSign = 1;
+				if (paulArea.x > path->back()->area.x) xSign = -1;
+
+				int ySign = 1;
+				if (paulArea.y > path->back()->area.y) ySign = -1;
+
+				paulette->moveBy(speed / 5 * xSign, speed / 5 * ySign);
+			}
+		}*/
 
 		updateClickAreas(&currClick);
 		//Prints the amount of characters for each part of the screen
