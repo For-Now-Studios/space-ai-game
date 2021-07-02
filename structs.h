@@ -323,8 +323,8 @@ struct CharacterObject : GameObjClick{
 	{
 		val *= flags & AIASSIGNED ? loyalty / 100 : 1;
 		val += ((flags & EMERGENCY) != 0) * 100
-			+ (flags & ((FORFRIENDS | FORHATE | FORLOVE | AGAINSTENEMY) != 0)) * 69
-			+ (flags & ((FORENEMIES | AGAINSTLOVE | AGAINSTFRIENDS) != 0)) * -96;
+			+ ((flags & (FORFRIENDS | FORHATE | FORLOVE | AGAINSTENEMY)) != 0) * 69
+			+ ((flags & (FORENEMIES | AGAINSTLOVE | AGAINSTFRIENDS)) != 0) * -96;
 	}
 	struct compGreater {
 		bool operator()(const Task* l, const Task* r) {
@@ -334,19 +334,19 @@ struct CharacterObject : GameObjClick{
 	
 
 	void addTask(Task* task) {
+		task->actualPrio = task->priority;
 		makeActualPriority(task->actualPrio, task->flag);
 		tasks.push_back(task);
 		tasks.sort(compGreater());
-		//tasks.sort();
 	}
 
 	//Currently calculates actual priority each time it compares
 	void rethinkOrder() {
 		for (Task* t : tasks) {
+			t->actualPrio = t->priority;
 			makeActualPriority(t->actualPrio, t->flag);
 		}
 		tasks.sort(compGreater());
-		//tasks.sort();
 	}
 
 	~CharacterObject() {

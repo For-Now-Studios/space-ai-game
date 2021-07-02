@@ -104,7 +104,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	paulette->addTask(new Task{ 120,240,btnHello,(void*)(new btnHelloParameter{"Place2!"}),4,0,10,"Place2",FORENEMIES });
 	paulette->rethinkOrder();
 	for (Task* t : paulette->tasks) {
-		printf("%s \n", t->name);
+		printf("%s actual priority %d\n", t->name, t->actualPrio);
 	}
 
 	DoorClickPars* DCP = new DoorClickPars;
@@ -472,22 +472,21 @@ int main(int argc, char *argv[]){
 		}
 
 		//Testing task movement
-		/*CharacterObject* paulette = characters.at(1);
-		SDL_Rect charArea = { paulette->x, paulette->y, 1, 1 };
+		CharacterObject* paulette = characters.at(1);
 		if (!paulette->tasks.empty()) {
-			if (SDL_HasIntersection(&path->back()->area, &charArea)) {
-				path->pop_back();
+			if (paulette->tasks.back()->x == paulette->x && paulette->tasks.back()->y == paulette->y) {
+				paulette->tasks.pop_back();
 			}
 			else {
 				int xSign = 1;
-				if (paulArea.x > path->back()->area.x) xSign = -1;
+				if (paulette->x > paulette->tasks.back()->x) xSign = -1;
 
 				int ySign = 1;
-				if (paulArea.y > path->back()->area.y) ySign = -1;
+				if (paulette->y > paulette->tasks.back()->y) ySign = -1;
 
 				paulette->moveBy(speed / 5 * xSign, speed / 5 * ySign);
 			}
-		}*/
+		}
 
 		updateClickAreas(&currClick);
 		//Prints the amount of characters for each part of the screen
