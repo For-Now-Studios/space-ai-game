@@ -157,7 +157,7 @@ void targetDoor(CharacterObject *c, Door *d){
 	}
 	else{ //Target the door
 		c->xDist = d->x - (c->x + c->area.w);
-		if(c->xDist <= 0) c->xDist = (d->x + d->area.w) - c->x;
+		if(c->xDist < 0) c->xDist = (d->x + d->area.w) - c->x;
 
 		c->yDist = (d->y + d->area.h) - (c->y + c->area.h);
 	}
@@ -217,7 +217,7 @@ void checkDoor(CharacterObject *object, Door *d, vector<Room *> *rooms,
 							Graph<GameObject *, int> *g){
 	if(!d->IsOpen){                             		
 		if(d->IsLocked){
-			printf("Door %s is locked\n", d->n);
+			//printf("Door %s is locked\n", d->n);
 			blockDoorPath(object, d, rooms, g);
 		}
 		else{
@@ -236,7 +236,7 @@ void checkDoor(CharacterObject *object, Door *d, vector<Room *> *rooms,
 		}
 
 		if(arrival->IsLocked){
-			printf("Door %s (arrival) is locked \n", arrival->n);
+			//printf("Door %s (arrival) is locked \n", arrival->n);
 			blockDoorPath(object, d, rooms, g);
 		}
 		else{
@@ -269,9 +269,9 @@ void updateMovement(CharacterObject *object, vector<Room *> *rooms,
 
 		if(object->path == nullptr) return;
 
-		for(GameObject *go : *object->path){
+		/*for(GameObject *go : *object->path){
 			printf("%s\n", go->n);
-		}
+		}*/
 
 		//targetDoor(object, sharedDoor(start, object->path->back()));
 		if(object->path->size() > 1){
@@ -306,24 +306,6 @@ void updateMovement(CharacterObject *object, vector<Room *> *rooms,
 		if(!object->path->empty()){
 			target(object, object->path->back());
 			object->path->pop_back();
-			
-			/*//If we have arrived at the next target room
-			if(SDL_HasIntersection(&object->area,
-							&object->path->back()->area)){
-				Room *current = object->path->back();
-				object->path->pop_back();
-	
-				if(object->path->empty()) return;
-	
-				//Find the next target door
-				targetDoor(object, sharedDoor(current,
-								object->path->back()));
-			}
-			else{
-				Room *start = whichRoom(rooms, object);
-				targetDoor(object, sharedDoor(start,
-								object->path->back()));
-			}*/
 		}
 		else{
 			//The character is in the correct room, so walk to the goal
@@ -344,9 +326,12 @@ void updateMovement(CharacterObject *object, vector<Room *> *rooms,
 	if(abs(ySpeed) > abs(object->yDist)) ySpeed = object->yDist;
 
 	object->moveBy(xSpeed, ySpeed);
+	//printf("%d %d\n", xSpeed, ySpeed);
 
 	object->xDist -= xSpeed;
 	object->yDist -= ySpeed;
+	
+	//printf("%d, %d\n", object->xDist, object->yDist);
 
 	//Check if the current target has been reached
 	if(object->xDist == 0 && object->yDist == 0){
