@@ -52,6 +52,67 @@ Room *whichRoom(vector<Room *> *v, GameObject *obj){
 	return nullptr;
 }
 
+GameObject *closestNode(GameObject *obj, Graph<GameObject *, int> *g){
+	GameObject *res = nullptr;
+	int dist = INT_MAX;
+
+	int objX = obj->x;
+	int objY = obj->y;
+	if(obj->image != nullptr){
+		objX += obj->image->width / 2;
+		objY += obj->image->height / 2;
+	}
+
+	//printf("(%d %d) : (%d %d)\n", obj->x, obj->y, objX, objY);
+
+	for(pair<GameObject *, Node<GameObject *, int> *> p : g->nodes){
+		GameObject *n = p.first;
+
+		int nX = n->x;
+		int nY = n->y;
+		if(n->image != nullptr){
+			nX += n->image->width / 2;
+			nY += n->image->height / 2;
+		}
+		//printf("\t(%d %d) : (%d %d)\n", n->x, n->y, nX, nY);
+		
+		//Calculate the euclidean distance between the two objects
+		int newDist = sqrt((objX - nX)*(objX - nX) + (objY - nY)*(objY - nY));
+		//printf("\tdist: %d newDist: %d\n", dist, newDist);
+		if(newDist < dist){
+			res = n;
+			dist = newDist;
+		}
+	}
+
+	return res;
+}
+
+/*
+	Returns all game objects present in the room froma  pathfinding graph
+*/
+vector<GameObject *> *RoomToGraph(Room *r, Graph<GameObject *, int> *g){
+	vector<GameObject *> *res = new vector<GameObject *>();
+
+	for(pair<GameObject *, Node<GameObject *, int> *> p : g->nodes){
+		GameObject *obj = p.first;
+
+		SDL_Rect area;
+		if(obj->image == nullptr){
+			area = {obj->x, obj->y, 1, 1};
+		}
+		else{
+			area = {obj->x, obj->y, obj->image->width, obj->image->height};
+		}
+
+		if(SDL_HasIntersection(&r->area, &area)) {
+			res->push_back(obj);
+		}
+	}
+
+	return res;
+}
+
 /*
 	Finds the shortest path from the specified beacon/room, to the target
 */
@@ -91,90 +152,73 @@ void targetDoor(CharacterObject *c, Door *d){
 
 	// Check if the door is a hatch
 	if(d->bottom != nullptr){
-		// Check if we are beneath the hatch
-		if(d->y < c->y){
-			//Have we arrived at the base of the ladder to the hatch?
-			if(d->bottom->x == c->x &&
-			(d->bottom->y + d->bottom->image->height) == (c->y + c->area.h)){
-				c->xDist = d->x - c->x;
-				c->yDist = d->y - (c->y + c->area.h);
-			}
-			else{
-				//Target the base of the ladder instead
-				c->target = d->bottom;
-				c->xDist = c->target->x - c->x;
-				c->yDist = c->target->y + c->target->image->height - 
-								(c->y + c->area.h);
-			}
-		}
-		else{
-			//Are we on top of the hatch yet?
-			if(d->x == c->x && d->y == c->y + c->area.h){
-				//Target the base of the ladder instead
-				c->target = d->bottom;
-				c->xDist = c->target->x - c->x;
-				c->yDist = c->target->y + c->target->image->height - 
-								(c->y + c->area.h);
-
-			}
-			else{
-				c->xDist = d->x - c->x;
-				c->yDist = d->y - (c->y + c->area.h);
-			}
-		}
+		c->xDist = d->x - c->x;
+		c->yDist = (d->y + d->area.h) - (c->y + c->area.h);
 	}
 	else{ //Target the door
-		c->xDist = (d->x + d->area.w) - c->x;
-		if(c->xDist <= 0) c->xDist = d->x - (c->x + c->area.w);
+		c->xDist = d->x - (c->x + c->area.w);
+		if(c->xDist <= 0) c->xDist = (d->x + d->area.w) - c->x;
 
 		c->yDist = (d->y + d->area.h) - (c->y + c->area.h);
 	}
 }
 
+void target(CharacterObject *c, GameObject *obj){
+	Door *d = dynamic_cast<Door *>(obj);
+	if(d != nullptr) targetDoor(c, d);
+	else targetGameObject(c, obj);
+}
+
+void blockDoorPath(CharacterObject *object, Door *d, vector<Room *> *rooms,
+							Graph<GameObject *, int> *g){
+	//Remember the next object we were heading towards
+	GameObject *r = nullptr;
+	if(!object->path->empty()){
+		r = object->path->back();
+	}
+	else{
+		printf("Error: Trying to access a ");
+		printf("locked door in pathfinding ");
+		printf("after reaching the final ");
+		printf("room of that path!\n");
+	}
+
+	// Forget the current path to the goal
+	delete object->path;
+	object->path = nullptr;
+	object->target = nullptr;
+
+	//Make a new mental model of the ship
+	int t = g->getEdgeValue(d, r);
+	g->updateEdge(d, r, INT_MAX);
+	g->updateEdge(r, d, INT_MAX);
+
+	//Figure out where to go
+	//Room *start = whichRoom(rooms, object);
+	GameObject *end = closestNode(object->goal, g);
+	object->path = findPathTo(g, d, end);
+
+	//Restore the graph
+	g->updateEdge(d, r, t);
+	g->updateEdge(r, d, t);
+
+	if(object->path == nullptr) return;
+
+	//targetDoor(object, sharedDoor(start, object->path->back()));
+	//Room *room = dynamic_cast<Room *>(object->path->back());
+
+	//Remove the door we are standing at from the path
+	object->path->pop_back();
+	target(object, object->path->back());
+	object->path->pop_back();
+}
+
 void checkDoor(CharacterObject *object, Door *d, vector<Room *> *rooms,
-					Graph<Room *, int> *g, int xSpeed, int ySpeed){
+							Graph<GameObject *, int> *g){
 	if(!d->IsOpen){                             		
-		object->moveBy(-xSpeed, -ySpeed);
-		object->xDist += xSpeed;
-		object->yDist += ySpeed;
-
 		if(d->IsLocked){
-			//Remember the room we were heading to
-			Room *r = nullptr;
-			if(!object->path->empty()){
-				r = object->path->back();
-			}
-			else{
-				printf("Error: Trying to access a ");
-				printf("locked door in pathfinding ");
-				printf("after reaching the final ");
-				printf("room of that path!\n");
-			}
-
-			// Forget the current path to the goal
-			delete object->path;
-			object->path = nullptr;
-			object->target = nullptr;
-
-			//Make a new mental model of the ship
-			Room *start = whichRoom(rooms, object);
-			int t = g->getEdgeValue(start, r);
-			g->updateEdge(start, r, INT_MAX);
-			g->updateEdge(r, start, INT_MAX);
-
-			//Figure out where to go
-			Room *end = whichRoom(rooms, object->goal);
-			object->path = (vector<Room *> *) findPathTo(
-				(Graph<GameObject *, int> *) g, start, end);
-
-			//Restore the graph
-			g->updateEdge(start, r, t);
-			g->updateEdge(r, start, t);
-
-			if(object->path == nullptr) return;
-
-			targetDoor(object, sharedDoor(start,
-							object->path->back()));
+			printf("Door %s is locked\n", d->n);
+			blockDoorPath(object, d, rooms, g);
 		}
 		else{
 			DoorClickPars *data = (DoorClickPars *) d->data;
@@ -182,31 +226,88 @@ void checkDoor(CharacterObject *object, Door *d, vector<Room *> *rooms,
 			d->IsOpen = true;
 		}
 	}
-	
+	else{
+		Door *arrival = dynamic_cast<Door *>(object->path->back());
+
+		if(arrival == nullptr){
+			printf("WARNING: Couldn't find the door we were going to.");
+			printf("Someone probably forgot to initialize the level's");
+			printf("path graph properly....\n");
+		}
+
+		if(arrival->IsLocked){
+			printf("Door %s (arrival) is locked \n", arrival->n);
+			blockDoorPath(object, d, rooms, g);
+		}
+		else{
+			DoorClickPars *data = (DoorClickPars *) arrival->data;
+			arrival->image = data->open;
+			arrival->IsOpen = true;
+			
+			object->x = arrival->x;
+			object->y = arrival->y + (arrival->area.h - object->area.h);
+
+			//Remove the second door and the room of arrival from the path
+			object->path->pop_back();
+			object->target = nullptr;
+		}
+	}
 }
 
 void updateMovement(CharacterObject *object, vector<Room *> *rooms,
-								Graph<Room *, int> *g){
+							Graph<GameObject *, int> *g){
 	//Check if the character wants to move anywhere
 	if(object->goal == nullptr) return;
 
 	//Calculate a path to the target if no such path has been calculated yet
 	if(object->path == nullptr){
-		Room *start = whichRoom(rooms, object);
-		Room *end = whichRoom(rooms, object->goal);
-		object->path = (vector<Room *> *) findPathTo(
-					(Graph<GameObject *, int> *) g, start, end);
+		//Room *start = whichRoom(rooms, object);
+		//Room *end = whichRoom(rooms, object->goal);
+		GameObject *start = closestNode(object, g);
+		GameObject *end = closestNode(object->goal, g);
+		object->path = findPathTo(g, start, end);
 
-		printf("Tried to find path\n");
 		if(object->path == nullptr) return;
-		printf("Found path\n");
 
-		targetDoor(object, sharedDoor(start, object->path->back()));
+		for(GameObject *go : *object->path){
+			printf("%s\n", go->n);
+		}
+
+		//targetDoor(object, sharedDoor(start, object->path->back()));
+		if(object->path->size() > 1){
+			if(object->path->back()->x > object->x &&
+			object->path->at(object->path->size() - 2)->x < object->x){
+				object->path->pop_back();
+			}
+			else if(object->path->back()->x < object->x &&
+			object->path->at(object->path->size() - 2)->x > object->x){
+				object->path->pop_back();
+			}
+
+			target(object, object->path->back());
+			object->path->pop_back();
+		}
+		else{
+			if(object->path->back()->x > object->x &&
+				object->goal->x < object->x){
+				object->path->pop_back();
+				object->target = nullptr;
+			}
+			else if(object->path->back()->x < object->x &&
+				object->goal->x > object->x){
+				object->path->pop_back();
+				object->target = nullptr;
+			}
+
+		}
 	}
 
 	if(object->target == nullptr){
 		if(!object->path->empty()){
-			//If we have arrived at the next target room
+			target(object, object->path->back());
+			object->path->pop_back();
+			
+			/*//If we have arrived at the next target room
 			if(SDL_HasIntersection(&object->area,
 							&object->path->back()->area)){
 				Room *current = object->path->back();
@@ -222,7 +323,7 @@ void updateMovement(CharacterObject *object, vector<Room *> *rooms,
 				Room *start = whichRoom(rooms, object);
 				targetDoor(object, sharedDoor(start,
 								object->path->back()));
-			}
+			}*/
 		}
 		else{
 			//The character is in the correct room, so walk to the goal
@@ -244,19 +345,11 @@ void updateMovement(CharacterObject *object, vector<Room *> *rooms,
 
 	object->moveBy(xSpeed, ySpeed);
 
-	//Handle collision correctly
-	Door *d = dynamic_cast<Door *>(object->target);
-	if(d != nullptr){
-		if(SDL_HasIntersection(&object->area, &d->area)){
-			checkDoor(object, d, rooms, g, xSpeed, ySpeed);
-		}
-	}
-	
 	object->xDist -= xSpeed;
 	object->yDist -= ySpeed;
 
 	//Check if the current target has been reached
-	if(xSpeed == 0 && ySpeed == 0){
+	if(object->xDist == 0 && object->yDist == 0){
 		//If the target was the goal, then we are done
 		if(object->target == object->goal){
 			object->goal = nullptr;
@@ -265,13 +358,10 @@ void updateMovement(CharacterObject *object, vector<Room *> *rooms,
 			object->target = nullptr;
 		}
 		else{
+			//Check if door
+			Door *d = dynamic_cast<Door *>(object->target);
 			if(d != nullptr){
-				if(d->bottom != nullptr){
-					checkDoor(object, d, rooms, g, xSpeed, ySpeed);
-
-					if(object->target = d) object->target = nullptr;
-				}
-				else object->target = nullptr;
+				checkDoor(object, d, rooms, g);
 			}
 			else{
 				object->target = nullptr;

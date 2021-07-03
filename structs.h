@@ -116,6 +116,7 @@ struct GameObject {
 	//Game Coordinates
 	int x;
 	int y;
+	char n[256];
 
 	//Images
 	Image *image;
@@ -248,7 +249,7 @@ struct CharacterObject : GameObjClick{
 	affectionTrait *sexuality;
 
 	//Pathfinding
-	std::vector<Room *> *path;
+	std::vector<GameObject *> *path;
 	GameObject *goal;
 	GameObject *target;
 	int xDist;
@@ -292,6 +293,7 @@ struct Door : GameObjClick {
 	bool IsLocked = false;
 	bool IsOpen = false;
 	GameObject *bottom; //TODO: Temp fix for ladders, could be revised
+	std::vector<Door *> doors;
 
 	Door(int xPos, int yPos, Image *img, void(*func)(void*), void* d)
 		: GameObjClick(xPos, yPos, img, func, d) {

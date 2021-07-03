@@ -244,6 +244,7 @@ template<class N> std::vector<N> *dijkstra(Graph<N, int> *g, N a, N b){
 		path->push_back(pre);
 		pre = prev.at(pre);
 	}
+	path->push_back(pre);
 
 	return path;
 }

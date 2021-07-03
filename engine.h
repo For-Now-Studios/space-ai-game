@@ -50,7 +50,7 @@ Room *whichRoom(vector<Room *> *v, GameObject *obj);
 vector<GameObject *> *findPathTo(Graph<GameObject *, int> *g, GameObject *from,
 								GameObject *to);
 void updateMovement(CharacterObject *object, vector<Room *> *rooms,
-								Graph<Room *, int> *g);
+							Graph<GameObject *, int> *g);
 
 // Relationships.cpp
 Graph<CharacterObject *, Relation> *initRelations(vector<CharacterObject *> *chars);

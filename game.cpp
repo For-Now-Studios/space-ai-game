@@ -27,7 +27,8 @@ struct Labels {
 	space for ease of use
 */
 bool loadLevel(vector<GameObject *>* objects, Media* media,
-	const char *path, CurrentClick* cc, Labels* labels, MouseStruct* mouse){
+	const char *path, CurrentClick* cc, Labels* labels, MouseStruct* mouse,
+	Graph<GameObject *, int> *pG){
 
 	/* ROOMS */
 	// The bridge
@@ -117,6 +118,20 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->door = bridgeDoor;
 	cockpit->doors.push_back(bridgeDoor);
 	bridgeHall->doors.push_back(bridgeDoor);
+	pG->addNode(bridgeDoor);
+	strcpy(bridgeDoor->n, "BridgeDoor");
+	//TestMap (all doors teleport to self)
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *t = new Door(129, 0, media->images.at(3), doorClick, DCP);
+	DCP->door = t;
+	pG->addNode(t);
+	pG->addEdge(bridgeDoor, t, 1);
+	pG->addEdge(t, bridgeDoor, 1);
+	strcpy(t->n, "BridgeDoorTemp (right)");
 
 	// Bridige Hall hatchet
 	DCP = new DoorClickPars;
@@ -128,12 +143,24 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->door = hallHatch;
 	bridgeHall->doors.push_back(hallHatch);
 	kitchenHall->doors.push_back(hallHatch);
+	pG->addNode(hallHatch);
+	pG->addEdge(t, hallHatch, 1);
+	pG->addEdge(hallHatch, t, 1);
+	strcpy(hallHatch->n, "hallHatch");
 	
-	GameObject *bot = new GameObject();
-	bot->x = 172;
-	bot->y = 64;
-	bot->image = media->images.at(11);
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(8);
+	DCP->closed = media->images.at(9);
+	DCP->locked = media->images.at(10);
+	Door *bot = new Door(172, 64, media->images.at(11), doorClick, DCP);
+	DCP->door = bot;
 	hallHatch->bottom = bot;
+	bot->bottom = hallHatch;
+	pG->addNode(bot);
+	pG->addEdge(bot, hallHatch, 1);
+	pG->addEdge(hallHatch, bot, 1);
+	strcpy(bot->n, "Bottom");
 
 	// Bedroom 1 Door
 	DCP = new DoorClickPars;
@@ -145,6 +172,24 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->door = bRoom1Door;
 	bridgeHall->doors.push_back(bRoom1Door);
 	bRoom1->doors.push_back(bRoom1Door);
+	pG->addNode(bRoom1Door);
+	pG->addEdge(bRoom1Door, hallHatch, 1);
+	pG->addEdge(hallHatch, bRoom1Door, 1);
+	pG->addEdge(bRoom1Door, t, 1);
+	pG->addEdge(t, bRoom1Door, 1);
+	strcpy(bRoom1->n, "Bedroom1");
+	//TestMap (all doors teleport to self)
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	t = new Door(257, 0, media->images.at(3), doorClick, DCP);
+	DCP->door = t;
+	pG->addNode(t);
+	pG->addEdge(bRoom1Door, t, 1);
+	pG->addEdge(t, bRoom1Door, 1);
+	strcpy(t->n, "Bedroom1Temp (right)");
 
 	// Bedroom 2 Door
 	DCP = new DoorClickPars;
@@ -156,6 +201,22 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->door = bRoom2Door;
 	bRoom1->doors.push_back(bRoom2Door);
 	bRoom2->doors.push_back(bRoom2Door);
+	pG->addNode(bRoom2Door);
+	pG->addEdge(bRoom2Door, t, 1);
+	pG->addEdge(t, bRoom2Door, 1);
+	strcpy(bRoom2->n, "Bedroom2");
+	//TestMap (all doors teleport to self)
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	t = new Door(385, 0, media->images.at(3), doorClick, DCP);
+	DCP->door = t;
+	pG->addNode(t);
+	pG->addEdge(bRoom2Door, t, 1);
+	pG->addEdge(t, bRoom2Door, 1);
+	strcpy(t->n, "Bedroom2Temp (right)");
 
 	// Bedroom 3 Door
 	DCP = new DoorClickPars;
@@ -167,6 +228,22 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->door = bRoom3Door;
 	kitchenHall->doors.push_back(bRoom3Door);
 	bRoom3->doors.push_back(bRoom3Door);
+	pG->addNode(bRoom3Door);
+	pG->addEdge(bRoom3Door, bot, 1);
+	pG->addEdge(bot, bRoom3Door, 1);
+	strcpy(bRoom3->n, "Bedroom3");
+	//TestMap (all doors teleport to self)
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	t = new Door(257, 64, media->images.at(3), doorClick, DCP);
+	DCP->door = t;
+	pG->addNode(t);
+	pG->addEdge(bRoom3Door, t, 1);
+	pG->addEdge(t, bRoom3Door, 1);
+	strcpy(t->n, "Bedroom3Temp (right)");
 
 	// Bedroom 4 Door
 	DCP = new DoorClickPars;
@@ -178,6 +255,22 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->door = bRoom4Door;
 	bRoom3->doors.push_back(bRoom4Door);
 	bRoom4->doors.push_back(bRoom4Door);
+	pG->addNode(bRoom4Door);
+	pG->addEdge(bRoom4Door, t, 1);
+	pG->addEdge(t, bRoom4Door, 1);
+	strcpy(bRoom4->n, "Bedroom4");
+	//TestMap (all doors teleport to self)
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	t = new Door(385, 64, media->images.at(3), doorClick, DCP);
+	DCP->door = t;
+	pG->addNode(t);
+	pG->addEdge(bRoom4Door, t, 1);
+	pG->addEdge(t, bRoom4Door, 1);
+	strcpy(t->n, "Bedroom4Temp (right)");
 
 	// Kitchen Door
 	DCP = new DoorClickPars;
@@ -189,6 +282,24 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->door = kitchenDoor;
 	kitchen->doors.push_back(kitchenDoor);
 	kitchenHall->doors.push_back(kitchenDoor);
+	pG->addNode(kitchenDoor);
+	pG->addEdge(kitchenDoor, bot, 1);
+	pG->addEdge(bot, kitchenDoor, 1);
+	pG->addEdge(kitchenDoor, bRoom3Door, 1);
+	pG->addEdge(bRoom3Door, kitchenDoor, 1);
+	strcpy(kitchenDoor->n, "KitchenDoor (right)");
+	//TestMap (all doors teleport to self)
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	t = new Door(127, 64, media->images.at(3), doorClick, DCP);
+	DCP->door = t;
+	pG->addNode(t);
+	pG->addEdge(kitchenDoor, t, 1);
+	pG->addEdge(t, kitchenDoor, 1);
+	strcpy(t->n, "KitchenDoorTemp (left)");
 
 	// Add all clickable elements to the click system
 	buildClickAreas(cc,
@@ -376,7 +487,7 @@ int main(int argc, char *argv[]){
 	
 	Labels labels;
 	Graph<CharacterObject *, Relation> *relGraph = nullptr;
-	Graph<Room *, int> *pathGraph = nullptr;
+	Graph<GameObject *, int> *pathGraph = new Graph<GameObject *, int>();
 	vector<CharacterObject *> characters;
 
 	if(running){
@@ -384,7 +495,8 @@ int main(int argc, char *argv[]){
 		labels.romance = loadAffectionTrait("romance.jpeg");
 		labels.sexuality = loadAffectionTrait("sexuality.jpeg");
 
-		if(loadLevel(&objects, &media, "", &currClick, &labels, &mouse)){
+		if(loadLevel(&objects, &media, "", &currClick, &labels, &mouse,
+									pathGraph)){
 			printf("Game object done!\n");
 
 			for(int i = 0; i < currClick.Characters.size(); i++){
@@ -393,7 +505,7 @@ int main(int argc, char *argv[]){
 			}
 
 			relGraph = initRelations(&characters);
-			pathGraph = initPathfinding(&currClick.rooms);
+			//pathGraph = initPathfinding(&currClick.rooms);
 		}
 	}
 
