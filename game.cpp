@@ -28,100 +28,182 @@ struct Labels {
 */
 bool loadLevel(vector<GameObject *>* objects, Media* media,
 	const char *path, CurrentClick* cc, Labels* labels, MouseStruct* mouse){
-	GameObject *obj = new GameObject;
-	obj->image = media->images.at(0);
-	obj->x = 0;
-	obj->y = 0;
 
-	GameObject *obj2 = new GameObject;
-	obj2->image = media->images.at(0);
-	obj2->x = 120;
-	obj2->y = 0;
+	/* ROOMS */
+	// The bridge
+	roomPopupPars* rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	Room *cockpit = new Room(0, 0, media->images.at(5), roomPopup, (void *)(rPup),
+										BRIDGE);
+	rPup->room = cockpit;
 
-	/*	So we can go through all buttons later on.*/
-	GameObjClick *c0 = new GameObjClick(0, 200, media->images.at(1), btnHello,
-		(void*)(new btnHelloParameter{ "c0!" }));
-	
-	GameObjClick *button = new GameObjClick(0, 0, media->images.at(0), testPopPopUp,
-		(void*)(new popPopUpPars{cc, false, objects, media}));
+	// Bridge hall
+	rPup = new roomPopupPars(popPopUpPars{ cc, false, objects, media});
+	Room *bridgeHall = new Room(128, 0, media->images.at(6), roomPopup,
+								(void *)(rPup), HALL);
+	rPup->room = bridgeHall;
 
-	GameObjClick *ui0 = new GameObjClick(0, 420, media->images.at(1), btnHello, //blaze it
-		(void*)(new btnHelloParameter{ "ui0!" }));
+	// Bedroom 1
+	rPup = new roomPopupPars(popPopUpPars{ cc, false, objects, media});
+	Room *bRoom1 = new Room(256, 0, media->images.at(5), roomPopup, (void *)(rPup),
+										BEDROOM);
+	rPup->room = bRoom1;
 
-	GameObjClick *button0 = new GameObjClick(0, 120, media->images.at(0), testPopPopUp0,
-		(void*)(new popPopUpPars{cc, false, objects, media}));
+	// Bedroom 2
+	rPup = new roomPopupPars(popPopUpPars{ cc, false, objects, media});
+	Room *bRoom2 = new Room(384, 0, media->images.at(5), roomPopup, (void *)(rPup),
+										BEDROOM);
+	rPup->room = bRoom2;
 
-	roomPopupPars* rPUP = new roomPopupPars(popPopUpPars{ cc, false, objects, media });
-	Room *roomTest = new Room(120, 120, media->images.at(0), roomPopup,
-		(void*)(rPUP),
-		TOILET | AICORE | CLEARLYFATAL
-	);
-	rPUP->room = roomTest;
-	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello,
-		(void*)(new btnHelloParameter{ "room option 0!" })));
-	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello,
-		(void*)(new btnHelloParameter{ "room option 1!" })));
-	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello,
-		(void*)(new btnHelloParameter{ "room option 2!" })));
-	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello,
-		(void*)(new btnHelloParameter{ "room option 3!" })));
-	roomTest->buttons.push_back(new GameObjClick(0, 0, media->images.at(1), btnHello,
-		(void*)(new btnHelloParameter{ "room option 4!" })));
+	// Bedroom 3
+	rPup = new roomPopupPars(popPopUpPars{ cc, false, objects, media});
+	Room *bRoom3 = new Room(256, 64, media->images.at(5), roomPopup, (void *)(rPup),
+										BEDROOM);
+	rPup->room = bRoom3;
 
-	Room *roomTest2 = new Room(240, 120, media->images.at(0), roomPopup,
-		(void*)(rPUP),
-		TOILET | AICORE | CLEARLYFATAL
-	);
-	Room *roomTest3 = new Room(120, 240, media->images.at(0), roomPopup,
-		(void*)(rPUP),
-		TOILET | AICORE | CLEARLYFATAL
-	);
-	Room *roomTest4 = new Room(240, 240, media->images.at(0), roomPopup,
-		(void*)(rPUP),
-		TOILET | AICORE | CLEARLYFATAL
-	);
+	// Bedroom 4
+	rPup = new roomPopupPars(popPopUpPars{ cc, false, objects, media});
+	Room *bRoom4 = new Room(384, 64, media->images.at(5), roomPopup, (void *)(rPup),
+										BEDROOM);
+	rPup->room = bRoom4;
 
-	CharacterObject *paul = new CharacterObject(120, 120,
-		media->images.at(1), btnHello,
-		(void *)(new btnHelloParameter{ "Come on mr tally man, tally my\
-			banana!" }), "Paul", intersex, labels->genders->at(0),
-				labels->romance->at(0), labels->sexuality->at(0));
-	CharacterObject *paulette = new CharacterObject(240, 120,
-		media->images.at(1), btnHello,
-		(void *)(new btnHelloParameter{ "Glorious failure!"}), "Paulette",
-			intersex, labels->genders->at(3), labels->romance->at(1),
+	// Kitchen Hall
+	rPup = new roomPopupPars(popPopUpPars{ cc, false, objects, media});
+	Room *kitchenHall = new Room(128, 64, media->images.at(6), roomPopup,
+								(void *)(rPup), HALL);
+	rPup->room = kitchenHall;
+
+	// Kitchen
+	rPup = new roomPopupPars(popPopUpPars{ cc, false, objects, media});
+	Room *kitchen = new Room(0, 64, media->images.at(5), roomPopup,
+								(void *)(rPup), KITCHEN);
+	rPup->room = kitchen;
+
+	/* CHARACTERS */
+	// Paul
+	CharacterObject *paul = new CharacterObject(320, 0,
+		media->images.at(7), btnHello, (void *)(new btnHelloParameter{"Paul"}),
+		"Paul", intersex, labels->genders->at(0), labels->romance->at(0),
+							labels->sexuality->at(0));
+
+	// Paulette
+	CharacterObject *paulette = new CharacterObject(400, 0,
+		media->images.at(7), btnHello,
+		(void *)(new btnHelloParameter{"Paulette"}), "Paulette", intersex,
+					labels->genders->at(3), labels->romance->at(1),
 							labels->sexuality->at(1));
-	CharacterObject *paulus = new CharacterObject(120, 240,
-		media->images.at(1), btnHello,
-		(void *)(new btnHelloParameter{ "Jolly cooperation!"}), "Paulus",
-				female, labels->genders->at(2), labels->romance->at(2),
+	
+	// Paulus
+	CharacterObject *paulus = new CharacterObject(310, 64,
+		media->images.at(7), btnHello,
+		(void *)(new btnHelloParameter{"Paulus"}), "Paulus", female,
+		labels->genders->at(2), labels->romance->at(2),
 							labels->sexuality->at(2));
 
+	// Paulob
+	CharacterObject *paulob = new CharacterObject(420, 64,
+		media->images.at(7), btnHello,
+		(void *)(new btnHelloParameter{"Paulob"}), "Paulob", male,
+		labels->genders->at(2), labels->romance->at(3),
+							labels->sexuality->at(3));
+
+	/* Doors */
+	// Bridge Door
 	DoorClickPars* DCP = new DoorClickPars;
-	Door *doorTest = new Door(600, 300, media->images.at(2), doorClick, DCP);
-	DCP->door = doorTest;
 	DCP->mouse = mouse;
 	DCP->open = media->images.at(2);
 	DCP->closed = media->images.at(3);
 	DCP->locked = media->images.at(4);
+	Door *bridgeDoor = new Door(112, 0, media->images.at(3), doorClick, DCP);
+	DCP->door = bridgeDoor;
 
-	//Build clickable areas
-	buildClickAreas(cc, { c0, paul, paulette, paulus }, { roomTest, roomTest2, roomTest3, roomTest4 }, { ui0 }, {}, {button, button0, doorTest});
+	// Bridige Hall hatchet
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(8);
+	DCP->closed = media->images.at(9);
+	DCP->locked = media->images.at(10);
+	Door *hallHatch = new Door(172, 54, media->images.at(9), doorClick, DCP);
+	DCP->door = hallHatch;
 
-	objects->push_back(obj);
-	objects->push_back(obj2);
-	objects->push_back(button);
-	objects->push_back(c0);
-	objects->push_back(ui0);
-	objects->push_back(button0);
-	objects->push_back(roomTest);
-	objects->push_back(roomTest2);
-	objects->push_back(roomTest3);
-	objects->push_back(roomTest4);
-	objects->push_back(doorTest);
+	// Bedroom 1 Door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *bRoom1Door = new Door(240, 0, media->images.at(3), doorClick, DCP);
+	DCP->door = bRoom1Door;
+
+	// Bedroom 2 Door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *bRoom2Door = new Door(368, 0, media->images.at(3), doorClick, DCP);
+	DCP->door = bRoom2Door;
+
+	// Bedroom 3 Door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *bRoom3Door = new Door(240, 64, media->images.at(3), doorClick, DCP);
+	DCP->door = bRoom3Door;
+
+	// Bedroom 4 Door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *bRoom4Door = new Door(368, 64, media->images.at(3), doorClick, DCP);
+	DCP->door = bRoom4Door;
+
+	// Kitchen Door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *kitchenDoor = new Door(112, 64, media->images.at(3), doorClick, DCP);
+	DCP->door = kitchenDoor;
+
+	// Add all clickable elements to the click system
+	buildClickAreas(cc,
+		{paul, paulette, paulus, paulob},
+		{cockpit, bridgeHall, bRoom1, bRoom2, bRoom3, bRoom4, kitchenHall,
+			kitchen},
+		{},
+		{},
+		{bridgeDoor, bRoom1Door, bRoom2Door, bRoom3Door, bRoom4Door, kitchenDoor,
+			hallHatch}
+	);
+
+	/* Add all objects to the objects list */
+	// Rooms
+	objects->push_back(cockpit);
+	objects->push_back(bridgeHall);
+	objects->push_back(bRoom1);
+	objects->push_back(bRoom2);
+	objects->push_back(bRoom3);
+	objects->push_back(bRoom4);
+	objects->push_back(kitchenHall);
+	objects->push_back(kitchen);
+	// Characters
 	objects->push_back(paul);
 	objects->push_back(paulette);
 	objects->push_back(paulus);
+	objects->push_back(paulob);
+	// Doors
+	objects->push_back(bridgeDoor);
+	objects->push_back(hallHatch);
+	objects->push_back(bRoom1Door);
+	objects->push_back(bRoom2Door);
+	objects->push_back(bRoom3Door);
+	objects->push_back(bRoom4Door);
+	objects->push_back(kitchenDoor);
 
 	return true;
 }
@@ -270,35 +352,19 @@ int main(int argc, char *argv[]){
 	CurrentClick currClick;
 	vector<GameObject*> objects;
 	
-	vector<char *> *genders = nullptr;
-	vector<affectionTrait *> *romance = nullptr;
-	vector<affectionTrait *> *sexuality = nullptr;
 	Labels labels;
 	Graph<CharacterObject *, Relation> *relGraph = nullptr;
 	vector<CharacterObject *> characters;
 
-	int channel; //MUSIC TEST
 	if(running){
-		genders = loadGender("gender.jpeg");
-		romance = loadAffectionTrait("romance.jpeg");
-		sexuality = loadAffectionTrait("sexuality.jpeg");
-		labels.genders = genders;
-		labels.romance = romance;
-		labels.sexuality = sexuality;
+		labels.genders = loadGender("gender.jpeg");
+		labels.romance = loadAffectionTrait("romance.jpeg");
+		labels.sexuality = loadAffectionTrait("sexuality.jpeg");
 
 		if(loadLevel(&objects, &media, "", &currClick, &labels, &mouse)){
 			printf("Game object done!\n");
 
-			// MUSIC TEST
-			Mix_Volume(-1, masterVolume);
-			Mix_VolumeMusic(masterVolume);
-			switchMusic(media.music.at(0), -1, 0, 60000);
-			channel = playSound(media.sounds.at(0), -1, 2.0f, 1000);
-		
-			media.images.push_back(new Image(media.fonts.at(0),
-						"Hello Jacob!", {0,0,0}, window.render));
-
-			for(int i = 1; i < currClick.Characters.size(); i++){
+			for(int i = 0; i < currClick.Characters.size(); i++){
 				characters.push_back((CharacterObject *)
 							currClick.Characters.at(i));
 			}
@@ -306,8 +372,6 @@ int main(int argc, char *argv[]){
 			relGraph = initRelations(&characters);
 		}
 	}
-	//Pause the music & sound
-	pauseAll();
 
 	Camera cam;
 	cam.x = 0;
@@ -316,63 +380,12 @@ int main(int argc, char *argv[]){
 	cam.wndX = 0;
 	cam.wndY = 0;
 
-	//GRAPH TEST
-	Graph<GameObject *, int> g;
-	g.addNode(objects.at(6));
-	g.addNode(objects.at(7));
-	g.addNode(objects.at(8));
-	g.addNode(objects.at(9));
-
-	g.addEdge(objects.at(6), objects.at(7), 1);
-	g.addEdge(objects.at(7), objects.at(6), 1);
-	g.addEdge(objects.at(6), objects.at(8), 1);
-	g.addEdge(objects.at(8), objects.at(6), 1);
-	g.addEdge(objects.at(7), objects.at(9), 1);
-	g.addEdge(objects.at(9), objects.at(7), 1);
-	g.addEdge(objects.at(8), objects.at(9), 1);
-	g.addEdge(objects.at(9), objects.at(8), 1);
-
-	Room *start = whichRoom(&currClick.rooms, objects.at(11));
-	vector<Room *> *path = (vector<Room *> *) findPathTo(&g, start, objects.at(9));
-
-	for(Room *r : *path){
-		printf("%d, %d\n", r->x, r->y);
-	}
-
 	// Timing
 	unsigned int targetFrequency = 60;
 	Uint32 targetTime = 1000 / targetFrequency;
 	Uint32 startTime = SDL_GetTicks();
 
 	printf("Initialization done\n");
-
-	int speed = 5; //For testing characters
-
-	printf("\nFeatures the genders of:\n");
-	for(char *t : *genders){
-		printf("%s\n", t);
-	}
-
-	printf("With a slice of:\n");
-	for(affectionTrait *t : *romance){
-		printf("%s\n", t->name);
-
-		for(int i = 0; i < t->n; i++){
-			printf("\t%s\n", t->genders[i]);
-		}
-	}
-
-	printf("And some casual:\n");
-	for(affectionTrait *t : *sexuality){
-		printf("%s\n", t->name);
-
-		for(int i = 0; i < t->n; i++){
-			printf("\t%s\n", t->genders[i]);
-		}
-	}
-
-	relGraph->print();
-
 
 	// The Loop
 	int ticks = 0;
@@ -439,40 +452,7 @@ int main(int argc, char *argv[]){
 			currClick.currentlySelected = nullptr;
 		}
 
-		// Testing moving characters
-		/*objects.at(3)->moveBy(speed, 0);
-		objects.at(10)->moveBy(speed, speed/3);
-		if (objects.at(3)->x > SCREEN_WIDTH - 60 || objects.at(3)->x < 1) {
-			speed *= -1;
-		}*/
-		SDL_Rect paulArea = {objects.at(11)->x, objects.at(11)->y, 1, 1};
-		if(!path->empty()){
-			if(SDL_HasIntersection(&path->back()->area, &paulArea)){
-				path->pop_back();
-			}
-			else{
-				int xSign = 1;
-				if(paulArea.x > path->back()->area.x) xSign = -1;
-
-				int ySign = 1;
-				if(paulArea.y > path->back()->area.y) ySign = -1;
-
-				objects.at(11)->moveBy(speed/5 * xSign, speed/5 * ySign);
-			}
-		}
-
 		updateClickAreas(&currClick);
-		//Prints the amount of characters for each part of the screen
-		//printf("S0: %d, S1: %d\n", currClick.numChars[0], currClick.numChars[1]);
-
-		SDL_Rect temp = {mouse.x, mouse.y, 1, 1};
-		SDL_Rect trans = translateToGame(&cam, &temp);
-		objects.at(0)->x = trans.x - objects.at(0)->image->width / 2;
-		objects.at(0)->y = trans.y -  objects.at(0)->image->height / 2;
-
-		//render(&window, media.images.at(0), 0, 120);
-		//render(&window, media.images.at(0), 120, 120, &cam);
-		render(&window, media.images.at(1), 120, 300);
 		
 		for(GameObject* obj : objects) {
 			render(&window, obj, &cam);
