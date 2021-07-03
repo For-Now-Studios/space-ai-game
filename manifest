@@ -1,9 +1,15 @@
 IMAGES:
 hal9000.png 120 120
 hal9000.png 60 60
-doorOpen.png 60 120
-doorClosed.png 60 120
-doorLocked.png 60 120
+doorOpen.png 32 64
+doorClosed.png 32 64
+doorLocked.png 32 64
+room1.png
+hall.png
+spaceman1.png
+hatchetOpen.png
+hatchetClosed.png
+hatchetLocked.png
 MUSIC:
 Space_Amb_2.wav
 testMusic.wav
