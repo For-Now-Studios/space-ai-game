@@ -4,6 +4,7 @@
 #include<SDL2/SDL_mixer.h>
 #include<SDL2/SDL_ttf.h>
 #include<fstream>
+#include<random>
 #include "structs.h"
 #include "graph.h"
 
@@ -51,3 +52,12 @@ vector<GameObject *> *findPathTo(Graph<GameObject *, int> *g, GameObject *from,
 
 // Relationships.cpp
 Graph<CharacterObject *, Relation> *initRelations(vector<CharacterObject *> *chars);
+bool validRomance(CharacterObject *a, CharacterObject *b);
+bool validSex(CharacterObject *a, CharacterObject *b);
+
+void fallout(vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine);
+void cheating(vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine);
+void confession(vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine);
+void birthday(vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine);
+void cuddles(vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine);
+void support(vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine);

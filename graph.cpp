@@ -173,7 +173,7 @@ template<class N, class V> class Graph{
 		edges.at(pair<N, N>(from, to))->value = value;
 	}
 
-	N getEdgeValue(N from, N to){
+	V getEdgeValue(N from, N to){
 		return edges.at(pair<N, N>(from, to))->value;
 	}
 
