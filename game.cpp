@@ -415,13 +415,17 @@ int main(int argc, char *argv[]){
 					break;
 
 				case SDL_MOUSEMOTION:
+					mouse.relX = event.motion.x-mouse.x;
+					mouse.relY = event.motion.y-mouse.y;
 					mouse.x = event.motion.x;
 					mouse.y = event.motion.y;
-					mouse.relX = event.motion.xrel;
-					mouse.relY = event.motion.yrel;
+					//mouse.relX = event.motion.xrel;
+					//mouse.relY = event.motion.yrel;
 					break;
 				case SDL_MOUSEBUTTONUP:
 				case SDL_MOUSEBUTTONDOWN:
+					mouse.relX = event.motion.x-mouse.x;
+					mouse.relY = event.motion.y-mouse.y;
 					mouse.x = event.button.x;
 					mouse.y = event.button.y;
 					/* In SDL, left button = 1, middle = 2, and
