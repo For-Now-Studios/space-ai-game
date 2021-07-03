@@ -1,6 +1,7 @@
 #include<cmath>
 #include "graph.h"
 #include "structs.h"
+#include "clickfunctions.h"
 
 using namespace std;
 
@@ -90,7 +91,6 @@ void targetDoor(CharacterObject *c, Door *d){
 
 	// Check if the door is a hatch
 	if(d->bottom != nullptr){
-		printf("Targeting a ladder! \n");
 		// Check if we are beneath the hatch
 		if(d->y < c->y){
 			//Have we arrived at the base of the ladder to the hatch?
@@ -124,17 +124,69 @@ void targetDoor(CharacterObject *c, Door *d){
 		}
 	}
 	else{ //Target the door
-		printf("Targeting a normie door! \n");
 		c->xDist = (d->x + d->area.w) - c->x;
 		if(c->xDist <= 0) c->xDist = d->x - (c->x + c->area.w);
 
 		c->yDist = (d->y + d->area.h) - (c->y + c->area.h);
-
 	}
 }
 
+void checkDoor(CharacterObject *object, Door *d, vector<Room *> *rooms,
+					Graph<Room *, int> *g, int xSpeed, int ySpeed){
+	if(!d->IsOpen){                             		
+		object->moveBy(-xSpeed, -ySpeed);
+		object->xDist += xSpeed;
+		object->yDist += ySpeed;
+
+		if(d->IsLocked){
+			//Remember the room we were heading to
+			Room *r = nullptr;
+			if(!object->path->empty()){
+				r = object->path->back();
+			}
+			else{
+				printf("Error: Trying to access a ");
+				printf("locked door in pathfinding ");
+				printf("after reaching the final ");
+				printf("room of that path!\n");
+			}
+
+			// Forget the current path to the goal
+			delete object->path;
+			object->path = nullptr;
+			object->target = nullptr;
+
+			//Make a new mental model of the ship
+			Room *start = whichRoom(rooms, object);
+			int t = g->getEdgeValue(start, r);
+			g->updateEdge(start, r, INT_MAX);
+			g->updateEdge(r, start, INT_MAX);
+
+			//Figure out where to go
+			Room *end = whichRoom(rooms, object->goal);
+			object->path = (vector<Room *> *) findPathTo(
+				(Graph<GameObject *, int> *) g, start, end);
+
+			//Restore the graph
+			g->updateEdge(start, r, t);
+			g->updateEdge(r, start, t);
+
+			if(object->path == nullptr) return;
+
+			targetDoor(object, sharedDoor(start,
+							object->path->back()));
+		}
+		else{
+			DoorClickPars *data = (DoorClickPars *) d->data;
+			d->image = data->open;
+			d->IsOpen = true;
+		}
+	}
+	
+}
+
 void updateMovement(CharacterObject *object, vector<Room *> *rooms,
-						Graph<Room *, int> *g){
+								Graph<Room *, int> *g){
 	//Check if the character wants to move anywhere
 	if(object->goal == nullptr) return;
 
@@ -144,6 +196,11 @@ void updateMovement(CharacterObject *object, vector<Room *> *rooms,
 		Room *end = whichRoom(rooms, object->goal);
 		object->path = (vector<Room *> *) findPathTo(
 					(Graph<GameObject *, int> *) g, start, end);
+
+		printf("Tried to find path\n");
+		if(object->path == nullptr) return;
+		printf("Found path\n");
+
 		targetDoor(object, sharedDoor(start, object->path->back()));
 	}
 
@@ -173,15 +230,6 @@ void updateMovement(CharacterObject *object, vector<Room *> *rooms,
 		}
 	}
 
-
-	//TODO: REWORK THIS SECTION!!!!!!!
-	/*
-		When given a target, calculate the line to that target, store the
-		normalized speed in each direction, and then apply these until the
-		target is reached, or something.
-
-		Drawback: It won't properly hunt moving targets
-	*/
 	int xSpeed = object->speed;
 	int ySpeed = object->speed;
 	
@@ -199,7 +247,9 @@ void updateMovement(CharacterObject *object, vector<Room *> *rooms,
 	//Handle collision correctly
 	Door *d = dynamic_cast<Door *>(object->target);
 	if(d != nullptr){
-		//TODO: HANDLE CHECKS FOR DOORS
+		if(SDL_HasIntersection(&object->area, &d->area)){
+			checkDoor(object, d, rooms, g, xSpeed, ySpeed);
+		}
 	}
 	
 	object->xDist -= xSpeed;
@@ -215,7 +265,17 @@ void updateMovement(CharacterObject *object, vector<Room *> *rooms,
 			object->target = nullptr;
 		}
 		else{
-			object->target = nullptr;
+			if(d != nullptr){
+				if(d->bottom != nullptr){
+					checkDoor(object, d, rooms, g, xSpeed, ySpeed);
+
+					if(object->target = d) object->target = nullptr;
+				}
+				else object->target = nullptr;
+			}
+			else{
+				object->target = nullptr;
+			}
 		}
 	}
 
