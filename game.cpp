@@ -150,9 +150,9 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	
 	DCP = new DoorClickPars;
 	DCP->mouse = mouse;
-	DCP->open = media->images.at(8);
-	DCP->closed = media->images.at(9);
-	DCP->locked = media->images.at(10);
+	DCP->open = media->images.at(11);
+	DCP->closed = media->images.at(11);
+	DCP->locked = media->images.at(8);
 	Door *bot = new Door(172, 64, media->images.at(11), doorClick, DCP);
 	DCP->door = bot;
 	hallHatch->bottom = bot;
@@ -294,7 +294,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(2);
 	DCP->closed = media->images.at(3);
 	DCP->locked = media->images.at(4);
-	t = new Door(127, 64, media->images.at(3), doorClick, DCP);
+	t = new Door(120, 64, media->images.at(3), doorClick, DCP);
 	DCP->door = t;
 	pG->addNode(t);
 	pG->addEdge(kitchenDoor, t, 1);

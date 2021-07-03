@@ -89,7 +89,7 @@ GameObject *closestNode(GameObject *obj, Graph<GameObject *, int> *g){
 }
 
 /*
-	Returns all game objects present in the room froma  pathfinding graph
+	Returns all game objects present in the room from a  pathfinding graph
 */
 vector<GameObject *> *RoomToGraph(Room *r, Graph<GameObject *, int> *g){
 	vector<GameObject *> *res = new vector<GameObject *>();
@@ -215,32 +215,47 @@ void blockDoorPath(CharacterObject *object, Door *d, vector<Room *> *rooms,
 
 void checkDoor(CharacterObject *object, Door *d, vector<Room *> *rooms,
 							Graph<GameObject *, int> *g){
-	if(!d->IsOpen){                             		
+
+	Door *arrival = dynamic_cast<Door *>(object->path->back());
+	if(arrival == nullptr){
+		printf("WARNING: Couldn't find the door we were going to.");
+		printf("Someone probably forgot to initialize the level's");
+		printf("path graph properly....\n");
+	}
+
+	//Make sure that the room of arrival isn't dangerous
+	Room *r = whichRoom(rooms, arrival);
+	if((r->flag & CLEARLYFATAL) != 0){
+		blockDoorPath(object, d, rooms, g);
+		return;
+	}
+
+	if(!d->IsOpen){
 		if(d->IsLocked){
 			//printf("Door %s is locked\n", d->n);
 			blockDoorPath(object, d, rooms, g);
 		}
 		else{
+			//Open the door
 			DoorClickPars *data = (DoorClickPars *) d->data;
 			d->image = data->open;
 			d->IsOpen = true;
 		}
 	}
 	else{
-		Door *arrival = dynamic_cast<Door *>(object->path->back());
-
-		if(arrival == nullptr){
-			printf("WARNING: Couldn't find the door we were going to.");
-			printf("Someone probably forgot to initialize the level's");
-			printf("path graph properly....\n");
-		}
 
 		if(arrival->IsLocked){
 			//printf("Door %s (arrival) is locked \n", arrival->n);
 			blockDoorPath(object, d, rooms, g);
 		}
 		else{
-			DoorClickPars *data = (DoorClickPars *) arrival->data;
+			//Close the door behind you
+			DoorClickPars *data = (DoorClickPars *) d->data;
+			d->image = data->closed;
+			d->IsOpen = true;
+
+			//Open the door of arrival
+			data = (DoorClickPars *) arrival->data;
 			arrival->image = data->open;
 			arrival->IsOpen = true;
 			
