@@ -83,28 +83,34 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	CharacterObject *paul = new CharacterObject(320, 0,
 		media->images.at(7), btnHello, (void *)(new btnHelloParameter{"Paul"}),
 		"Paul", intersex, labels->genders->at(0), labels->romance->at(0),
-							labels->sexuality->at(0));
+							labels->sexuality->at(0), pilot);
 
 	// Paulette
 	CharacterObject *paulette = new CharacterObject(400, 0,
 		media->images.at(7), btnHello,
 		(void *)(new btnHelloParameter{"Paulette"}), "Paulette", intersex,
 					labels->genders->at(3), labels->romance->at(1),
-							labels->sexuality->at(1));
+							labels->sexuality->at(1), engineer);
 	
 	// Paulus
 	CharacterObject *paulus = new CharacterObject(310, 64,
 		media->images.at(7), btnHello,
 		(void *)(new btnHelloParameter{"Paulus"}), "Paulus", female,
 		labels->genders->at(2), labels->romance->at(2),
-							labels->sexuality->at(2));
+							labels->sexuality->at(2), doctor);
 
 	// Paulob
 	CharacterObject *paulob = new CharacterObject(420, 64,
 		media->images.at(7), btnHello,
 		(void *)(new btnHelloParameter{"Paulob"}), "Paulob", male,
 		labels->genders->at(2), labels->romance->at(3),
-							labels->sexuality->at(3));
+							labels->sexuality->at(3), captain);
+  
+  //Add tasks for paulette:
+	paulette->addTask(new Task{ 120,120,btnHello,(void*)(new btnHelloParameter{"Start!"}),1,0,10,"Start",AIASSIGNED });
+	paulette->addTask(new Task{ 240,120,btnHello,(void*)(new btnHelloParameter{"Place0!"}),2,0,10,"Place0",AGAINSTFRIENDS });
+	paulette->addTask(new Task{ 240,240,btnHello,(void*)(new btnHelloParameter{"Place1!"}),3,0,10,"Place1",FORLOVE });
+	paulette->addTask(new Task{ 120,240,btnHello,(void*)(new btnHelloParameter{"Place2!"}),4,0,10,"Place2",FORENEMIES });
 
 	/* Doors */
 	// Bridge Door
@@ -451,7 +457,7 @@ int main(int argc, char *argv[]){
 			}
 			currClick.currentlySelected = nullptr;
 		}
-
+    
 		updateClickAreas(&currClick);
 		
 		for(GameObject* obj : objects) {
