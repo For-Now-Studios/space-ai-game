@@ -173,7 +173,7 @@ template<class N, class V> class Graph{
 		edges.at(pair<N, N>(from, to))->value = value;
 	}
 
-	N getEdgeValue(N from, N to){
+	V getEdgeValue(N from, N to){
 		return edges.at(pair<N, N>(from, to))->value;
 	}
 
@@ -246,6 +246,7 @@ template<class N> std::vector<N> *dijkstra(Graph<N, int> *g, N a, N b){
 		path->push_back(pre);
 		pre = prev.at(pre);
 	}
+	path->push_back(pre);
 
 	return path;
 }
