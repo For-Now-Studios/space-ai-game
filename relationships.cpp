@@ -87,6 +87,16 @@ Graph<CharacterObject *, Relation> *initRelations(vector<CharacterObject *> *cha
 	return g;
 }
 
+/*
+Changes the stress level
+Just checks so it doesn't go below zero
+and if a character is paranoid it increases.
+*/
+void changeStress(int amnt, CharacterObject* cobj) {
+	int newStress = cobj->stress + amnt + ((cobj->traitFlags & PARANOID) != 0) * abs(amnt >> 1);
+	cobj->stress = newStress > -1 ? newStress : 0;
+}
+
 void fallout(vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine dre) {
 	vector<CharacterObject*> chars(characters);
 	shuffle(chars.begin(), chars.end(), dre);
@@ -100,9 +110,9 @@ void fallout(vector<CharacterObject*>& characters, CharacterObject* currChar, Gr
 		}
 		relatonships.updateEdge(currChar, otherChar, On_Bad_Terms);
 		relatonships.updateEdge(otherChar, currChar, On_Bad_Terms);
-		currChar->stress = currChar->stress + 20 > -1 ? currChar->stress + 20 : 0;
+		changeStress(20, currChar);
 		printf("%s's stress just increased, it is now %d\n", currChar->name, currChar->stress);
-		otherChar->stress = otherChar->stress + 20 > -1 ? otherChar->stress + 20 : 0;
+		changeStress(20, otherChar);
 		printf("%s's stress just increased, it is now %d\n", otherChar->name, otherChar->stress);
 		return;
 	}
@@ -118,12 +128,12 @@ void cheating(vector<CharacterObject*>& characters, CharacterObject* currChar, G
 			printf("%s is cheating with %s, that is bad\n", currChar->name, cobj->name);
 			int roll = distribution(dre);
 			if (roll < 50) {
-				currChar->stress = currChar->stress+20 > -1 ? currChar->stress + 20 : 0;
+				changeStress(20, currChar);
 				printf("%s's stress just increased, it is now %d\n", currChar->name, currChar->stress);
 			}
 			roll = distribution(dre);
 			if (roll < 50) {
-				cobj->stress = cobj->stress + 20 > -1 ? cobj->stress + 20 : 0;
+				changeStress(20, cobj);
 				printf("%s's stress just increased, it is now %d\n", cobj->name, cobj->stress);
 			}
 			return;
@@ -145,9 +155,9 @@ void confession(vector<CharacterObject*>& characters, CharacterObject* currChar,
 			currChar->dating = true;
 			cobj->dating = true;
 
-			currChar->stress = currChar->stress - 20 > -1 ? currChar->stress - 20 : 0;
+			changeStress(-20, currChar);
 			printf("%s's stress just decreased, it is now %d\n", currChar->name, currChar->stress);
-			cobj->stress = cobj->stress - 20 > -1 ? cobj->stress - 20 : 0;
+			changeStress(-20, cobj);
 			printf("%s's stress just decreased, it is now %d\n", cobj->name, cobj->stress);
 			relatonships.updateEdge(currChar, cobj, Dating);
 			relatonships.updateEdge(cobj, currChar, Dating);
@@ -160,8 +170,8 @@ void confession(vector<CharacterObject*>& characters, CharacterObject* currChar,
 void birthday(vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine dre) {
 	printf("%s is throwing a birthday, everyones stress is lowered.\n", currChar->name);
 	for (CharacterObject* character : characters) {
-		character->stress = character->stress - 10 > -1 ? character->stress - 10 : 0;
-		printf("%s's stress: %d\n", currChar->name, character->stress);
+		changeStress(-10, character);
+		printf("%s's stress: %d\n", character->name, character->stress);
 	}
 }
 
@@ -173,9 +183,9 @@ void cuddles(vector<CharacterObject*>& characters, CharacterObject* currChar, Gr
 		if (relatonships.getEdgeValue(currChar, cobj) == Dating) {
 			printf("%s is cuddling with %s, it is hella great\n", currChar->name, cobj->name);
 
-			currChar->stress = currChar->stress - 20 > -1 ? currChar->stress - 20 : 0;
+			changeStress(-20, currChar);
 			printf("%s's stress just decreased, it is now %d\n", currChar->name, currChar->stress);
-			cobj->stress = cobj->stress - 20 > -1 ? cobj->stress - 20 : 0;
+			changeStress(-20, cobj);
 			printf("%s's stress just decreased, it is now %d\n", cobj->name, cobj->stress);
 			return;
 		}
@@ -194,7 +204,7 @@ void support(vector<CharacterObject*>& characters, CharacterObject* currChar, Gr
 		}
 
 		printf("%s is being supprotive and supporting %s, so %s is less stressed and this makes them more positive to each other\n", currChar->name, otherChar->name, otherChar->name);
-		otherChar->stress = otherChar->stress - 20 > -1 ? otherChar->stress - 20 : 0;
+		changeStress(-20, otherChar);
 		printf("%s's stress just decreased, it is now %d\n", otherChar->name, otherChar->stress);
 		return;
 	}

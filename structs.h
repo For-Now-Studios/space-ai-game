@@ -283,7 +283,7 @@ enum Role {
 };
 
 struct relationEventChances {
-	int falloutChance = 20; //Both of you count to ten before you do anything irrational.
+	int falloutChance = 10; //Both of you count to ten before you do anything irrational.
 	int confessionChance = 16; // 14+2 valentines day.
 	int cheatingChance = 69; //Nice, gotta get that lay
 	int birthdayChance = 12; //The year I stopped having birthday parties.

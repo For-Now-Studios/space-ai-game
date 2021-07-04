@@ -84,28 +84,28 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	CharacterObject *paul = new CharacterObject(320, 0,
 		media->images.at(7), btnHello, (void *)(new btnHelloParameter{"Paul"}),
 		"Paul", intersex, labels->genders->at(0), labels->romance->at(0),
-							labels->sexuality->at(0), pilot, 0);
+							labels->sexuality->at(0), pilot, TRUSTING|SENSATIVE);
 
 	// Paulette
 	CharacterObject *paulette = new CharacterObject(400, 0,
 		media->images.at(7), btnHello,
 		(void *)(new btnHelloParameter{"Paulette"}), "Paulette", intersex,
 					labels->genders->at(3), labels->romance->at(1),
-							labels->sexuality->at(1), engineer, 0);
+							labels->sexuality->at(1), engineer, BIGOT|LIER);
 	
 	// Paulus
 	CharacterObject *paulus = new CharacterObject(310, 64,
 		media->images.at(7), btnHello,
 		(void *)(new btnHelloParameter{"Paulus"}), "Paulus", female,
 		labels->genders->at(2), labels->romance->at(2),
-							labels->sexuality->at(2), doctor, 0);
+							labels->sexuality->at(2), doctor, PARANOID);
 
 	// Paulob
 	CharacterObject *paulob = new CharacterObject(420, 64,
 		media->images.at(7), btnHello,
 		(void *)(new btnHelloParameter{"Paulob"}), "Paulob", male,
 		labels->genders->at(2), labels->romance->at(3),
-							labels->sexuality->at(3), captain, 0);
+							labels->sexuality->at(3), captain, CARING);
   
   //Add tasks for paulette:
 	paulette->addTask(new Task{ 120,120,btnHello,(void*)(new btnHelloParameter{"Start!"}),1,0,10,"Start",AIASSIGNED });
@@ -378,12 +378,14 @@ int main(int argc, char *argv[]){
 				characters.push_back((CharacterObject *)
 							currClick.Characters.at(i));
 			}
+
+			//Check for flags and edit chances
 			for (CharacterObject* cobj : characters) {
 				if (cobj->traitFlags & SENSATIVE) {
-					cobj->rec.noChance -= 40;
+					cobj->rec.noChance -= 5;
 				}
 				if (cobj->traitFlags & BIGOT) {
-					cobj->rec.falloutChance += 40;
+					cobj->rec.falloutChance += 10;
 				}
 				if (cobj->traitFlags & LIER) {
 					cobj->rec.birthdayChance += 40;
@@ -393,6 +395,13 @@ int main(int argc, char *argv[]){
 					cobj->rec.confessionChance += 40;
 					cobj->rec.supportChance += 40;
 					cobj->rec.cuddleChance += 40;
+					cobj->rec.cheatingChance -= 40;
+				}
+				if (cobj->sexuality->n == 0) {
+					cobj->rec.cheatingChance = 0;
+				}
+				if (cobj->romance->n == 0) {
+					cobj->rec.confessionChance = 0;
 				}
 			}
 
@@ -485,17 +494,18 @@ int main(int argc, char *argv[]){
     
 		updateClickAreas(&currClick);
 
-		const uniform_int_distribution<int> d100(0, 999);
+		const uniform_int_distribution<int> d1000(0, 999);
 		for (CharacterObject* cobj : characters) {
-			int roll = d100(generator);
-			if (roll < cobj->rec.noChance) continue;
-			const int numEvents = 6;
+			//Roll a d1000 to see if *this* character has an event.
+			int roll = d1000(generator);
+			if (roll < cobj->rec.noChance) continue; //If it rolls under then we skip to the next character in the iteration
+			const int numEvents = 6; //Number of events we check
 			int chances[numEvents] = {
 				cobj->rec.falloutChance+cobj->stress,
-				cobj->romance->n != 0 ? cobj->rec.confessionChance : 0,
-				cobj->dating ? (cobj->sexuality->n != 0 ? cobj->rec.cheatingChance : 0) : 0,
+				cobj->rec.confessionChance,
+				cobj->dating ? cobj->rec.cheatingChance : 0, //If you are dating, you can cheat
 				cobj->rec.birthdayChance,
-				cobj->dating ? cobj->rec.cuddleChance : 0,
+				cobj->dating ? cobj->rec.cuddleChance : 0, //If you are dating, you can cuddle.
 				cobj->rec.supportChance,
 			};
 			void(*functions[numEvents])(vector<CharacterObject*>&, CharacterObject*, Graph<CharacterObject *, Relation>&, default_random_engine) = {
