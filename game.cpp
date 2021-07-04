@@ -669,10 +669,10 @@ int main(int argc, char *argv[]){
 			currClick.currentlySelected = nullptr;
 		}
 
-		if(key[0]) cam.y -= 10;
-		if(key[1]) cam.x -= 10;
-		if(key[2]) cam.y += 10;
-		if(key[3]) cam.x += 10;
+		if(key[0]) cam.y -= 20;
+		if(key[1]) cam.x -= 20;
+		if(key[2]) cam.y += 20;
+		if(key[3]) cam.x += 20;
 		if(key[4]) cam.zoomLevel += 0.01;
 		if(key[5]) cam.zoomLevel -= 0.01;
     
