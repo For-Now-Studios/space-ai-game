@@ -9,8 +9,8 @@
 #include "clickfunctions.h"
 #include "graph.h"
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 1920;
+const int SCREEN_HEIGHT = 1080;
 
 struct Labels {
 	vector<char *> *genders = nullptr;
@@ -518,7 +518,7 @@ int main(int argc, char *argv[]){
 	Camera cam;
 	cam.x = 0;
 	cam.y = 0;
-	cam.zoomLevel = 1.0f;
+	cam.zoomLevel = 0.25f;
 	cam.wndX = 0;
 	cam.wndY = 0;
 
@@ -531,6 +531,10 @@ int main(int argc, char *argv[]){
 
 	// The Loop
 	int ticks = 0;
+
+	//TEST CODE TODO: REMOVE
+	bool key[6];
+	for(bool k : key) k = false;
 
 	while(running){
 		SDL_RenderClear(window.render);
@@ -581,6 +585,56 @@ int main(int argc, char *argv[]){
 					mouse.scrollRight = event.wheel.x;
 					mouse.scrollUp = event.wheel.y;
 					break;
+
+				//TEMPORARY. TODO: REMOVE
+				case SDL_KEYDOWN:
+					switch(event.key.keysym.sym){
+						case SDLK_w:
+							key[0] = true;
+							break;
+						case SDLK_a:
+							key[1] = true;
+							break;
+						case SDLK_s:
+							key[2] = true;
+							break;
+						case SDLK_d:
+							key[3] = true;
+							break;
+						case SDLK_UP:
+							key[4] = true;
+							break;
+						case SDLK_DOWN:
+							key[5] = true;
+							break;
+						default:
+							break;
+					}
+					break;
+				case SDL_KEYUP:
+					switch(event.key.keysym.sym){
+						case SDLK_w:
+							key[0] = false;
+							break;
+						case SDLK_a:
+							key[1] = false;
+							break;
+						case SDLK_s:
+							key[2] = false;
+							break;
+						case SDLK_d:
+							key[3] = false;
+							break;
+						case SDLK_UP:
+							key[4] = false;
+							break;
+						case SDLK_DOWN:
+							key[5] = false;
+							break;
+						default:
+							break;
+					}
+					break;
 				default:
 					break;
 			}
@@ -614,9 +668,18 @@ int main(int argc, char *argv[]){
 			}
 			currClick.currentlySelected = nullptr;
 		}
+
+		if(key[0]) cam.y -= 10;
+		if(key[1]) cam.x -= 10;
+		if(key[2]) cam.y += 10;
+		if(key[3]) cam.x += 10;
+		if(key[4]) cam.zoomLevel += 0.01;
+		if(key[5]) cam.zoomLevel -= 0.01;
     
 		updateClickAreas(&currClick);
 		
+		//Render
+		render(&window, media.images.at(12), 0, 0, &cam); //Render background
 		for(GameObject* obj : objects) {
 			render(&window, obj, &cam);
 		}
