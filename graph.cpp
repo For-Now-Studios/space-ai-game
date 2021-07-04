@@ -9,6 +9,8 @@
 
 using namespace std;
 
+template<class N, class V> class Node;
+
 // NOTE: A very collision prone hash function that hashes the class pair
 // TODO: Make this less collision prone
 struct pairHash {

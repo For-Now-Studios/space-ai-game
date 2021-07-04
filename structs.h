@@ -4,6 +4,7 @@
 #include<SDL2/SDL_image.h>
 #include<SDL2/SDL_mixer.h>
 #include<SDL2/SDL_ttf.h>
+#include<list>
 
 struct Room;
 
@@ -227,6 +228,42 @@ struct GameObjClick : GameObject, IsClickable {
 	}
 };
 
+#define AIASSIGNED (1 << 0)
+#define SELFCARE (1 << 1)
+#define EMERGENCY (1 << 2)
+#define LIFEORDEATH (1 << 3) 
+#define FORFRIENDS (1 << 4)
+#define FORLOVE (1 << 5)
+#define FORENEMIES (1 << 6) 
+#define FORHATE (1 << 7)
+#define AGAINSTENEMY (1 << 8)
+#define AGAINSTLOVE (1 << 9)
+#define AGAINSTFRIENDS (1 << 10)
+
+struct Task {
+	// Location
+	int x;
+	int y;
+
+	// Effect
+	void(*function)(void*); //The function that does its effect
+	void* data = nullptr; //The data sent into the function
+	
+	int priority; //How important is this job?
+	int actualPrio; //How ACTUALLY important is this?
+	int waitTime;
+
+	const char* name;
+
+	int flag;
+
+	~Task() {
+		delete data;
+		data = nullptr;
+		printf("Data for a task has been freed!\n");
+	}
+};
+
 struct affectionTrait{
 	char *name;
 	char **genders;
@@ -239,6 +276,15 @@ enum Sex{
 	intersex
 };
 
+enum Role {
+	captain,
+	pilot,
+	doctor,
+	engineer,
+	biologist,
+	generalist
+};
+
 struct CharacterObject : GameObjClick{
 	int stress;
 	int loyalty;
@@ -247,6 +293,8 @@ struct CharacterObject : GameObjClick{
 	char *gender;
 	affectionTrait *romance;
 	affectionTrait *sexuality;
+	Role role;
+	std::list<Task*> tasks;
 
 	//Pathfinding
 	std::vector<GameObject *> *path;
@@ -257,18 +305,18 @@ struct CharacterObject : GameObjClick{
 	int speed;
 
 	CharacterObject(int xPos, int yPos, Image *img, void(*func)(void*), void* d,
-		const char *n, Sex s, char *g, affectionTrait *r, affectionTrait *se) :
+		const char *n, Sex s, char *g, affectionTrait *r, affectionTrait *se, Role roly) :
 						 GameObjClick(xPos, yPos, img, func, d){
-		setParam(n, s, g, r, se);
+		setParam(n, s, g, r, se, roly);
 	}
 	CharacterObject(int xPos, int yPos, Image *img, SDL_Rect ar, void(*func)(void*),
-	void* d, const char *n, Sex s, char *g, affectionTrait *r, affectionTrait *se) :
+	void* d, const char *n, Sex s, char *g, affectionTrait *r, affectionTrait *se, Role roly) :
 					 GameObjClick(xPos, yPos, img, ar, func, d){
-		setParam(n, s, g, r, se);
+		setParam(n, s, g, r, se, roly);
 	}
 	
 	void setParam(const char *n, Sex s, char *g, affectionTrait *r,
-								affectionTrait *se){
+						affectionTrait *se, Role roly){
 		name = n;
 		sex = s;
 		gender = g;
@@ -277,12 +325,53 @@ struct CharacterObject : GameObjClick{
 
 		stress = 0;
 		loyalty = 100;
-		path = nullptr;
+    
+    path = nullptr;
 		goal = nullptr;
 		target = nullptr;
 		xDist = 0;
 		yDist = 0;
 		speed = 1;
+
+		role = roly;
+	}
+
+
+	void makeActualPriority(int &val, int flags)
+	{
+		val *= flags & AIASSIGNED ? loyalty / 100 : 1;
+		val += ((flags & EMERGENCY) != 0) * 100
+			+ ((flags & (FORFRIENDS | FORHATE | FORLOVE | AGAINSTENEMY)) != 0) * 69
+			+ ((flags & (FORENEMIES | AGAINSTLOVE | AGAINSTFRIENDS)) != 0) * -96;
+	}
+	struct compGreater {
+		bool operator()(const Task* l, const Task* r) {
+			return l->actualPrio < r->actualPrio;
+		}
+	};
+	
+
+	void addTask(Task* task) {
+		task->actualPrio = task->priority;
+		makeActualPriority(task->actualPrio, task->flag);
+		tasks.push_back(task);
+		tasks.sort(compGreater());
+	}
+
+	//Currently calculates actual priority each time it compares
+	void rethinkOrder() {
+		for (Task* t : tasks) {
+			t->actualPrio = t->priority;
+			makeActualPriority(t->actualPrio, t->flag);
+		}
+		tasks.sort(compGreater());
+	}
+
+	~CharacterObject() {
+		for(Task* t : tasks) {
+			delete t;
+		}
+		printf("Deleted a task, for there is no need to do anything when you are heading to the void!\n");
 	}
 };
 
