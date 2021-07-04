@@ -6,6 +6,8 @@
 #include<SDL2/SDL_ttf.h>
 #include<list>
 
+struct Room;
+
 struct WindowStruct {
 	SDL_Window *window;
 	SDL_Texture *screenTexture;
@@ -115,18 +117,19 @@ struct GameObject {
 	//Game Coordinates
 	int x;
 	int y;
+	char n[256];
 
 	//Images
 	Image *image;
+
+	virtual ~GameObject() {
+
+	}
 	
 	// Function to move the object, implemented mostly because so children can make their own move functions and be run.
 	virtual void moveBy(int xDir, int yDir) { 
 		x += xDir;
 		y += yDir;
-	}
-
-	virtual ~GameObject() {
-
 	}
 };
 
@@ -293,6 +296,14 @@ struct CharacterObject : GameObjClick{
 	Role role;
 	std::list<Task*> tasks;
 
+	//Pathfinding
+	std::vector<GameObject *> *path;
+	GameObject *goal;
+	GameObject *target;
+	int xDist;
+	int yDist;
+	int speed;
+
 	CharacterObject(int xPos, int yPos, Image *img, void(*func)(void*), void* d,
 		const char *n, Sex s, char *g, affectionTrait *r, affectionTrait *se, Role roly) :
 						 GameObjClick(xPos, yPos, img, func, d){
@@ -316,6 +327,13 @@ struct CharacterObject : GameObjClick{
 		loyalty = 100;
 
 		role = roly;
+
+		path = nullptr;
+		goal = nullptr;
+		target = nullptr;
+		xDist = 0;
+		yDist = 0;
+		speed = 1;
 	}
 
 
@@ -355,6 +373,22 @@ struct CharacterObject : GameObjClick{
 		}
 		printf("Deleted a task, for there is no need to do anything when you are heading to the void!\n");
 	}
+
+};
+
+/*
+	Door struct for doors
+*/
+struct Door : GameObjClick {
+	bool IsLocked = false;
+	bool IsOpen = false;
+	GameObject *bottom; //TODO: Temp fix for ladders, could be revised
+	std::vector<Door *> doors;
+
+	Door(int xPos, int yPos, Image *img, void(*func)(void*), void* d)
+		: GameObjClick(xPos, yPos, img, func, d) {
+			bottom = nullptr;
+		}
 };
 
 #define STORAGE (1 << 0)
@@ -374,6 +408,7 @@ struct Room : GameObjClick {
 	int flag;
 	const char* name;
 	std::vector<GameObjClick*> buttons;
+	std::vector<Door *> doors;
 
 	Room(int xPos, int yPos, Image *img, void(*func)(void*), void* d, int f)
 		: flag{ f }, GameObjClick(xPos, yPos, img, func, d) {
@@ -383,16 +418,6 @@ struct Room : GameObjClick {
 		: flag{ f }, GameObjClick(xPos, yPos, img, ar, func, d) {
 
 	}
-};
-
-/*
-	Door struct for doors
-*/
-struct Door : GameObjClick {
-	bool IsLocked = false;
-	bool IsOpen = false;
-	Door(int xPos, int yPos, Image *img, void(*func)(void*), void* d)
-		: GameObjClick(xPos, yPos, img, func, d) {}
 };
 
 enum Relation{

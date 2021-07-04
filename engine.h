@@ -45,9 +45,12 @@ vector<char *> *loadGender(const char *path);
 vector<affectionTrait *> *loadAffectionTrait(const char *path);
 
 // Pathfinding.cpp
+Graph<Room *, int> *initPathfinding(vector<Room *> *v);
 Room *whichRoom(vector<Room *> *v, GameObject *obj);
 vector<GameObject *> *findPathTo(Graph<GameObject *, int> *g, GameObject *from,
 								GameObject *to);
+void updateMovement(CharacterObject *object, vector<Room *> *rooms,
+							Graph<GameObject *, int> *g);
 
 // Relationships.cpp
 Graph<CharacterObject *, Relation> *initRelations(vector<CharacterObject *> *chars);

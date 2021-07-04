@@ -1,4 +1,5 @@
 #pragma once
+#include "click.h"
 
 /*
 	Test funtion and struct parameter.
