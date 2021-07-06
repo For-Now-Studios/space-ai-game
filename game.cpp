@@ -31,6 +31,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	Graph<GameObject *, int> *pG){
 
 	/* ROOMS */
+	vector<Room *> rooms;
 	// The bridge
 	roomPopupPars* rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *cockpit = new Room(0, 0, media->images.at(5), roomPopup, (void *)(rPup),
@@ -85,174 +86,203 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	Room *r1 = new Room(2418, 520, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r1;
+	rooms.push_back(r1);
 
 	// Proper Room 2
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r2 = new Room(3161, 650, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r2;
+	rooms.push_back(r2);
 
 	// Proper Room 3
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r3 = new Room(6314, 721, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r3;
+	rooms.push_back(r3);
 
 	// Proper Room 4
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r4 = new Room(1614, 674, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r4;
+	rooms.push_back(r4);
 
 	// Proper Room 5
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r5 = new Room(3203, 797, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r5;
+	rooms.push_back(r5);
 
 	// Proper Room 6
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r6 = new Room(4775, 1270, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r6;
+	rooms.push_back(r6);
 
 	// Proper Room 7
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r7 = new Room(5491, 1110, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r7;
+	rooms.push_back(r7);
 
 	// Proper Room 8
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r8 = new Room(6244, 1094, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r8;
+	rooms.push_back(r8);
 
 	// Proper Room 9
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r9 = new Room(1001, 1092, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r9;
+	rooms.push_back(r9);
 
 	// Proper Room 10
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r10 = new Room(2591, 1219, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r10;
+	rooms.push_back(r10);
 
 	// Proper Room 11
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r11 = new Room(5225, 1531, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r11;
+	rooms.push_back(r11);
 
 	// Proper Room 12
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r12 = new Room(6244, 1295, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r12;
+	rooms.push_back(r12);
 
 	// Proper Room 13
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r13 = new Room(1305, 1442, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r13;
+	rooms.push_back(r13);
 
 	// Proper Room 14
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r14 = new Room(3186, 1839, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r14;
+	rooms.push_back(r14);
 
 	// Proper Room 15
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r15 = new Room(6244, 1707, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r15;
+	rooms.push_back(r15);
 
 	// Proper Room 16
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r16 = new Room(6387, 1709, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r16;
+	rooms.push_back(r16);
 
 	// Proper Room 17
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r17 = new Room(6599, 1709, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
-	rPup->room = r2;
+	rPup->room = r17;
+	rooms.push_back(r17);
 
 	// Proper Room 18
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r18 = new Room(6811, 1709, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r18;
+	rooms.push_back(r18);
 
 	// Proper Room 19
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r19 = new Room(7021, 1709, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r19;
+	rooms.push_back(r19);
 
 	// Proper Room 20
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r20 = new Room(1373, 2574, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r20;
+	rooms.push_back(r20);
 
 	// Proper Room 21
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r21 = new Room(2900, 2521, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r21;
+	rooms.push_back(r21);
 
 	// Proper Room 22
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r22 = new Room(6387, 1929, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r22;
+	rooms.push_back(r22);
 
 	// Proper Room 23
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r23 = new Room(6599, 1929, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r23;
+	rooms.push_back(r23);
 
 	// Proper Room 24
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r24 = new Room(6811, 1929, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
-	rPup->room = r2;
+	rPup->room = r24;
+	rooms.push_back(r24);
 
 	// Proper Room 25
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r25 = new Room(7021, 1929, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r25;
+	rooms.push_back(r25);
 
 	// Proper Room 26
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r26 = new Room(2900, 2696, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r26;
+	rooms.push_back(r26);
 
 	// Proper Room 27
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r27 = new Room(4385, 2780, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r27;
+	rooms.push_back(r27);
 
 	// Proper Room 28
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r28 = new Room(2900, 2867, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r28;
+	rooms.push_back(r28);
 
 	// Proper Room 29
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
 	Room *r29 = new Room(1231, 3084, media->images.at(5), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r29;
+	rooms.push_back(r29);
 
 	/* DOORS */
 	vector<IsClickable *> doors;
@@ -301,7 +331,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(2);
 	DCP->closed = media->images.at(3);
 	DCP->locked = media->images.at(4);
-	Door *r2Dr = new Door(5757, 738 - media->images.at(3)->height,
+	Door *r2Dr = new Door(5747, 738 - media->images.at(3)->height,
 						media->images.at(3), doorClick, DCP);
 	DCP->door = r2Dr;
 	pG->addNode(r2Dr); //Add the door to the pathfinder graph
@@ -339,7 +369,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(8);
 	DCP->closed = media->images.at(9);
 	DCP->locked = media->images.at(10);
-	Door *r4Dt = new Door(2507, 884 - media->images.at(9)->height,
+	Door *r4Dt = new Door(2507, 871 - media->images.at(9)->height,
 						media->images.at(9), doorClick, DCP);
 	DCP->door = r4Dt;
 	r4Dt->bottom = r1D; //Indicate that this is a vertical door
@@ -407,7 +437,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(2);
 	DCP->closed = media->images.at(3);
 	DCP->locked = media->images.at(4);
-	Door *r5Dbr = new Door(4460, 1671 - media->images.at(3)->height,
+	Door *r5Dbr = new Door(4450, 1671 - media->images.at(3)->height,
 						media->images.at(3), doorClick, DCP);
 	DCP->door = r5Dbr;
 	pG->addNode(r5Dbr); //Add the door to the pathfinder graph
@@ -419,8 +449,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(8);
 	DCP->closed = media->images.at(9);
 	DCP->locked = media->images.at(10);
-	Door *r5Dbb = new Door(4318, 1672 - media->images.at(8)->height,
-						media->images.at(8), doorClick, DCP);
+	Door *r5Dbb = new Door(4318, 1672 - media->images.at(9)->height,
+						media->images.at(9), doorClick, DCP);
 	DCP->door = r5Dbb;
 	pG->addNode(r5Dbb); //Add the door to the pathfinder graph
 	doors.push_back(r5Dbb);
@@ -445,21 +475,21 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(8);
 	DCP->closed = media->images.at(9);
 	DCP->locked = media->images.at(10);
-	Door *r6Db = new Door(4913, 1428 - media->images.at(8)->height,
-						media->images.at(8), doorClick, DCP);
+	Door *r6Db = new Door(4913, 1428 - media->images.at(9)->height,
+						media->images.at(9), doorClick, DCP);
 	DCP->door = r6Db;
 	pG->addNode(r6Db); //Add the door to the pathfinder graph
 	pG->addEdge(r5Dbr, r6Db, 1);
 	pG->addEdge(r6Db, r5Dbr, 1);
 	doors.push_back(r6Db);
 
-	// Room 6 righ door
+	// Room 6 right door
 	DCP = new DoorClickPars;
 	DCP->mouse = mouse;
 	DCP->open = media->images.at(2);
 	DCP->closed = media->images.at(3);
 	DCP->locked = media->images.at(4);
-	Door *r6Dr = new Door(5049, 1248 - media->images.at(3)->height,
+	Door *r6Dr = new Door(5049, 1428 - media->images.at(3)->height,
 						media->images.at(3), doorClick, DCP);
 	DCP->door = r6Dr;
 	pG->addNode(r6Dr); //Add the door to the pathfinder graph
@@ -485,8 +515,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(8);
 	DCP->closed = media->images.at(9);
 	DCP->locked = media->images.at(10);
-	Door *r7Dt = new Door(5553, 1428 - media->images.at(8)->height,
-						media->images.at(8), doorClick, DCP);
+	Door *r7Dt = new Door(5553, 1428 - media->images.at(9)->height,
+						media->images.at(9), doorClick, DCP);
 	DCP->door = r7Dt;
 	pG->addNode(r7Dt); //Add the door to the pathfinder graph
 	pG->addEdge(r2Db, r7Dt, 1);
@@ -499,8 +529,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(8);
 	DCP->closed = media->images.at(9);
 	DCP->locked = media->images.at(10);
-	Door *r7Db = new Door(5714, 1428 - media->images.at(8)->height,
-						media->images.at(8), doorClick, DCP);
+	Door *r7Db = new Door(5714, 1428 - media->images.at(9)->height,
+						media->images.at(9), doorClick, DCP);
 	DCP->door = r7Db;
 	pG->addNode(r7Db); //Add the door to the pathfinder graph
 	doors.push_back(r7Db);
@@ -582,8 +612,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(8);
 	DCP->closed = media->images.at(9);
 	DCP->locked = media->images.at(10);
-	Door *r11Dt = new Door(5714, 1672 - media->images.at(8)->height,
-						media->images.at(8), doorClick, DCP);
+	Door *r11Dt = new Door(5714, 1672 - media->images.at(9)->height,
+						media->images.at(9), doorClick, DCP);
 	DCP->door = r11Dt;
 	pG->addNode(r11Dt); //Add the door to the pathfinder graph
 	pG->addEdge(r7Db, r11Dt, 1);
@@ -622,8 +652,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(8);
 	DCP->closed = media->images.at(9);
 	DCP->locked = media->images.at(10);
-	Door *r13Db = new Door(1392, 1584 - media->images.at(8)->height,
-						media->images.at(8), doorClick, DCP);
+	Door *r13Db = new Door(1392, 1584 - media->images.at(9)->height,
+						media->images.at(9), doorClick, DCP);
 	DCP->door = r13Db;
 	pG->addNode(r13Db); //Add the door to the pathfinder graph
 	doors.push_back(r13Db);
@@ -634,8 +664,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(8);
 	DCP->closed = media->images.at(9);
 	DCP->locked = media->images.at(10);
-	Door *r13Dt = new Door(2022, 1584 - media->images.at(8)->height,
-						media->images.at(8), doorClick, DCP);
+	Door *r13Dt = new Door(2022, 1584 - media->images.at(9)->height,
+						media->images.at(9), doorClick, DCP);
 	DCP->door = r13Dt;
 	pG->addNode(r13Dt); //Add the door to the pathfinder graph
 	pG->addEdge(r9D, r13Dt, 1);
@@ -674,8 +704,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(8);
 	DCP->closed = media->images.at(9);
 	DCP->locked = media->images.at(10);
-	Door *r14Db = new Door(3893, 2213 - media->images.at(8)->height,
-						media->images.at(8), doorClick, DCP);
+	Door *r14Db = new Door(3893, 2213 - media->images.at(9)->height,
+						media->images.at(9), doorClick, DCP);
 	DCP->door = r14Db;
 	pG->addNode(r14Db); //Add the door to the pathfinder graph
 	doors.push_back(r14Db);
@@ -686,8 +716,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(8);
 	DCP->closed = media->images.at(9);
 	DCP->locked = media->images.at(10);
-	Door *r14Dt = new Door(4318, 2213 - media->images.at(8)->height,
-						media->images.at(8), doorClick, DCP);
+	Door *r14Dt = new Door(4318, 2213 - media->images.at(9)->height,
+						media->images.at(9), doorClick, DCP);
 	DCP->door = r14Dt;
 	pG->addNode(r14Dt); //Add the door to the pathfinder graph
 	pG->addEdge(r5Dbb, r14Dt, 1);
@@ -818,8 +848,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(8);
 	DCP->closed = media->images.at(9);
 	DCP->locked = media->images.at(10);
-	Door *r20Dt = new Door(1392, 2801 - media->images.at(8)->height,
-						media->images.at(8), doorClick, DCP);
+	Door *r20Dt = new Door(1392, 2801 - media->images.at(9)->height,
+						media->images.at(9), doorClick, DCP);
 	DCP->door = r20Dt;
 	pG->addNode(r20Dt); //Add the door to the pathfinder graph
 	pG->addEdge(r13Db, r20Dt, 1);
@@ -844,8 +874,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(8);
 	DCP->closed = media->images.at(9);
 	DCP->locked = media->images.at(10);
-	Door *r21D = new Door(3893, 2626 - media->images.at(8)->height,
-						media->images.at(8), doorClick, DCP);
+	Door *r21D = new Door(3893, 2626 - media->images.at(9)->height,
+						media->images.at(9), doorClick, DCP);
 	DCP->door = r21D;
 	pG->addNode(r21D); //Add the door to the pathfinder graph
 	pG->addEdge(r14Db, r21D, 1);
@@ -964,8 +994,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(8);
 	DCP->closed = media->images.at(9);
 	DCP->locked = media->images.at(10);
-	Door *r26Dt = new Door(3893, 2801 - media->images.at(8)->height,
-						media->images.at(8), doorClick, DCP);
+	Door *r26Dt = new Door(3893, 2801 - media->images.at(9)->height,
+						media->images.at(9), doorClick, DCP);
 	DCP->door = r26Dt;
 	pG->addNode(r26Dt); //Add the door to the pathfinder graph
 	pG->addEdge(r14Db, r26Dt, 1);
@@ -1006,8 +1036,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(8);
 	DCP->closed = media->images.at(9);
 	DCP->locked = media->images.at(10);
-	Door *r28D = new Door(3893, 2972 - media->images.at(8)->height,
-						media->images.at(8), doorClick, DCP);
+	Door *r28D = new Door(3893, 2972 - media->images.at(9)->height,
+						media->images.at(9), doorClick, DCP);
 	DCP->door = r28D;
 	pG->addNode(r28D); //Add the door to the pathfinder graph
 	pG->addEdge(r14Db, r28D, 1);
@@ -1024,8 +1054,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(8);
 	DCP->closed = media->images.at(9);
 	DCP->locked = media->images.at(10);
-	Door *r29D = new Door(3893, 3952 - media->images.at(8)->height,
-						media->images.at(8), doorClick, DCP);
+	Door *r29D = new Door(3893, 3952 - media->images.at(9)->height,
+						media->images.at(9), doorClick, DCP);
 	DCP->door = r29D;
 	pG->addNode(r29D); //Add the door to the pathfinder graph
 	pG->addEdge(r14Db, r29D, 1);
@@ -1268,8 +1298,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 
 	// Add all clickable elements to the click system
 	printf("About to add all clicks\n");
-	vector<Room *> rooms({cockpit, bridgeHall, bRoom1, bRoom2, bRoom3, bRoom4,
-								kitchenHall, kitchen});
+	//vector<Room *> rooms({cockpit, bridgeHall, bRoom1, bRoom2, bRoom3, bRoom4,
+	//							kitchenHall, kitchen});
 	vector<IsClickable *> uiElements;
 	vector<IsClickable *> popupElements;
 	buildClickAreas(cc,
