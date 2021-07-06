@@ -22,7 +22,8 @@ void addClickableToAreas(initializer_list<ClickArea*> areas, IsClickable* ic) {
 	Adds IsClickable:s to a list of areas.
 	NOTICE: It is a list of clickables.
 */
-void addClickablesToAreas(initializer_list<ClickArea*> areas, initializer_list<IsClickable*> clickables) {
+void addClickablesToAreas(initializer_list<ClickArea*> areas,
+					vector<IsClickable *> &clickables) {
 	for (IsClickable* ic : clickables) {
 		addClickableToAreas(areas, ic);
 	}	
@@ -48,8 +49,11 @@ void addCharacter(CurrentClick *cc, IsClickable* character) {
 	}
 }
 
-void buildClickAreas(CurrentClick *cc, initializer_list<IsClickable*> characters, initializer_list<Room*> rooms,
-	initializer_list<IsClickable*> UIElems, initializer_list<IsClickable*> popupElems, initializer_list<IsClickable*> gameElems) {
+void buildClickAreas(CurrentClick *cc, initializer_list<IsClickable*> characters,
+					vector<Room *> &rooms,
+					vector<IsClickable *> &UIElems,
+					vector<IsClickable *> &popupElems,
+					vector<IsClickable *> &gameElems) {
 
 	//## UI ##
 	initializer_list<ClickArea*> UIAreas = {

@@ -255,6 +255,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	rPup->room = r29;
 
 	/* DOORS */
+	vector<IsClickable *> doors;
 	// Room 1 down door
 	DoorClickPars* DCP = new DoorClickPars;
 	DCP->mouse = mouse;
@@ -268,7 +269,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	//bridgeHall->doors.push_back(bridgeDoor);
 	pG->addNode(r1D); //Add the door to the pathfinder graph
 	//strcpy(bridgeDoor->n, "BridgeDoor"); //TEST CODE TODO: REMOVE
-	//TestMap (all doors teleport to self)
+	doors.push_back(r1D);
 
 	// Room 2 left door
 	DCP = new DoorClickPars;
@@ -280,17 +281,19 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 						media->images.at(3), doorClick, DCP);
 	DCP->door = r2Dl;
 	pG->addNode(r2Dl); //Add the door to the pathfinder graph
+	doors.push_back(r2Dl);
 
-	// Room 2 down door
+	// Room 2 bot door
 	DCP = new DoorClickPars;
 	DCP->mouse = mouse;
 	DCP->open = media->images.at(8);
 	DCP->closed = media->images.at(9);
 	DCP->locked = media->images.at(10);
-	Door *r2Dd = new Door(5553, 742 - media->images.at(9)->height,
+	Door *r2Db = new Door(5553, 742 - media->images.at(9)->height,
 						media->images.at(9), doorClick, DCP);
-	DCP->door = r2Dd;
-	pG->addNode(r2Dd); //Add the door to the pathfinder graph
+	DCP->door = r2Db;
+	pG->addNode(r2Db); //Add the door to the pathfinder graph
+	doors.push_back(r2Db);
 
 	// Room 2 right door
 	DCP = new DoorClickPars;
@@ -302,6 +305,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 						media->images.at(3), doorClick, DCP);
 	DCP->door = r2Dr;
 	pG->addNode(r2Dr); //Add the door to the pathfinder graph
+	doors.push_back(r2Dr);
 
 	// Room 3 left door
 	DCP = new DoorClickPars;
@@ -315,6 +319,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	pG->addNode(r3D); //Add the door to the pathfinder graph
 	pG->addEdge(r3D, r2Dr, 1);
 	pG->addEdge(r2Dr, r3D, 1);
+	doors.push_back(r3D);
 
 	// Room 4 left door
 	DCP = new DoorClickPars;
@@ -326,6 +331,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 						media->images.at(3), doorClick, DCP);
 	DCP->door = r4Dl;
 	pG->addNode(r4Dl); //Add the door to the pathfinder graph
+	doors.push_back(r4Dl);
 
 	// Room 4 top door
 	DCP = new DoorClickPars;
@@ -341,6 +347,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	pG->addEdge(r4Dt, r1D, 1);
 	pG->addEdge(r1D, r4Dt, 1);
 	r1D->bottom = r4Dt; //Indicate that this is a vertical door
+	doors.push_back(r4Dt);
 
 	// Room 4 right door
 	DCP = new DoorClickPars;
@@ -354,20 +361,682 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	pG->addNode(r4Dr); //Add the door to the pathfinder graph
 	pG->addEdge(r4Dr, r2Dl, 1);
 	pG->addEdge(r2Dl, r4Dr, 1);
+	doors.push_back(r4Dr);
 
 	// Room 5 top left door
-	//TODO: IMPLEMENT PROPERLY
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r5Dtl = new Door(3203, 871 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r5Dtl;
+	pG->addNode(r5Dtl); //Add the door to the pathfinder graph
+	pG->addEdge(r5Dtl, r4Dr, 1);
+	pG->addEdge(r4Dr, r5Dtl, 1);
+	doors.push_back(r5Dtl);
+
+	// Room 5 bottom left door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r5Dbl = new Door(3509, 1468 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r5Dbl;
+	pG->addNode(r5Dbl); //Add the door to the pathfinder graph
+	doors.push_back(r5Dbl);
+
+	// Room 5 top right door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r5Dtr = new Door(4227, 1211 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r5Dtr;
+	pG->addNode(r5Dtr); //Add the door to the pathfinder graph
+	doors.push_back(r5Dtr);
+
+	// Room 5 bottom right door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r5Dbr = new Door(4460, 1671 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r5Dbr;
+	pG->addNode(r5Dbr); //Add the door to the pathfinder graph
+	doors.push_back(r5Dbr);
+
+	// Room 5 bottom bot door
 	DCP = new DoorClickPars;
 	DCP->mouse = mouse;
 	DCP->open = media->images.at(8);
 	DCP->closed = media->images.at(9);
 	DCP->locked = media->images.at(10);
-	Door *r5Dtl = new Door(2507, 884 - media->images.at(9)->height,
-						media->images.at(9), doorClick, DCP);
-	DCP->door = r5Dtl;
-	pG->addNode(r5Dtl); //Add the door to the pathfinder graph
-	pG->addEdge(r5Dtl, r1D, 1);
-	pG->addEdge(r1D, r5Dtl, 1);
+	Door *r5Dbb = new Door(4318, 1672 - media->images.at(8)->height,
+						media->images.at(8), doorClick, DCP);
+	DCP->door = r5Dbb;
+	pG->addNode(r5Dbb); //Add the door to the pathfinder graph
+	doors.push_back(r5Dbb);
+
+	// Room 6 left door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r6Dl = new Door(4775, 1426 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r6Dl;
+	pG->addNode(r6Dl); //Add the door to the pathfinder graph
+	pG->addEdge(r5Dtr, r6Dl, 1);
+	pG->addEdge(r6Dl, r5Dtr, 1);
+	doors.push_back(r6Dl);
+
+	// Room 6 bot door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(8);
+	DCP->closed = media->images.at(9);
+	DCP->locked = media->images.at(10);
+	Door *r6Db = new Door(4913, 1428 - media->images.at(8)->height,
+						media->images.at(8), doorClick, DCP);
+	DCP->door = r6Db;
+	pG->addNode(r6Db); //Add the door to the pathfinder graph
+	pG->addEdge(r5Dbr, r6Db, 1);
+	pG->addEdge(r6Db, r5Dbr, 1);
+	doors.push_back(r6Db);
+
+	// Room 6 righ door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r6Dr = new Door(5049, 1248 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r6Dr;
+	pG->addNode(r6Dr); //Add the door to the pathfinder graph
+	doors.push_back(r6Dr);
+
+	// Room 7 left door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r7Dl = new Door(5491, 1428 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r7Dl;
+	pG->addNode(r7Dl); //Add the door to the pathfinder graph
+	pG->addEdge(r6Dr, r7Dl, 1);
+	pG->addEdge(r7Dl, r6Dr, 1);
+	doors.push_back(r7Dl);
+
+	// Room 7 top door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(8);
+	DCP->closed = media->images.at(9);
+	DCP->locked = media->images.at(10);
+	Door *r7Dt = new Door(5553, 1428 - media->images.at(8)->height,
+						media->images.at(8), doorClick, DCP);
+	DCP->door = r7Dt;
+	pG->addNode(r7Dt); //Add the door to the pathfinder graph
+	pG->addEdge(r2Db, r7Dt, 1);
+	pG->addEdge(r7Dt, r2Db, 1);
+	doors.push_back(r7Dt);
+
+	// Room 7 bot door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(8);
+	DCP->closed = media->images.at(9);
+	DCP->locked = media->images.at(10);
+	Door *r7Db = new Door(5714, 1428 - media->images.at(8)->height,
+						media->images.at(8), doorClick, DCP);
+	DCP->door = r7Db;
+	pG->addNode(r7Db); //Add the door to the pathfinder graph
+	doors.push_back(r7Db);
+
+	// Room 7 right door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r7Dr = new Door(6054, 1426 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r7Dr;
+	pG->addNode(r7Dr); //Add the door to the pathfinder graph
+	doors.push_back(r7Dr);
+
+	// Room 8 left door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r8D = new Door(6244, 1226 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r8D;
+	pG->addNode(r8D); //Add the door to the pathfinder graph
+	pG->addEdge(r7Dr, r8D, 1);
+	pG->addEdge(r8D, r7Dr, 1);
+	doors.push_back(r8D);
+
+	// Room 9 right door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r9D = new Door(1304, 1242 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r9D;
+	pG->addNode(r9D); //Add the door to the pathfinder graph
+	pG->addEdge(r4Dl, r9D, 1);
+	pG->addEdge(r9D, r4Dl, 1);
+	doors.push_back(r9D);
+
+	// Room 10 right door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r10D = new Door(3006, 1468 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r10D;
+	pG->addNode(r10D); //Add the door to the pathfinder graph
+	pG->addEdge(r5Dbl, r10D, 1);
+	pG->addEdge(r10D, r5Dbl, 1);
+	doors.push_back(r10D);
+
+	// Room 11 left door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r11Dl = new Door(5225, 1671 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r11Dl;
+	pG->addNode(r11Dl); //Add the door to the pathfinder graph
+	pG->addEdge(r5Dbr, r11Dl, 1);
+	pG->addEdge(r11Dl, r5Dbr, 1);
+	pG->addEdge(r6Db, r11Dl, 1);
+	pG->addEdge(r11Dl, r6Db, 1);
+	doors.push_back(r11Dl);
+
+
+	// Room 11 top door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(8);
+	DCP->closed = media->images.at(9);
+	DCP->locked = media->images.at(10);
+	Door *r11Dt = new Door(5714, 1672 - media->images.at(8)->height,
+						media->images.at(8), doorClick, DCP);
+	DCP->door = r11Dt;
+	pG->addNode(r11Dt); //Add the door to the pathfinder graph
+	pG->addEdge(r7Db, r11Dt, 1);
+	pG->addEdge(r11Dt, r7Db, 1);
+	doors.push_back(r11Dt);
+
+	// Room 11 right door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r11Dr = new Door(6013, 1672 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r11Dr;
+	pG->addNode(r11Dr); //Add the door to the pathfinder graph
+	doors.push_back(r11Dr);
+
+	// Room 12 left door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r12D = new Door(6244, 1426 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r12D;
+	pG->addNode(r12D); //Add the door to the pathfinder graph
+	pG->addEdge(r7Dr, r12D, 1);
+	pG->addEdge(r12D, r7Dr, 1);
+	doors.push_back(r12D);
+
+	// Room 13 bot door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(8);
+	DCP->closed = media->images.at(9);
+	DCP->locked = media->images.at(10);
+	Door *r13Db = new Door(1392, 1584 - media->images.at(8)->height,
+						media->images.at(8), doorClick, DCP);
+	DCP->door = r13Db;
+	pG->addNode(r13Db); //Add the door to the pathfinder graph
+	doors.push_back(r13Db);
+
+	// Room 13 top door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(8);
+	DCP->closed = media->images.at(9);
+	DCP->locked = media->images.at(10);
+	Door *r13Dt = new Door(2022, 1584 - media->images.at(8)->height,
+						media->images.at(8), doorClick, DCP);
+	DCP->door = r13Dt;
+	pG->addNode(r13Dt); //Add the door to the pathfinder graph
+	pG->addEdge(r9D, r13Dt, 1);
+	pG->addEdge(r13Dt, r9D, 1);
+	doors.push_back(r13Dt);
+
+	// Room 13 right door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r13Dr = new Door(2199, 1580 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r13Dr;
+	pG->addNode(r13Dr); //Add the door to the pathfinder graph
+	doors.push_back(r13Dr);
+
+	// Room 14 left door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r14Dl = new Door(3186, 2079 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r14Dl;
+	pG->addNode(r14Dl); //Add the door to the pathfinder graph
+	pG->addEdge(r13Dr, r14Dl, 1);
+	pG->addEdge(r14Dl, r13Dr, 1);
+	doors.push_back(r14Dl);
+
+	// Room 14 bot door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(8);
+	DCP->closed = media->images.at(9);
+	DCP->locked = media->images.at(10);
+	Door *r14Db = new Door(3893, 2213 - media->images.at(8)->height,
+						media->images.at(8), doorClick, DCP);
+	DCP->door = r14Db;
+	pG->addNode(r14Db); //Add the door to the pathfinder graph
+	doors.push_back(r14Db);
+
+	// Room 14 top door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(8);
+	DCP->closed = media->images.at(9);
+	DCP->locked = media->images.at(10);
+	Door *r14Dt = new Door(4318, 2213 - media->images.at(8)->height,
+						media->images.at(8), doorClick, DCP);
+	DCP->door = r14Dt;
+	pG->addNode(r14Dt); //Add the door to the pathfinder graph
+	pG->addEdge(r5Dbb, r14Dt, 1);
+	pG->addEdge(r14Dt, r5Dbb, 1);
+	doors.push_back(r14Dt);
+
+	// Room 15 left door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r15Dl = new Door(6244, 1830 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r15Dl;
+	pG->addNode(r15Dl); //Add the door to the pathfinder graph
+	pG->addEdge(r11Dr, r15Dl, 1);
+	pG->addEdge(r15Dl, r11Dr, 1);
+	doors.push_back(r15Dl);
+
+	// Room 15 right door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r15Dr = new Door(6366, 1828 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r15Dr;
+	pG->addNode(r15Dr); //Add the door to the pathfinder graph
+	doors.push_back(r15Dr);
+
+	// Room 16 left door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r16Dl = new Door(6387, 1828 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r16Dl;
+	pG->addNode(r16Dl); //Add the door to the pathfinder graph
+	pG->addEdge(r15Dr, r16Dl, 1);
+	pG->addEdge(r16Dl, r15Dr, 1);
+	doors.push_back(r16Dl);
+
+	// Room 16 right door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r16Dr = new Door(6578, 1828 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r16Dr;
+	pG->addNode(r16Dr); //Add the door to the pathfinder graph
+	doors.push_back(r16Dr);
+
+	// Room 17 left door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r17Dl = new Door(6599, 1828 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r17Dl;
+	pG->addNode(r17Dl); //Add the door to the pathfinder graph
+	pG->addEdge(r16Dr, r17Dl, 1);
+	pG->addEdge(r17Dl, r16Dr, 1);
+	doors.push_back(r17Dl);
+
+	// Room 17 right door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r17Dr = new Door(6790, 1828 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r17Dr;
+	pG->addNode(r17Dr); //Add the door to the pathfinder graph
+	doors.push_back(r17Dr);
+
+	// Room 18 left door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r18Dl = new Door(6811, 1828 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r18Dl;
+	pG->addNode(r18Dl); //Add the door to the pathfinder graph
+	pG->addEdge(r17Dr, r18Dl, 1);
+	pG->addEdge(r18Dl, r17Dr, 1);
+	doors.push_back(r18Dl);
+
+	// Room 18 right door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r18Dr = new Door(7002, 1828 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r17Dr;
+	pG->addNode(r17Dr); //Add the door to the pathfinder graph
+	doors.push_back(r18Dr);
+
+	// Room 19 left door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r19D = new Door(7021, 1828 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r19D;
+	pG->addNode(r19D); //Add the door to the pathfinder graph
+	pG->addEdge(r17Dr, r19D, 1);
+	pG->addEdge(r19D, r17Dr, 1);
+	doors.push_back(r19D);
+
+	// Room 20 top door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(8);
+	DCP->closed = media->images.at(9);
+	DCP->locked = media->images.at(10);
+	Door *r20Dt = new Door(1392, 2801 - media->images.at(8)->height,
+						media->images.at(8), doorClick, DCP);
+	DCP->door = r20Dt;
+	pG->addNode(r20Dt); //Add the door to the pathfinder graph
+	pG->addEdge(r13Db, r20Dt, 1);
+	pG->addEdge(r20Dt, r13Db, 1);
+	doors.push_back(r20Dt);
+
+	// Room 20 right door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r20Dr = new Door(2054, 2796 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r20Dr;
+	pG->addNode(r20Dr); //Add the door to the pathfinder graph
+	doors.push_back(r20Dr);
+
+	// Room 21 top door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(8);
+	DCP->closed = media->images.at(9);
+	DCP->locked = media->images.at(10);
+	Door *r21D = new Door(3893, 2626 - media->images.at(8)->height,
+						media->images.at(8), doorClick, DCP);
+	DCP->door = r21D;
+	pG->addNode(r21D); //Add the door to the pathfinder graph
+	pG->addEdge(r14Db, r21D, 1);
+	pG->addEdge(r21D, r14Db, 1);
+	doors.push_back(r21D);
+
+	// Room 22 left door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r22Dl = new Door(6387, 2050 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r22Dl;
+	pG->addNode(r22Dl); //Add the door to the pathfinder graph
+	pG->addEdge(r11Dr, r22Dl, 1);
+	pG->addEdge(r22Dl, r11Dr, 1);
+	doors.push_back(r22Dl);
+
+	// Room 22 right door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r22Dr = new Door(6578, 2048 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r22Dr;
+	pG->addNode(r22Dr); //Add the door to the pathfinder graph
+	doors.push_back(r22Dr);
+
+	// Room 23 left door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r23Dl = new Door(6599, 2048 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r23Dl;
+	pG->addNode(r23Dl); //Add the door to the pathfinder graph
+	pG->addEdge(r22Dr, r23Dl, 1);
+	pG->addEdge(r23Dl, r22Dr, 1);
+	doors.push_back(r23Dl);
+
+	// Room 23 right door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r23Dr = new Door(6790, 2048 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r23Dr;
+	pG->addNode(r23Dr); //Add the door to the pathfinder graph
+	doors.push_back(r23Dr);
+
+	// Room 24 left door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r24Dl = new Door(6811, 2048 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r24Dl;
+	pG->addNode(r24Dl); //Add the door to the pathfinder graph
+	pG->addEdge(r23Dr, r24Dl, 1);
+	pG->addEdge(r24Dl, r23Dr, 1);
+	doors.push_back(r24Dl);
+
+	// Room 24 right door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r24Dr = new Door(7002, 2048 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r24Dr;
+	pG->addNode(r24Dr); //Add the door to the pathfinder graph
+	doors.push_back(r24Dr);
+
+	// Room 25 left door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r25D = new Door(7021, 2048 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r25D;
+	pG->addNode(r25D); //Add the door to the pathfinder graph
+	pG->addEdge(r24Dr, r25D, 1);
+	pG->addEdge(r25D, r24Dr, 1);
+	doors.push_back(r25D);
+
+	// Room 26 left door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r26Dl = new Door(2900, 2796 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r26Dl;
+	pG->addNode(r26Dl); //Add the door to the pathfinder graph
+	pG->addEdge(r20Dr, r26Dl, 1);
+	pG->addEdge(r26Dl, r20Dr, 1);
+	doors.push_back(r26Dl);
+
+	// Room 26 top door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(8);
+	DCP->closed = media->images.at(9);
+	DCP->locked = media->images.at(10);
+	Door *r26Dt = new Door(3893, 2801 - media->images.at(8)->height,
+						media->images.at(8), doorClick, DCP);
+	DCP->door = r26Dt;
+	pG->addNode(r26Dt); //Add the door to the pathfinder graph
+	pG->addEdge(r14Db, r26Dt, 1);
+	pG->addEdge(r26Dt, r14Db, 1);
+	pG->addEdge(r21D, r26Dt, 1);
+	pG->addEdge(r26Dt, r21D, 1);
+	doors.push_back(r26Dt);
+
+	// Room 26 right door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r26Dr = new Door(4116, 2801 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r26Dr;
+	pG->addNode(r26Dr); //Add the door to the pathfinder graph
+	doors.push_back(r26Dr);
+
+	// Room 27 left door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(2);
+	DCP->closed = media->images.at(3);
+	DCP->locked = media->images.at(4);
+	Door *r27D = new Door(4385, 2866 - media->images.at(3)->height,
+						media->images.at(3), doorClick, DCP);
+	DCP->door = r27D;
+	pG->addNode(r27D); //Add the door to the pathfinder graph
+	pG->addEdge(r26Dr, r27D, 1);
+	pG->addEdge(r27D, r26Dr, 1);
+	doors.push_back(r27D);
+
+	// Room 28 top door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(8);
+	DCP->closed = media->images.at(9);
+	DCP->locked = media->images.at(10);
+	Door *r28D = new Door(3893, 2972 - media->images.at(8)->height,
+						media->images.at(8), doorClick, DCP);
+	DCP->door = r28D;
+	pG->addNode(r28D); //Add the door to the pathfinder graph
+	pG->addEdge(r14Db, r28D, 1);
+	pG->addEdge(r28D, r14Db, 1);
+	pG->addEdge(r21D, r28D, 1);
+	pG->addEdge(r28D, r21D, 1);
+	pG->addEdge(r26Dt, r28D, 1);
+	pG->addEdge(r28D, r26Dt, 1);
+	doors.push_back(r28D);
+
+	// Room 29 top door
+	DCP = new DoorClickPars;
+	DCP->mouse = mouse;
+	DCP->open = media->images.at(8);
+	DCP->closed = media->images.at(9);
+	DCP->locked = media->images.at(10);
+	Door *r29D = new Door(3893, 3952 - media->images.at(8)->height,
+						media->images.at(8), doorClick, DCP);
+	DCP->door = r29D;
+	pG->addNode(r29D); //Add the door to the pathfinder graph
+	pG->addEdge(r14Db, r29D, 1);
+	pG->addEdge(r29D, r14Db, 1);
+	pG->addEdge(r21D, r29D, 1);
+	pG->addEdge(r29D, r21D, 1);
+	pG->addEdge(r26Dt, r29D, 1);
+	pG->addEdge(r29D, r26Dt, 1);
+	pG->addEdge(r28D, r29D, 1);
+	pG->addEdge(r29D, r28D, 1);
+	doors.push_back(r29D);
 
 	/* CHARACTERS */
 	// Paul
@@ -598,15 +1267,20 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	strcpy(t->n, "KitchenDoorTemp (left)");
 
 	// Add all clickable elements to the click system
+	printf("About to add all clicks\n");
+	vector<Room *> rooms({cockpit, bridgeHall, bRoom1, bRoom2, bRoom3, bRoom4,
+								kitchenHall, kitchen});
+	vector<IsClickable *> uiElements;
+	vector<IsClickable *> popupElements;
 	buildClickAreas(cc,
 		{paul, paulette, paulus, paulob},
-		{cockpit, bridgeHall, bRoom1, bRoom2, bRoom3, bRoom4, kitchenHall,
-			kitchen},
-		{},
-		{},
-		{bridgeDoor, bRoom1Door, bRoom2Door, bRoom3Door, bRoom4Door, kitchenDoor,
-			hallHatch}
+		rooms,
+		uiElements,
+		popupElements,
+		doors
 	);
+
+	printf("Added all clicks\n");
 
 	/* Add all objects to the objects list */
 	// Rooms
@@ -662,6 +1336,12 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	objects->push_back(bRoom3Door);
 	objects->push_back(bRoom4Door);
 	objects->push_back(kitchenDoor);
+	objects->push_back(kitchenDoor);
+	for(IsClickable *d : doors){
+		objects->push_back((GameObject *) d);
+	}
+
+	printf("Objects done\n");
 
 	return true;
 }
