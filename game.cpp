@@ -832,8 +832,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->locked = media->images.at(4);
 	Door *r18Dr = new Door(7002, 1828 - media->images.at(3)->height,
 						media->images.at(3), doorClick, DCP);
-	DCP->door = r17Dr;
-	pG->addNode(r17Dr); //Add the door to the pathfinder graph
+	DCP->door = r18Dr;
+	pG->addNode(r18Dr); //Add the door to the pathfinder graph
 	doors.push_back(r18Dr);
 
 	// Room 19 left door
@@ -1086,9 +1086,22 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	pG->addEdge(r29D, r28D, 1);
 	doors.push_back(r29D);
 
+	//Make all doors in the same room connect to eachother in the path graph
+	//TODO: REMEMBER TO CHANGE THIS WHEN BEACONS ARE ADDED TO MORE COMPLEX ROOMS
+	for(int i = 0; i < doors.size() - 1; i++){
+		for(int j = i+1; j < doors.size(); j++){
+			GameObject *d1 = (GameObject *)((Door *) doors.at(i));
+			GameObject *d2 = (GameObject *)((Door *) doors.at(j));
+			if(whichRoom(&rooms, d1) ==  whichRoom(&rooms, d2)){
+				pG->addEdge(d1, d2, 1);
+				pG->addEdge(d2, d1, 1);
+			}
+		}
+	}
+
 	/* CHARACTERS */
 	// Paul
-	CharacterObject *paul = new CharacterObject(320, 0,
+	CharacterObject *paul = new CharacterObject(r16->x + 100, 1831 - 100,
 		media->images.at(7), btnHello, (void *)(new btnHelloParameter{"Paul"}),
 		"Paul", intersex, labels->genders->at(0), labels->romance->at(0),
 							labels->sexuality->at(0), pilot);
@@ -1559,6 +1572,7 @@ int main(int argc, char *argv[]){
 
 			relGraph = initRelations(&characters);
 			//pathGraph = initPathfinding(&currClick.rooms);
+			pathGraph->print();
 		}
 	}
 
