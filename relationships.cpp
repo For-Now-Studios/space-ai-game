@@ -97,6 +97,15 @@ void changeStress(int amnt, CharacterObject* cobj) {
 	cobj->stress = newStress > -1 ? newStress : 0;
 }
 
+/*
+	### THE DIFFERENT RELATIONSHIP EVENTS ###
+	Each function should have the same return value and the same parameters.
+	* Characters, for all characters alive
+	* currChar for the current character this event activated for
+	* relationships, the relationship graph
+	* dre, the random engine.
+*/
+
 void fallout(vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine dre) {
 	vector<CharacterObject*> chars(characters);
 	shuffle(chars.begin(), chars.end(), dre);

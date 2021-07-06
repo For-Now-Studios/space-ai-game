@@ -286,21 +286,23 @@ enum Role {
 };
 
 struct relationEventChances {
+	//The default chances for each event, just arbitary numbers
 	int falloutChance = 10; //Both of you count to ten before you do anything irrational.
 	int confessionChance = 16; // 14+2 valentines day.
 	int cheatingChance = 69; //Nice, gotta get that lay
 	int birthdayChance = 12; //The year I stopped having birthday parties.
 	int cuddleChance = 33; //Spooning
 	int supportChance = 29; //0+8+1+2+3+4+9+2+0+0
-	int noChance = 999; //Cause the meaning of life is that there is no chance.
+	int noChance = 999; //1/1000 chance for each character.
 };
 
+//The traits a character have, see doc
 #define BIGOT (1 << 0)
 #define CARING (1 << 1)
 #define PARANOID (1 << 2)
 #define TRUSTING (1 << 3)
 #define SENSATIVE (1 << 4)
-#define LIER (1 << 5)
+#define LIER (1 << 5) //Increases the chances for birthdays and cheating
 
 struct CharacterObject : GameObjClick{
 	int stress;
@@ -312,9 +314,9 @@ struct CharacterObject : GameObjClick{
 	affectionTrait *sexuality;
 	Role role;
 	std::list<Task*> tasks;
-	int traitFlags;
-	relationEventChances rec;
-	bool dating = false;
+	int traitFlags; //The traits they have.
+	relationEventChances rec; //The chance *this* characters has for each event.
+	bool dating = false; //If they are currently dating anyone.
 
 	//Pathfinding
 	std::vector<GameObject *> *path;
