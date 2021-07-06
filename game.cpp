@@ -1338,7 +1338,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	objects->push_back(kitchenDoor);
 	objects->push_back(kitchenDoor);
 	for(IsClickable *d : doors){
-		objects->push_back((GameObject *) d);
+		objects->push_back(dynamic_cast<GameObject*>((Room*)d));
 	}
 
 	printf("Objects done\n");
