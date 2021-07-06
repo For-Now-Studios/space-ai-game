@@ -228,6 +228,8 @@ struct GameObjClick : GameObject, IsClickable {
 	}
 };
 
+struct CharacterObject;
+
 #define AIASSIGNED (1 << 0)
 #define SELFCARE (1 << 1)
 #define EMERGENCY (1 << 2)
@@ -258,6 +260,18 @@ struct Task {
 	const char* name;
 
 	int flag;
+
+	Task(GameObject* loc, void(*func)(void*), void* d, int prio, int wait,
+		const char* n, int f) : 
+		location{loc}, function{func}, data{d}, priority{prio},
+		actualPrio{0}, waitTime{wait}, waitingFor{nullptr}, name{ n }, 
+		flag{ f } {}
+	
+	Task(GameObject* loc, void(*func)(void*), void* d, int prio, int wait,
+		const char* n, int f, CharacterObject* cobj) :
+		location{ loc }, function{ func }, data{ d }, priority{ prio },
+		actualPrio{ 0 }, waitTime{ wait }, waitingFor{ cobj }, name{ n },
+		flag{ f } {}
 
 	~Task() {
 		delete data;
@@ -290,11 +304,11 @@ enum Role {
 struct relationEventChances {
 	//The default chances for each event, just arbitary numbers
 	int falloutChance = 10; //Both of you count to ten before you do anything irrational.
-	int confessionChance = 16; // 14+2 valentines day.
-	int cheatingChance = 69; //Nice, gotta get that lay
-	int birthdayChance = 12; //The year I stopped having birthday parties.
-	int cuddleChance = 33; //Spooning
-	int supportChance = 29; //0+8+1+2+3+4+9+2+0+0
+	int confessionChance = 0;//16; // 14+2 valentines day.
+	int cheatingChance = 0;//69; //Nice, gotta get that lay
+	int birthdayChance = 0;// 12; //The year I stopped having birthday parties.
+	int cuddleChance = 0;//33; //Spooning
+	int supportChance = 0;//29; //0+8+1+2+3+4+9+2+0+0
 	int noChance = 999; //1/1000 chance for each character.
 };
 
@@ -316,7 +330,7 @@ struct CharacterObject : GameObjClick{
 	affectionTrait *sexuality;
 	Role role;
 	std::list<Task*> tasks;
-	Task* currentTask;
+	Task* currentTask = nullptr;
 	int traitFlags; //The traits they have.
 	relationEventChances rec; //The chance *this* characters has for each event.
 	bool dating = false; //If they are currently dating anyone.
@@ -363,8 +377,7 @@ struct CharacterObject : GameObjClick{
 	}
 
 
-	void makeActualPriority(int &val, int flags)
-	{
+	void makeActualPriority(int &val, int flags) {
 		val *= flags & AIASSIGNED ? loyalty / 100 : 1;
 		val += ((flags & EMERGENCY) != 0) * 100
 			+ ((flags & (FORFRIENDS | FORHATE | FORLOVE | AGAINSTENEMY)) != 0) * 69
@@ -373,25 +386,47 @@ struct CharacterObject : GameObjClick{
 	struct compGreater {
 		Task* last = nullptr;
 		bool operator()(const Task* l, const Task* r) {
-			if (l == last) return l->actualPrio + 100 < r->actualPrio;
-			if (r == last) return l->actualPrio < r->actualPrio + 100;
+			if (l == last) return l->actualPrio + 10000 < r->actualPrio;
+			if (r == last) return l->actualPrio < r->actualPrio + 10000;
 			return l->actualPrio < r->actualPrio;
 		}
 	};
+
+	void changeCurrentTask() {
+		if (!tasks.empty()) {
+			if (currentTask != tasks.back()) {
+				printf("Change of main tasks\n");
+				Task* task = tasks.back();
+				delete path;
+				path = nullptr;
+				target = nullptr;
+				goal = task->location;
+				currentTask = tasks.back();
+			}
+		} else {
+			goal = nullptr;
+			delete path;
+			path = nullptr;
+			currentTask = nullptr;
+			target = nullptr;
+		}
+	}
 	
 	void removeTask() {
 		delete tasks.back();
 		tasks.pop_back();
-		currentTask = tasks.back();
+		changeCurrentTask();
 	}
 
 	void addTask(Task* task) {
 		task->actualPrio = task->priority;
 		makeActualPriority(task->actualPrio, task->flag);
+
 		tasks.push_back(task);
 		compGreater cg{ currentTask };
 		tasks.sort(cg);
-		currentTask = tasks.back();
+
+		changeCurrentTask();
 	}
 
 	void rethinkOrder() {
@@ -401,7 +436,7 @@ struct CharacterObject : GameObjClick{
 		}
 
 		tasks.sort(compGreater());
-		currentTask = tasks.back();
+		changeCurrentTask();
 	}
 
 	~CharacterObject() {

@@ -109,12 +109,10 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 							labels->sexuality->at(3), captain, CARING);
   
   //Add tasks for paulette:
-	/*
-	paulette->addTask(new Task{ 120,120,btnHello,(void*)(new btnHelloParameter{"Start!"}),1,0,10,"Start",AIASSIGNED });
-	paulette->addTask(new Task{ 240,120,btnHello,(void*)(new btnHelloParameter{"Place0!"}),2,0,10,"Place0",AGAINSTFRIENDS });
-	paulette->addTask(new Task{ 240,240,btnHello,(void*)(new btnHelloParameter{"Place1!"}),3,0,10,"Place1",FORLOVE });
-	paulette->addTask(new Task{ 120,240,btnHello,(void*)(new btnHelloParameter{"Place2!"}),4,0,10,"Place2",FORENEMIES });
-	*/
+	paulette->addTask(new Task(kitchen, btnHello, (void*)(new btnHelloParameter{"Paulette Kitchen!"}),1,130,"GOTO Kitchen",AIASSIGNED));
+	paulette->addTask(new Task(bRoom2, btnHello, (void*)(new btnHelloParameter{"Paulette Hello Bedroom number 2!"}),2,0,"GOTO Bedroom n2",AGAINSTFRIENDS ));
+	paul->addTask(new Task(kitchen, btnHello, (void*)(new btnHelloParameter{ "Paul Hello Kitchen!" }), 1, 200, "GOTO Kitchen", AIASSIGNED));
+	paul->addTask(new Task(bRoom2, btnHello, (void*)(new btnHelloParameter{ "Paul Hello Bedroom number 2!" }), 2, 0, "GOTO Bedroom n2", AGAINSTFRIENDS));
 
 	/* Doors */
 	// Bridge Door
@@ -621,28 +619,23 @@ int main(int argc, char *argv[]){
 		for(CharacterObject *c : characters) {
 			bool arrived = updateMovement(c, &currClick.rooms, pathGraph);
 			if (arrived) {
-				if (c->currentTask->flag & WAITINGFOR) {
-					if (whichRoom(&currClick.rooms, c->currentTask->waitingFor) != whichRoom(&currClick.rooms, c)) {
-						continue;
+				if (c->currentTask != nullptr) {
+					if (c->currentTask->flag & WAITINGFOR) {
+						if (whichRoom(&currClick.rooms, c->currentTask->waitingFor) != whichRoom(&currClick.rooms, c)) {
+							continue;
+						}
+					}
+					if (c->currentTask->waitTime < 1) {
+						if (c->currentTask->function != nullptr) {
+							c->currentTask->function(c->currentTask->data);
+						}
+						c->removeTask();
+					}
+					else {
+						c->currentTask->waitTime--;
 					}
 				}
-				if (c->currentTask->waitTime < 1) {
-					c->currentTask->function(c->currentTask->data);
-					c->removeTask();
-				}
-				else {
-					c->currentTask->waitTime--;
-				}
 			}
-			if (!c->tasks.empty()) {
-				Task* task = c->tasks.back();
-				if (task->location != c->goal) {
-					delete c->path;
-					c->path = nullptr;
-				}
-				c->goal = task->location;
-			}
-			c->goal = nullptr;
 		}
 
 		//Update the movment of a character
@@ -685,7 +678,8 @@ int main(int argc, char *argv[]){
 			TODO: Make the addition of events better.
 		*/
 		const uniform_int_distribution<int> d1000(0, 999);
-		for (CharacterObject* cobj : characters) {
+		for (CharacterObject* cobj : characters)//CharacterObject* cobj = characters.at(0);//
+		{
 			//Roll a d1000 to see if *this* character has an event.
 			int roll = d1000(generator);
 			if (roll < cobj->rec.noChance) continue; //If it rolls under then we skip to the next character in the iteration
@@ -699,7 +693,8 @@ int main(int argc, char *argv[]){
 				cobj->rec.supportChance,
 			};
 			//Array of functions for each event
-			void(*functions[numEvents])(vector<CharacterObject*>&, CharacterObject*, Graph<CharacterObject *, Relation>&, default_random_engine) = {
+			void(*functions[numEvents])(CurrentClick *cc, vector<CharacterObject*>&,
+				CharacterObject*, Graph<CharacterObject *, Relation>&, default_random_engine) = {
 				fallout,
 				confession,
 				cheating,
@@ -721,8 +716,8 @@ int main(int argc, char *argv[]){
 				and then prev-chance to chance-of-secound-event, and so on.*/
 				if (roll < chances[i] + prev) {
 					//if it rolls under then we call that related function in the array
-					functions[i](characters, cobj, *relGraph, generator);
-					printf("\n");
+					functions[i](&currClick, characters, cobj, *relGraph, generator);
+					//printf("\n");
 					break;
 				}
 				prev += chances[i];

@@ -317,6 +317,8 @@ bool updateMovement(CharacterObject *object, vector<Room *> *rooms,
 		}
 	}
 
+	printf("%s's path is %d\n", object->name, object->path->size());
+
 	if(object->target == nullptr){
 		if(!object->path->empty()){
 			target(object, object->path->back());

@@ -49,3 +49,16 @@ void closeRoomPopup(void*);
  Has *pretty* graphics to show this
 */
 void doorClick(void*);
+
+/*
+	###########################
+	### Relationship events ###
+	###########################
+*/
+struct FalloutEffectPars {
+	CharacterObject* currChar;
+	CharacterObject* otherChar;
+	Graph<CharacterObject*, Relation>& relatonships;
+};
+
+void falloutEffect(void*);
