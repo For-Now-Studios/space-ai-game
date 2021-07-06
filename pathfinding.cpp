@@ -282,7 +282,7 @@ void updateMovement(CharacterObject *object, vector<Room *> *rooms,
 		GameObject *end = closestNode(object->goal, g);
 		object->path = findPathTo(g, start, end);
 
-		printf("%p %p\n", start, end);
+		//printf("%p %p\n", start, end);
 
 		//printf("Paul is searching for the way\n");
 		if(object->path == nullptr) return;

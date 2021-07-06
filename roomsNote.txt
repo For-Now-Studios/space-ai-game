@@ -21,17 +21,17 @@ that has yet to be counted being prioritized first
 13: 1305, 1442 -> 2199, 1584
 14: 3186, 1839 -> 5101, 2213
 15: 6244, 1707 -> 6366, 1831 
-16: 6387, 1709 -> 6578, 1831 
-17: 6599, 1709 -> 6790, 1831 
-18: 6811, 1709 -> 7002, 1831 
-19: 7021, 1709 -> 7212, 1831 
-
+16: 6387, 1709 -> 6578, 1831 (uses the beedroom sprite, currently offset 16 for rooms) 
+17: 6599, 1709 -> 6790, 1831 (uses the beedroom sprite, currently offset 16 for rooms) 
+18: 6811, 1709 -> 7002, 1831 (uses the beedroom sprite, currently offset 16 for rooms)  
+19: 7021, 1709 -> 7212, 1831 (uses the beedroom sprite, currently offset 16 for rooms) 
+                              
 20: 1373, 2574 -> 2054, 2801
 21: 2900, 2521 -> 4116, 2626
-22: 6387, 1929 -> 6578, 2051
-23: 6599, 1929 -> 6790, 2051
-24: 6811, 1929 -> 7002, 2051
-25: 7021, 1929 -> 7212, 2051
+22: 6387, 1929 -> 6578, 2051 (uses the beedroom sprite, currently offset 16 for rooms) 
+23: 6599, 1929 -> 6790, 2051 (uses the beedroom sprite, currently offset 16 for rooms) 
+24: 6811, 1929 -> 7002, 2051 (uses the beedroom sprite, currently offset 16 for rooms) 
+25: 7021, 1929 -> 7212, 2051 (uses the beedroom sprite, currently offset 16 for rooms) 
 
 26: 2900, 2696 -> 4116, 2801
 27: 4385, 2780 -> 4515, 2866

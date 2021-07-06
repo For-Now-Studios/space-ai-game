@@ -32,254 +32,204 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 
 	/* ROOMS */
 	vector<Room *> rooms;
-	// The bridge
-	roomPopupPars* rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *cockpit = new Room(0, 0, media->images.at(5), roomPopup, (void *)(rPup),
-										BRIDGE);
-	rPup->room = cockpit;
-
-	// Bridge hall
-	rPup = new roomPopupPars(popPopUpPars{ cc, false, objects, media});
-	Room *bridgeHall = new Room(128, 0, media->images.at(6), roomPopup,
-								(void *)(rPup), HALL);
-	rPup->room = bridgeHall;
-
-	// Bedroom 1
-	rPup = new roomPopupPars(popPopUpPars{ cc, false, objects, media});
-	Room *bRoom1 = new Room(256, 0, media->images.at(5), roomPopup, (void *)(rPup),
-										BEDROOM);
-	rPup->room = bRoom1;
-
-	// Bedroom 2
-	rPup = new roomPopupPars(popPopUpPars{ cc, false, objects, media});
-	Room *bRoom2 = new Room(384, 0, media->images.at(5), roomPopup, (void *)(rPup),
-										BEDROOM);
-	rPup->room = bRoom2;
-
-	// Bedroom 3
-	rPup = new roomPopupPars(popPopUpPars{ cc, false, objects, media});
-	Room *bRoom3 = new Room(256, 64, media->images.at(5), roomPopup, (void *)(rPup),
-										BEDROOM);
-	rPup->room = bRoom3;
-
-	// Bedroom 4
-	rPup = new roomPopupPars(popPopUpPars{ cc, false, objects, media});
-	Room *bRoom4 = new Room(384, 64, media->images.at(5), roomPopup, (void *)(rPup),
-										BEDROOM);
-	rPup->room = bRoom4;
-
-	// Kitchen Hall
-	rPup = new roomPopupPars(popPopUpPars{ cc, false, objects, media});
-	Room *kitchenHall = new Room(128, 64, media->images.at(6), roomPopup,
-								(void *)(rPup), HALL);
-	rPup->room = kitchenHall;
-
-	// Kitchen
-	rPup = new roomPopupPars(popPopUpPars{ cc, false, objects, media});
-	Room *kitchen = new Room(0, 64, media->images.at(5), roomPopup,
-								(void *)(rPup), KITCHEN);
-	rPup->room = kitchen;
-
 	// Proper Room 1
-	//roomPopupPars* rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r1 = new Room(2418, 520, media->images.at(5), roomPopup, (void *)(rPup),
+	roomPopupPars* rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	Room *r1 = new Room(2418, 520, media->images.at(13), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r1;
 	rooms.push_back(r1);
 
 	// Proper Room 2
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r2 = new Room(3161, 650, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r2 = new Room(3161, 650, media->images.at(14), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r2;
 	rooms.push_back(r2);
 
 	// Proper Room 3
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r3 = new Room(6314, 721, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r3 = new Room(6314, 721, media->images.at(15), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r3;
 	rooms.push_back(r3);
 
 	// Proper Room 4
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r4 = new Room(1614, 674, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r4 = new Room(1614, 674, media->images.at(16), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r4;
 	rooms.push_back(r4);
 
 	// Proper Room 5
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r5 = new Room(3203, 797, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r5 = new Room(3203, 797, media->images.at(17), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r5;
 	rooms.push_back(r5);
 
 	// Proper Room 6
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r6 = new Room(4775, 1270, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r6 = new Room(4775, 1270, media->images.at(18), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r6;
 	rooms.push_back(r6);
 
 	// Proper Room 7
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r7 = new Room(5491, 1110, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r7 = new Room(5491, 1110, media->images.at(19), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r7;
 	rooms.push_back(r7);
 
 	// Proper Room 8
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r8 = new Room(6244, 1094, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r8 = new Room(6244, 1094, media->images.at(20), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r8;
 	rooms.push_back(r8);
 
 	// Proper Room 9
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r9 = new Room(1001, 1092, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r9 = new Room(1001, 1092, media->images.at(21), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r9;
 	rooms.push_back(r9);
 
 	// Proper Room 10
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r10 = new Room(2591, 1219, media->images.at(5), roomPopup, (void *)(rPup),
-										BRIDGE);
+	Room *r10 = new Room(2591, 1219, media->images.at(22), roomPopup, (void *)(rPup), BRIDGE);
 	rPup->room = r10;
 	rooms.push_back(r10);
 
 	// Proper Room 11
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r11 = new Room(5225, 1531, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r11 = new Room(5225, 1531, media->images.at(23), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r11;
 	rooms.push_back(r11);
 
 	// Proper Room 12
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r12 = new Room(6244, 1295, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r12 = new Room(6244, 1295, media->images.at(24), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r12;
 	rooms.push_back(r12);
 
 	// Proper Room 13
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r13 = new Room(1305, 1442, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r13 = new Room(1305, 1442, media->images.at(25), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r13;
 	rooms.push_back(r13);
 
 	// Proper Room 14
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r14 = new Room(3186, 1839, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r14 = new Room(3186, 1839, media->images.at(26), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r14;
 	rooms.push_back(r14);
 
 	// Proper Room 15
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r15 = new Room(6244, 1707, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r15 = new Room(6244, 1707, media->images.at(27), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r15;
 	rooms.push_back(r15);
 
 	// Proper Room 16
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r16 = new Room(6387, 1709, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r16 = new Room(6387, 1709, media->images.at(28), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r16;
 	rooms.push_back(r16);
 
 	// Proper Room 17
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r17 = new Room(6599, 1709, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r17 = new Room(6599, 1709, media->images.at(28), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r17;
 	rooms.push_back(r17);
 
 	// Proper Room 18
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r18 = new Room(6811, 1709, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r18 = new Room(6811, 1709, media->images.at(28), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r18;
 	rooms.push_back(r18);
 
 	// Proper Room 19
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r19 = new Room(7021, 1709, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r19 = new Room(7021, 1709, media->images.at(28), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r19;
 	rooms.push_back(r19);
 
 	// Proper Room 20
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r20 = new Room(1373, 2574, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r20 = new Room(1373, 2574, media->images.at(29), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r20;
 	rooms.push_back(r20);
 
 	// Proper Room 21
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r21 = new Room(2900, 2521, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r21 = new Room(2900, 2521, media->images.at(30), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r21;
 	rooms.push_back(r21);
 
 	// Proper Room 22
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r22 = new Room(6387, 1929, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r22 = new Room(6387, 1929, media->images.at(28), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r22;
 	rooms.push_back(r22);
 
 	// Proper Room 23
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r23 = new Room(6599, 1929, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r23 = new Room(6599, 1929, media->images.at(28), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r23;
 	rooms.push_back(r23);
 
 	// Proper Room 24
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r24 = new Room(6811, 1929, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r24 = new Room(6811, 1929, media->images.at(28), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r24;
 	rooms.push_back(r24);
 
 	// Proper Room 25
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r25 = new Room(7021, 1929, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r25 = new Room(7021, 1929, media->images.at(28), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r25;
 	rooms.push_back(r25);
 
 	// Proper Room 26
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r26 = new Room(2900, 2696, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r26 = new Room(2900, 2696, media->images.at(31), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r26;
 	rooms.push_back(r26);
 
 	// Proper Room 27
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r27 = new Room(4385, 2780, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r27 = new Room(4385, 2780, media->images.at(32), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r27;
 	rooms.push_back(r27);
 
 	// Proper Room 28
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r28 = new Room(2900, 2867, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r28 = new Room(2900, 2867, media->images.at(33), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r28;
 	rooms.push_back(r28);
 
 	// Proper Room 29
 	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
-	Room *r29 = new Room(1231, 3084, media->images.at(5), roomPopup, (void *)(rPup),
+	Room *r29 = new Room(1231, 3084, media->images.at(34), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r29;
 	rooms.push_back(r29);
@@ -295,10 +245,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	Door *r1D = new Door(2507, 624 - media->images.at(9)->height,
 						media->images.at(9), doorClick, DCP);
 	DCP->door = r1D;
-	//cockpit->doors.push_back(bridgeDoor);
-	//bridgeHall->doors.push_back(bridgeDoor);
 	pG->addNode(r1D); //Add the door to the pathfinder graph
-	//strcpy(bridgeDoor->n, "BridgeDoor"); //TEST CODE TODO: REMOVE
 	doors.push_back(r1D);
 
 	// Room 2 left door
@@ -1092,7 +1039,10 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 		for(int j = i+1; j < doors.size(); j++){
 			GameObject *d1 = (GameObject *)((Door *) doors.at(i));
 			GameObject *d2 = (GameObject *)((Door *) doors.at(j));
-			if(whichRoom(&rooms, d1) ==  whichRoom(&rooms, d2)){
+			if(whichRoom(&rooms, d1) == whichRoom(&rooms, d2)){
+				if(whichRoom(&rooms, d1) == nullptr)
+					printf("Door at x: %d y: %d is not in a room\n",
+									d1->x, d1->y);
 				pG->addEdge(d1, d2, 1);
 				pG->addEdge(d2, d1, 1);
 			}
@@ -1107,21 +1057,21 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 							labels->sexuality->at(0), pilot);
 
 	// Paulette
-	CharacterObject *paulette = new CharacterObject(400, 0,
+	CharacterObject *paulette = new CharacterObject(r17->x + 20, 1831 - 50,
 		media->images.at(7), btnHello,
 		(void *)(new btnHelloParameter{"Paulette"}), "Paulette", intersex,
 					labels->genders->at(3), labels->romance->at(1),
 							labels->sexuality->at(1), engineer);
 	
 	// Paulus
-	CharacterObject *paulus = new CharacterObject(310, 64,
+	CharacterObject *paulus = new CharacterObject(r18->x + 10, 1831 - 50,
 		media->images.at(7), btnHello,
 		(void *)(new btnHelloParameter{"Paulus"}), "Paulus", female,
 		labels->genders->at(2), labels->romance->at(2),
 							labels->sexuality->at(2), doctor);
 
 	// Paulob
-	CharacterObject *paulob = new CharacterObject(420, 64,
+	CharacterObject *paulob = new CharacterObject(r19->x + 50, 1831 - 50,
 		media->images.at(7), btnHello,
 		(void *)(new btnHelloParameter{"Paulob"}), "Paulob", male,
 		labels->genders->at(2), labels->romance->at(3),
@@ -1133,204 +1083,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	paulette->addTask(new Task{ 240,240,btnHello,(void*)(new btnHelloParameter{"Place1!"}),3,0,10,"Place1",FORLOVE });
 	paulette->addTask(new Task{ 120,240,btnHello,(void*)(new btnHelloParameter{"Place2!"}),4,0,10,"Place2",FORENEMIES });
 
-	/* Doors */
-	// Bridge Door
-	DCP = new DoorClickPars;
-	DCP->mouse = mouse;
-	DCP->open = media->images.at(2);
-	DCP->closed = media->images.at(3);
-	DCP->locked = media->images.at(4);
-	Door *bridgeDoor = new Door(128, 0, media->images.at(3), doorClick, DCP);
-	DCP->door = bridgeDoor;
-	cockpit->doors.push_back(bridgeDoor);
-	bridgeHall->doors.push_back(bridgeDoor);
-	pG->addNode(bridgeDoor);
-	strcpy(bridgeDoor->n, "BridgeDoor");
-	//TestMap (all doors teleport to self)
-	DCP = new DoorClickPars;
-	DCP->mouse = mouse;
-	DCP->open = media->images.at(2);
-	DCP->closed = media->images.at(3);
-	DCP->locked = media->images.at(4);
-	Door *t = new Door(129, 0, media->images.at(3), doorClick, DCP);
-	DCP->door = t;
-	pG->addNode(t);
-	pG->addEdge(bridgeDoor, t, 1);
-	pG->addEdge(t, bridgeDoor, 1);
-	strcpy(t->n, "BridgeDoorTemp (right)");
-
-	// Bridige Hall hatchet
-	DCP = new DoorClickPars;
-	DCP->mouse = mouse;
-	DCP->open = media->images.at(8);
-	DCP->closed = media->images.at(9);
-	DCP->locked = media->images.at(10);
-	Door *hallHatch = new Door(172, 54, media->images.at(9), doorClick, DCP);
-	DCP->door = hallHatch;
-	bridgeHall->doors.push_back(hallHatch);
-	kitchenHall->doors.push_back(hallHatch);
-	pG->addNode(hallHatch);
-	pG->addEdge(t, hallHatch, 1);
-	pG->addEdge(hallHatch, t, 1);
-	strcpy(hallHatch->n, "hallHatch");
-	
-	DCP = new DoorClickPars;
-	DCP->mouse = mouse;
-	DCP->open = media->images.at(11);
-	DCP->closed = media->images.at(11);
-	DCP->locked = media->images.at(8);
-	Door *bot = new Door(172, 64, media->images.at(11), doorClick, DCP);
-	DCP->door = bot;
-	hallHatch->bottom = bot;
-	bot->bottom = hallHatch;
-	pG->addNode(bot);
-	pG->addEdge(bot, hallHatch, 1);
-	pG->addEdge(hallHatch, bot, 1);
-	strcpy(bot->n, "Bottom");
-
-	// Bedroom 1 Door
-	DCP = new DoorClickPars;
-	DCP->mouse = mouse;
-	DCP->open = media->images.at(2);
-	DCP->closed = media->images.at(3);
-	DCP->locked = media->images.at(4);
-	Door *bRoom1Door = new Door(256, 0, media->images.at(3), doorClick, DCP);
-	DCP->door = bRoom1Door;
-	bridgeHall->doors.push_back(bRoom1Door);
-	bRoom1->doors.push_back(bRoom1Door);
-	pG->addNode(bRoom1Door);
-	pG->addEdge(bRoom1Door, hallHatch, 1);
-	pG->addEdge(hallHatch, bRoom1Door, 1);
-	pG->addEdge(bRoom1Door, t, 1);
-	pG->addEdge(t, bRoom1Door, 1);
-	strcpy(bRoom1->n, "Bedroom1");
-	//TestMap (all doors teleport to self)
-	DCP = new DoorClickPars;
-	DCP->mouse = mouse;
-	DCP->open = media->images.at(2);
-	DCP->closed = media->images.at(3);
-	DCP->locked = media->images.at(4);
-	t = new Door(257, 0, media->images.at(3), doorClick, DCP);
-	DCP->door = t;
-	pG->addNode(t);
-	pG->addEdge(bRoom1Door, t, 1);
-	pG->addEdge(t, bRoom1Door, 1);
-	strcpy(t->n, "Bedroom1Temp (right)");
-
-	// Bedroom 2 Door
-	DCP = new DoorClickPars;
-	DCP->mouse = mouse;
-	DCP->open = media->images.at(2);
-	DCP->closed = media->images.at(3);
-	DCP->locked = media->images.at(4);
-	Door *bRoom2Door = new Door(384, 0, media->images.at(3), doorClick, DCP);
-	DCP->door = bRoom2Door;
-	bRoom1->doors.push_back(bRoom2Door);
-	bRoom2->doors.push_back(bRoom2Door);
-	pG->addNode(bRoom2Door);
-	pG->addEdge(bRoom2Door, t, 1);
-	pG->addEdge(t, bRoom2Door, 1);
-	strcpy(bRoom2->n, "Bedroom2");
-	//TestMap (all doors teleport to self)
-	DCP = new DoorClickPars;
-	DCP->mouse = mouse;
-	DCP->open = media->images.at(2);
-	DCP->closed = media->images.at(3);
-	DCP->locked = media->images.at(4);
-	t = new Door(385, 0, media->images.at(3), doorClick, DCP);
-	DCP->door = t;
-	pG->addNode(t);
-	pG->addEdge(bRoom2Door, t, 1);
-	pG->addEdge(t, bRoom2Door, 1);
-	strcpy(t->n, "Bedroom2Temp (right)");
-
-	// Bedroom 3 Door
-	DCP = new DoorClickPars;
-	DCP->mouse = mouse;
-	DCP->open = media->images.at(2);
-	DCP->closed = media->images.at(3);
-	DCP->locked = media->images.at(4);
-	Door *bRoom3Door = new Door(256, 64, media->images.at(3), doorClick, DCP);
-	DCP->door = bRoom3Door;
-	kitchenHall->doors.push_back(bRoom3Door);
-	bRoom3->doors.push_back(bRoom3Door);
-	pG->addNode(bRoom3Door);
-	pG->addEdge(bRoom3Door, bot, 1);
-	pG->addEdge(bot, bRoom3Door, 1);
-	strcpy(bRoom3->n, "Bedroom3");
-	//TestMap (all doors teleport to self)
-	DCP = new DoorClickPars;
-	DCP->mouse = mouse;
-	DCP->open = media->images.at(2);
-	DCP->closed = media->images.at(3);
-	DCP->locked = media->images.at(4);
-	t = new Door(257, 64, media->images.at(3), doorClick, DCP);
-	DCP->door = t;
-	pG->addNode(t);
-	pG->addEdge(bRoom3Door, t, 1);
-	pG->addEdge(t, bRoom3Door, 1);
-	strcpy(t->n, "Bedroom3Temp (right)");
-
-	// Bedroom 4 Door
-	DCP = new DoorClickPars;
-	DCP->mouse = mouse;
-	DCP->open = media->images.at(2);
-	DCP->closed = media->images.at(3);
-	DCP->locked = media->images.at(4);
-	Door *bRoom4Door = new Door(384, 64, media->images.at(3), doorClick, DCP);
-	DCP->door = bRoom4Door;
-	bRoom3->doors.push_back(bRoom4Door);
-	bRoom4->doors.push_back(bRoom4Door);
-	pG->addNode(bRoom4Door);
-	pG->addEdge(bRoom4Door, t, 1);
-	pG->addEdge(t, bRoom4Door, 1);
-	strcpy(bRoom4->n, "Bedroom4");
-	//TestMap (all doors teleport to self)
-	DCP = new DoorClickPars;
-	DCP->mouse = mouse;
-	DCP->open = media->images.at(2);
-	DCP->closed = media->images.at(3);
-	DCP->locked = media->images.at(4);
-	t = new Door(385, 64, media->images.at(3), doorClick, DCP);
-	DCP->door = t;
-	pG->addNode(t);
-	pG->addEdge(bRoom4Door, t, 1);
-	pG->addEdge(t, bRoom4Door, 1);
-	strcpy(t->n, "Bedroom4Temp (right)");
-
-	// Kitchen Door
-	DCP = new DoorClickPars;
-	DCP->mouse = mouse;
-	DCP->open = media->images.at(2);
-	DCP->closed = media->images.at(3);
-	DCP->locked = media->images.at(4);
-	Door *kitchenDoor = new Door(128, 64, media->images.at(3), doorClick, DCP);
-	DCP->door = kitchenDoor;
-	kitchen->doors.push_back(kitchenDoor);
-	kitchenHall->doors.push_back(kitchenDoor);
-	pG->addNode(kitchenDoor);
-	pG->addEdge(kitchenDoor, bot, 1);
-	pG->addEdge(bot, kitchenDoor, 1);
-	pG->addEdge(kitchenDoor, bRoom3Door, 1);
-	pG->addEdge(bRoom3Door, kitchenDoor, 1);
-	strcpy(kitchenDoor->n, "KitchenDoor (right)");
-	//TestMap (all doors teleport to self)
-	DCP = new DoorClickPars;
-	DCP->mouse = mouse;
-	DCP->open = media->images.at(2);
-	DCP->closed = media->images.at(3);
-	DCP->locked = media->images.at(4);
-	t = new Door(120, 64, media->images.at(3), doorClick, DCP);
-	DCP->door = t;
-	pG->addNode(t);
-	pG->addEdge(kitchenDoor, t, 1);
-	pG->addEdge(t, kitchenDoor, 1);
-	strcpy(t->n, "KitchenDoorTemp (left)");
-
 	// Add all clickable elements to the click system
-	printf("About to add all clicks\n");
-	//vector<Room *> rooms({cockpit, bridgeHall, bRoom1, bRoom2, bRoom3, bRoom4,
-	//							kitchenHall, kitchen});
 	vector<IsClickable *> uiElements;
 	vector<IsClickable *> popupElements;
 	buildClickAreas(cc,
@@ -1341,19 +1094,9 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 		doors
 	);
 
-	printf("Added all clicks\n");
-
 	/* Add all objects to the objects list */
 	// Rooms
-	objects->push_back(cockpit);
-	objects->push_back(bridgeHall);
-	objects->push_back(bRoom1);
-	objects->push_back(bRoom2);
-	objects->push_back(bRoom3);
-	objects->push_back(bRoom4);
-	objects->push_back(kitchenHall);
-	objects->push_back(kitchen);
-	objects->push_back(r1);
+	/*objects->push_back(r1);
 	objects->push_back(r2);
 	objects->push_back(r3);
 	objects->push_back(r4);
@@ -1381,23 +1124,16 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	objects->push_back(r26);
 	objects->push_back(r27);
 	objects->push_back(r28);
-	objects->push_back(r29);
-	//Ladders
-	objects->push_back(bot);
+	objects->push_back(r29);*/
+	for(Room *r : rooms){
+		objects->push_back(r);
+	}
 	// Characters
 	objects->push_back(paul);
 	objects->push_back(paulette);
 	objects->push_back(paulus);
 	objects->push_back(paulob);
 	// Doors
-	objects->push_back(bridgeDoor);
-	objects->push_back(hallHatch);
-	objects->push_back(bRoom1Door);
-	objects->push_back(bRoom2Door);
-	objects->push_back(bRoom3Door);
-	objects->push_back(bRoom4Door);
-	//objects->push_back(kitchenDoor);
-	objects->push_back(kitchenDoor);
 	for(IsClickable *d : doors){
 		objects->push_back(dynamic_cast<GameObject*>((Room*)d));
 	}
@@ -1572,7 +1308,7 @@ int main(int argc, char *argv[]){
 
 			relGraph = initRelations(&characters);
 			//pathGraph = initPathfinding(&currClick.rooms);
-			pathGraph->print();
+			//pathGraph->print();
 		}
 	}
 
