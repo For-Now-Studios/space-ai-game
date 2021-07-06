@@ -518,6 +518,9 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	Door *r7Dt = new Door(5553, 1428 - media->images.at(9)->height,
 						media->images.at(9), doorClick, DCP);
 	DCP->door = r7Dt;
+	r7Dt->bottom = r2Db; //Indicate that this is a vertical door
+	r2Db->bottom = r7Dt; //Indicate that this is a vertical door
+	pG->addNode(r4Dt); //Add the door to the pathfinder graph
 	pG->addNode(r7Dt); //Add the door to the pathfinder graph
 	pG->addEdge(r2Db, r7Dt, 1);
 	pG->addEdge(r7Dt, r2Db, 1);
@@ -615,6 +618,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	Door *r11Dt = new Door(5714, 1672 - media->images.at(9)->height,
 						media->images.at(9), doorClick, DCP);
 	DCP->door = r11Dt;
+	r11Dt->bottom = r7Db; //Indicate that this is a vertical door
+	r7Db->bottom = r11Dt; //Indicate that this is a vertical door
 	pG->addNode(r11Dt); //Add the door to the pathfinder graph
 	pG->addEdge(r7Db, r11Dt, 1);
 	pG->addEdge(r11Dt, r7Db, 1);
@@ -667,6 +672,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	Door *r13Dt = new Door(2022, 1584 - media->images.at(9)->height,
 						media->images.at(9), doorClick, DCP);
 	DCP->door = r13Dt;
+	r13Dt->bottom = r9D; //Indicate that this is a vertical door
 	pG->addNode(r13Dt); //Add the door to the pathfinder graph
 	pG->addEdge(r9D, r13Dt, 1);
 	pG->addEdge(r13Dt, r9D, 1);
@@ -719,6 +725,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	Door *r14Dt = new Door(4318, 2213 - media->images.at(9)->height,
 						media->images.at(9), doorClick, DCP);
 	DCP->door = r14Dt;
+	r14Dt->bottom = r5Dbb; //Indicate that this is a vertical door
+	r5Dbb->bottom = r14Dt; //Indicate that this is a vertical door
 	pG->addNode(r14Dt); //Add the door to the pathfinder graph
 	pG->addEdge(r5Dbb, r14Dt, 1);
 	pG->addEdge(r14Dt, r5Dbb, 1);
@@ -851,6 +859,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	Door *r20Dt = new Door(1392, 2801 - media->images.at(9)->height,
 						media->images.at(9), doorClick, DCP);
 	DCP->door = r20Dt;
+	r20Dt->bottom = r13Db; //Indicate that this is a vertical door
+	r13Db->bottom = r20Dt; //Indicate that this is a vertical door
 	pG->addNode(r20Dt); //Add the door to the pathfinder graph
 	pG->addEdge(r13Db, r20Dt, 1);
 	pG->addEdge(r20Dt, r13Db, 1);
@@ -877,6 +887,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	Door *r21D = new Door(3893, 2626 - media->images.at(9)->height,
 						media->images.at(9), doorClick, DCP);
 	DCP->door = r21D;
+	r21D->bottom = r14Db; //Indicate that this is a vertical door
+	r14Db->bottom = r21D; //Indicate that this is a vertical door
 	pG->addNode(r21D); //Add the door to the pathfinder graph
 	pG->addEdge(r14Db, r21D, 1);
 	pG->addEdge(r21D, r14Db, 1);
@@ -997,6 +1009,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	Door *r26Dt = new Door(3893, 2801 - media->images.at(9)->height,
 						media->images.at(9), doorClick, DCP);
 	DCP->door = r26Dt;
+	r26Dt->bottom = r14Db; //Indicate that this is a vertical door
+	r14Db->bottom = r26Dt; //Indicate that this is a vertical door
 	pG->addNode(r26Dt); //Add the door to the pathfinder graph
 	pG->addEdge(r14Db, r26Dt, 1);
 	pG->addEdge(r26Dt, r14Db, 1);
@@ -1039,6 +1053,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	Door *r28D = new Door(3893, 2972 - media->images.at(9)->height,
 						media->images.at(9), doorClick, DCP);
 	DCP->door = r28D;
+	r28D->bottom = r14Db; //Indicate that this is a vertical door
+	r14Db->bottom = r28D; //Indicate that this is a vertical door
 	pG->addNode(r28D); //Add the door to the pathfinder graph
 	pG->addEdge(r14Db, r28D, 1);
 	pG->addEdge(r28D, r14Db, 1);
@@ -1057,6 +1073,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	Door *r29D = new Door(3893, 3952 - media->images.at(9)->height,
 						media->images.at(9), doorClick, DCP);
 	DCP->door = r29D;
+	r29D->bottom = r14Db; //Indicate that this is a vertical door
+	r14Db->bottom = r29D; //Indicate that this is a vertical door
 	pG->addNode(r29D); //Add the door to the pathfinder graph
 	pG->addEdge(r14Db, r29D, 1);
 	pG->addEdge(r29D, r14Db, 1);
