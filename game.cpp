@@ -494,6 +494,14 @@ int main(int argc, char *argv[]){
     
 		updateClickAreas(&currClick);
 
+		//Simple implementation of events
+		/*
+			If you want to add more events you have to increase the number of events we handle.
+			And then you have to add another chance in the struct relationEventChances
+			And add that in the "chances" array
+			And its corresponding function in the function array "functions"
+			TODO: Make the addition of events better.
+		*/
 		const uniform_int_distribution<int> d1000(0, 999);
 		for (CharacterObject* cobj : characters) {
 			//Roll a d1000 to see if *this* character has an event.
@@ -508,6 +516,7 @@ int main(int argc, char *argv[]){
 				cobj->dating ? cobj->rec.cuddleChance : 0, //If you are dating, you can cuddle.
 				cobj->rec.supportChance,
 			};
+			//Array of functions for each event
 			void(*functions[numEvents])(vector<CharacterObject*>&, CharacterObject*, Graph<CharacterObject *, Relation>&, default_random_engine) = {
 				fallout,
 				confession,
@@ -517,6 +526,7 @@ int main(int argc, char *argv[]){
 				support
 			};
 			int allChances = 0;
+			//Need summarize all chances
 			for (int chance : chances) {
 				allChances += chance;
 			}
@@ -525,7 +535,10 @@ int main(int argc, char *argv[]){
 			roll = chanceDist(generator);
 			int prev = 0;
 			for (int i = 0; i < numEvents; i++) {
+				/*Check the first range 0 to chance-of-first-event, 
+				and then prev-chance to chance-of-secound-event, and so on.*/
 				if (roll < chances[i] + prev) {
+					//if it rolls under then we call that related function in the array
 					functions[i](characters, cobj, *relGraph, generator);
 					printf("\n");
 					break;
