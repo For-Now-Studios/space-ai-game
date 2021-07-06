@@ -239,11 +239,11 @@ struct GameObjClick : GameObject, IsClickable {
 #define AGAINSTENEMY (1 << 8)
 #define AGAINSTLOVE (1 << 9)
 #define AGAINSTFRIENDS (1 << 10)
+#define WAITINGFOR (1 << 11)
 
 struct Task {
 	// Location
-	int x;
-	int y;
+	GameObject *location;
 
 	// Effect
 	void(*function)(void*); //The function that does its effect
@@ -252,6 +252,8 @@ struct Task {
 	int priority; //How important is this job?
 	int actualPrio; //How ACTUALLY important is this?
 	int waitTime;
+
+	CharacterObject* waitingFor;
 
 	const char* name;
 
@@ -314,6 +316,7 @@ struct CharacterObject : GameObjClick{
 	affectionTrait *sexuality;
 	Role role;
 	std::list<Task*> tasks;
+	Task* currentTask;
 	int traitFlags; //The traits they have.
 	relationEventChances rec; //The chance *this* characters has for each event.
 	bool dating = false; //If they are currently dating anyone.
@@ -348,7 +351,7 @@ struct CharacterObject : GameObjClick{
 		stress = 0;
 		loyalty = 100;
     
-    path = nullptr;
+		path = nullptr;
 		goal = nullptr;
 		target = nullptr;
 		xDist = 0;
@@ -368,26 +371,37 @@ struct CharacterObject : GameObjClick{
 			+ ((flags & (FORENEMIES | AGAINSTLOVE | AGAINSTFRIENDS)) != 0) * -96;
 	}
 	struct compGreater {
+		Task* last = nullptr;
 		bool operator()(const Task* l, const Task* r) {
+			if (l == last) return l->actualPrio + 100 < r->actualPrio;
+			if (r == last) return l->actualPrio < r->actualPrio + 100;
 			return l->actualPrio < r->actualPrio;
 		}
 	};
 	
+	void removeTask() {
+		delete tasks.back();
+		tasks.pop_back();
+		currentTask = tasks.back();
+	}
 
 	void addTask(Task* task) {
 		task->actualPrio = task->priority;
 		makeActualPriority(task->actualPrio, task->flag);
 		tasks.push_back(task);
-		tasks.sort(compGreater());
+		compGreater cg{ currentTask };
+		tasks.sort(cg);
+		currentTask = tasks.back();
 	}
 
-	//Currently calculates actual priority each time it compares
 	void rethinkOrder() {
 		for (Task* t : tasks) {
 			t->actualPrio = t->priority;
 			makeActualPriority(t->actualPrio, t->flag);
 		}
+
 		tasks.sort(compGreater());
+		currentTask = tasks.back();
 	}
 
 	~CharacterObject() {

@@ -109,10 +109,12 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 							labels->sexuality->at(3), captain, CARING);
   
   //Add tasks for paulette:
+	/*
 	paulette->addTask(new Task{ 120,120,btnHello,(void*)(new btnHelloParameter{"Start!"}),1,0,10,"Start",AIASSIGNED });
 	paulette->addTask(new Task{ 240,120,btnHello,(void*)(new btnHelloParameter{"Place0!"}),2,0,10,"Place0",AGAINSTFRIENDS });
 	paulette->addTask(new Task{ 240,240,btnHello,(void*)(new btnHelloParameter{"Place1!"}),3,0,10,"Place1",FORLOVE });
 	paulette->addTask(new Task{ 120,240,btnHello,(void*)(new btnHelloParameter{"Place2!"}),4,0,10,"Place2",FORENEMIES });
+	*/
 
 	/* Doors */
 	// Bridge Door
@@ -616,13 +618,40 @@ int main(int argc, char *argv[]){
 			}
 		}
 
-		//Update the movment of a character
-		for(CharacterObject *c : characters){
-			updateMovement(c, &currClick.rooms, pathGraph);
+		for(CharacterObject *c : characters) {
+			bool arrived = updateMovement(c, &currClick.rooms, pathGraph);
+			if (arrived) {
+				if (c->currentTask->flag & WAITINGFOR) {
+					if (whichRoom(&currClick.rooms, c->currentTask->waitingFor) != whichRoom(&currClick.rooms, c)) {
+						continue;
+					}
+				}
+				if (c->currentTask->waitTime < 1) {
+					c->currentTask->function(c->currentTask->data);
+					c->removeTask();
+				}
+				else {
+					c->currentTask->waitTime--;
+				}
+			}
+			if (!c->tasks.empty()) {
+				Task* task = c->tasks.back();
+				if (task->location != c->goal) {
+					delete c->path;
+					c->path = nullptr;
+				}
+				c->goal = task->location;
+			}
+			c->goal = nullptr;
 		}
 
+		//Update the movment of a character
+		/*for(CharacterObject *c : characters){
+			updateMovement(c, &currClick.rooms, pathGraph);
+		}*/
+
 		//TEST!!! TODO: REMOVE!
-		if(characters.at(0)->goal == nullptr){
+		/*if(characters.at(0)->goal == nullptr){
 			if(whichRoom(&currClick.rooms, characters.at(0)) !=
 								currClick.rooms.at(7)){
 				characters.at(0)->goal = currClick.rooms.at(7);
@@ -630,7 +659,7 @@ int main(int argc, char *argv[]){
 			else{
 				characters.at(0)->goal = currClick.rooms.at(2);
 			}
-		}
+		}*/
 
 
 		//More advanced simple button test

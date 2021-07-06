@@ -269,10 +269,10 @@ void checkDoor(CharacterObject *object, Door *d, vector<Room *> *rooms,
 	}
 }
 
-void updateMovement(CharacterObject *object, vector<Room *> *rooms,
+bool updateMovement(CharacterObject *object, vector<Room *> *rooms,
 							Graph<GameObject *, int> *g){
 	//Check if the character wants to move anywhere
-	if(object->goal == nullptr) return;
+	if(object->goal == nullptr) return true;
 
 	//Calculate a path to the target if no such path has been calculated yet
 	if(object->path == nullptr){
@@ -282,7 +282,7 @@ void updateMovement(CharacterObject *object, vector<Room *> *rooms,
 		GameObject *end = closestNode(object->goal, g);
 		object->path = findPathTo(g, start, end);
 
-		if(object->path == nullptr) return;
+		if(object->path == nullptr) return false;
 
 		/*for(GameObject *go : *object->path){
 			printf("%s\n", go->n);
@@ -356,6 +356,7 @@ void updateMovement(CharacterObject *object, vector<Room *> *rooms,
 			delete object->path;
 			object->path = nullptr;
 			object->target = nullptr;
+			return true;
 		}
 		else{
 			//Check if door
@@ -368,6 +369,7 @@ void updateMovement(CharacterObject *object, vector<Room *> *rooms,
 			}
 		}
 	}
+	return false;
 
 	//printf("%d, %d\n", xSpeed, ySpeed);
 }
