@@ -671,30 +671,39 @@ int main(int argc, char *argv[]){
 
 		//Simple implementation of events
 		/*
-			If you want to add more events you have to increase the number of events we handle.
-			And then you have to add another chance in the struct relationEventChances
-			And add that in the "chances" array
-			And its corresponding function in the function array "functions"
+			If you want to add more events you have to increase the number
+			of events handled, add its chance in the struct
+			relationEventChances, and add that in the "chances" array.
+			Finally add its corresponding function in the function array
+			"functions"
 			TODO: Make the addition of events better.
 		*/
-		const uniform_int_distribution<int> d1000(0, 999);
-		for (CharacterObject* cobj : characters)//CharacterObject* cobj = characters.at(0);//
+		uniform_int_distribution<int> d1000(0, 999);
+		for (CharacterObject* cobj : characters)
+			//CharacterObject* cobj = characters.at(0);//
 		{
 			//Roll a d1000 to see if *this* character has an event.
 			int roll = d1000(generator);
-			if (roll < cobj->rec.noChance) continue; //If it rolls under then we skip to the next character in the iteration
+			// Check if the roll was too low to trigger an event
+			if (roll < cobj->rec.noChance) continue;
+
 			const int numEvents = 6; //Number of events we check
 			int chances[numEvents] = {
 				cobj->rec.falloutChance+cobj->stress,
 				cobj->rec.confessionChance,
-				cobj->dating ? cobj->rec.cheatingChance : 0, //If you are dating, you can cheat
+				//If you are dating, you can cheat
+				cobj->dating ? cobj->rec.cheatingChance : 0,
 				cobj->rec.birthdayChance,
-				cobj->dating ? cobj->rec.cuddleChance : 0, //If you are dating, you can cuddle.
+				//If you are dating, you can cuddle.
+				cobj->dating ? cobj->rec.cuddleChance : 0,
 				cobj->rec.supportChance,
 			};
+
 			//Array of functions for each event
-			void(*functions[numEvents])(CurrentClick *cc, vector<CharacterObject*>&,
-				CharacterObject*, Graph<CharacterObject *, Relation>&, default_random_engine) = {
+			void(*functions[numEvents])(CurrentClick *cc,
+				vector<CharacterObject*>&, CharacterObject *,
+					Graph<CharacterObject *, Relation>&,
+							default_random_engine) = {
 				fallout,
 				confession,
 				cheating,
@@ -702,6 +711,7 @@ int main(int argc, char *argv[]){
 				cuddles,
 				support
 			};
+
 			int allChances = 0;
 			//Need summarize all chances
 			for (int chance : chances) {
@@ -712,11 +722,16 @@ int main(int argc, char *argv[]){
 			roll = chanceDist(generator);
 			int prev = 0;
 			for (int i = 0; i < numEvents; i++) {
-				/*Check the first range 0 to chance-of-first-event, 
-				and then prev-chance to chance-of-secound-event, and so on.*/
+				/*
+					Check if the roll is in between the max of the
+					previous event's chance and this even'ts change,
+					with the  first event being checked in the range
+					0 to chance-of-first-event
+				*/
 				if (roll < chances[i] + prev) {
-					//if it rolls under then we call that related function in the array
-					functions[i](&currClick, characters, cobj, *relGraph, generator);
+					// Call the apropriate function for the event
+					functions[i](&currClick, characters, cobj,
+								*relGraph, generator);
 					//printf("\n");
 					break;
 				}

@@ -180,21 +180,33 @@ Just checks so it doesn't go below zero
 and if a character is paranoid it increases.
 */
 void changeStress(int amnt, CharacterObject* cobj) {
-	int newStress = cobj->stress + amnt + ((cobj->traitFlags & PARANOID) != 0) * abs(amnt >> 1);
+	int newStress = cobj->stress + amnt +
+			((cobj->traitFlags & PARANOID) != 0) * abs(amnt >> 1);
+
 	cobj->stress = newStress > -1 ? newStress : 0;
 }
+
 void falloutEffect(void *cntxt) {
 	FalloutEffectPars *pars = (FalloutEffectPars*)cntxt;
-	printf("%s had a fallout with %s, so they are on bad terms now\n", pars->currChar->name, pars->otherChar->name);
-	if (pars->relatonships.getEdgeValue(pars->currChar, pars->otherChar) == Dating) {
-		printf("%s and %s have broken up\n", pars->currChar->name, pars->otherChar->name);
+
+	printf("%s had a fallout with %s, so they are on bad terms now\n",
+					pars->currChar->name, pars->otherChar->name);
+
+	if(pars->relatonships.getEdgeValue(pars->currChar, pars->otherChar) == Dating){
+		printf("%s and %s have broken up\n", pars->currChar->name,
+								pars->otherChar->name);
 		pars->currChar->dating = false;
 		pars->otherChar->dating = false;
 	}
+
 	pars->relatonships.updateEdge(pars->currChar, pars->otherChar, On_Bad_Terms);
 	pars->relatonships.updateEdge(pars->otherChar, pars->currChar, On_Bad_Terms);
+
 	changeStress(20, pars->currChar);
-	printf("%s's stress just increased, it is now %d\n", pars->currChar->name, pars->currChar->stress);
+	printf("%s's stress just increased, it is now %d\n", pars->currChar->name,
+								pars->currChar->stress);
+
 	changeStress(20, pars->otherChar);
-	printf("%s's stress just increased, it is now %d\n", pars->otherChar->name, pars->otherChar->stress);
+	printf("%s's stress just increased, it is now %d\n", pars->otherChar->name,
+								pars->otherChar->stress);
 }
