@@ -124,9 +124,11 @@ void cleanClickAreas(CurrentClick *cc) {
 	delete cc->numChars;
 }
 
-ClickReciept* createPopup(const vector<IsClickable*>& clicks, const vector<GameObject*>& objs, vector<GameObject*>* currentObjects, CurrentClick *cc, const SDL_Rect& area) {
+ClickReciept* createPopup(const vector<IsClickable*>& clicks,
+		const vector<GameObject*>& objs, vector<GameObject*>* currentObjects,
+						CurrentClick *cc, const SDL_Rect& area) {
 	ClickReciept* cr = new ClickReciept;
-	cr->renderObjs = new vector<GameObject*>(objs);
+	cr->renderObjs = new vector<GameObject *>(objs);
 	cc->toRender.push_back(cr->renderObjs);
 
 	cr->ca = new ClickAreaPopup(area);

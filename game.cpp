@@ -1592,7 +1592,7 @@ int main(int argc, char *argv[]){
 		for (vector<GameObject*>* vec : currClick.toRender)
 		{
 			for (GameObject* obj : *vec) {
-				render(&window, obj, &cam);
+				render(&window, obj);
 			}
 		}
 
