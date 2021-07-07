@@ -226,6 +226,13 @@ struct GameObjClick : GameObject, IsClickable {
 		area.x += xDir;
 		area.y += yDir;
 	}
+
+	void moveTo(int a, int b){
+		x = a;
+		y = b;
+		area.x = x;
+		area.y = y;
+	}
 };
 
 #define AIASSIGNED (1 << 0)

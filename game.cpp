@@ -1496,6 +1496,32 @@ int main(int argc, char *argv[]){
 			currClick.currentlySelected = nullptr;
 		}
 
+		/*SDL_Rect pTemp = translateToCamera(&cam, &characters.at(0)->area);
+		mouse.x = pTemp.x;
+		mouse.y = pTemp.y;
+		if(checkCord(&currClick, mouse, &cam) != nullptr){
+			printf("Paul can be found at (%d %d)\n", mouse.x, mouse.y);
+		}
+		else{
+			printf("Paul is in the shadow realm :( !\n");
+			for(ClickArea *area : currClick.Game){
+				for(IsClickable *ic : area->clicks){
+					if(ic == (IsClickable *)characters.at(0)){
+						printf("Paul was found!\n");
+						printf("\t(%d, %d)\n", characters.at(0)->x, characters.at(0)->y);
+						printf("\tIn: (%d, %d)\n", area->area.x, area->area.y);
+						break;
+					}
+				}
+			}
+		}*/
+		/*SDL_Rect pTemp = translateToCamera(&cam, &characters.at(0)->area);
+		printf("\t(%d, %d)\n", pTemp.x, pTemp.y);
+		printf("\t\t(%d, %d) - (%d, %d)\n", characters.at(0)->x,
+				characters.at(0)->y, characters.at(0)->area.x,
+				characters.at(0)->area.y);
+		*/
+		
 		if(key[0]) cam.y -= 20;
 		if(key[1]) cam.x -= 20;
 		if(key[2]) cam.y += 20;
