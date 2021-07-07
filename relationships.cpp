@@ -115,14 +115,9 @@ GameObject* getRandomRoom(CurrentClick *cc, default_random_engine dre) {
 	return (GameObject*)chosen;
 }
 
-bool test = false;
 void fallout(CurrentClick *cc, vector<CharacterObject*>& characters,
 			CharacterObject* currChar, Graph<CharacterObject*,
 				Relation>& relatonships, default_random_engine dre) {
-
-	//if (test) return;
-	test = true;
-
 	// Randomly order the characters
 	vector<CharacterObject*> chars(characters);
 	shuffle(chars.begin(), chars.end(), dre);
@@ -133,22 +128,18 @@ void fallout(CurrentClick *cc, vector<CharacterObject*>& characters,
 		if (otherChar == currChar) continue;
 
 		//Get a location for the event to go down
-		GameObject* location = getRandomRoom(cc, dre); //whichRoom(&cc->rooms, currChar);
+		GameObject* location = getRandomRoom(cc, dre);
 		if (location == nullptr) {
-			whichRoom(&cc->rooms, currChar);
 			printf("%s is trying to have a fallout with %s, but can't find a appropiate location\n", currChar->name, otherChar->name);
+			return;
 		}
-
 		printf("Ordering %s and %s to have a fallout\n", currChar->name,
 									otherChar->name);
-
-		Task* currCharTask = new Task(location, nullptr,
+		Task* currCharTask = new Task(location, falloutEffect,
 		(void*)(new FalloutEffectPars{currChar, otherChar, relatonships}),
-							1, 200, "FALLOUT", AGAINSTENEMY);
-
-		Task* otherCharTask = new Task(location, nullptr, nullptr, 100, 300,
-								"Nothing", AGAINSTENEMY);
-
+			0, 0, "FALLOUT", AGAINSTENEMY | WAITINGFOR, otherChar);
+		Task* otherCharTask = new Task(location, nullptr, nullptr, 0, 0,
+								"Nothing", AGAINSTENEMY|WAITINGFOR, currChar);
 		currChar->addTask(currCharTask);
 		otherChar->addTask(otherCharTask);
 
@@ -157,23 +148,27 @@ void fallout(CurrentClick *cc, vector<CharacterObject*>& characters,
 }
 
 void cheating(CurrentClick *cc, vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine dre) {
-	uniform_int_distribution<int> distribution(1, 100);
 	vector<CharacterObject*> chars(characters);
 	shuffle(chars.begin(), chars.end(), dre);
 	for (CharacterObject* cobj : chars) {
 		if (cobj == currChar) continue;
 		if (relatonships.getEdgeValue(currChar, cobj) != Dating && validSex(currChar, cobj)) {
-			printf("%s is cheating with %s, that is bad\n", currChar->name, cobj->name);
-			int roll = distribution(dre);
-			if (roll < 50) {
-				//changeStress(20, currChar);
-				printf("%s's stress just increased, it is now %d\n", currChar->name, currChar->stress);
+			//Get a location for the event to go down
+			GameObject* location = getRandomRoom(cc, dre);
+
+			if (location == nullptr) {
+				printf("%s is trying to cheat with %s, but can't find a appropiate location for coopulation\n", currChar->name, cobj->name);
+				return;
 			}
-			roll = distribution(dre);
-			if (roll < 50) {
-				//changeStress(20, cobj);
-				printf("%s's stress just increased, it is now %d\n", cobj->name, cobj->stress);
-			}
+			printf("Ordering %s and %s to have an affair\n", currChar->name,
+				cobj->name);
+			Task* currCharTask = new Task(location, cheatingEffect,
+				(void*)(new CheatingEffectPars{ currChar, cobj, relatonships, dre }),
+				100, 0, "CHEATING", FORLOVE | WAITINGFOR, cobj);
+			Task* otherCharTask = new Task(location, nullptr, nullptr, 100, 0,
+				"Nothing", FORLOVE | WAITINGFOR, currChar);
+			currChar->addTask(currCharTask);
+			cobj->addTask(otherCharTask);
 			return;
 		}
 	}
@@ -188,17 +183,22 @@ void confession(CurrentClick *cc, vector<CharacterObject*>& characters, Characte
 	for (CharacterObject* cobj : chars) {
 		if (cobj == currChar) continue;
 		if (relatonships.getEdgeValue(currChar, cobj) != Dating && validRomance(currChar, cobj)) {
-			printf("%s just confessed to %s, they are now dating\n", currChar->name, cobj->name);
+			//Get a location for the event to go down
+			GameObject* location = getRandomRoom(cc, dre);
 
-			currChar->dating = true;
-			cobj->dating = true;
-
-			//changeStress(-20, currChar);
-			printf("%s's stress just decreased, it is now %d\n", currChar->name, currChar->stress);
-			//changeStress(-20, cobj);
-			printf("%s's stress just decreased, it is now %d\n", cobj->name, cobj->stress);
-			relatonships.updateEdge(currChar, cobj, Dating);
-			relatonships.updateEdge(cobj, currChar, Dating);
+			if (location == nullptr) {
+				printf("%s is trying to cheat with %s, but can't find an appropiate location for coopulation\n", currChar->name, cobj->name);
+				return;
+			}
+			printf("Ordering %s to date %s\n", currChar->name,
+				cobj->name);
+			Task* currCharTask = new Task(location, confessionEffect,
+				(void*)(new ConfessionEffectPars{ currChar, cobj, relatonships }),
+				100, 0, "CONFESSION", FORLOVE | WAITINGFOR, cobj);
+			Task* otherCharTask = new Task(location, nullptr, nullptr, 100, 0,
+				"Nothing", FORLOVE | WAITINGFOR, currChar);
+			currChar->addTask(currCharTask);
+			cobj->addTask(otherCharTask);
 			return;
 		}
 	}
@@ -206,10 +206,31 @@ void confession(CurrentClick *cc, vector<CharacterObject*>& characters, Characte
 }
 
 void birthday(CurrentClick *cc, vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine dre) {
-	printf("%s is throwing a birthday, everyones stress is lowered.\n", currChar->name);
-	for (CharacterObject* character : characters) {
-		//changeStress(-10, character);
-		printf("%s's stress: %d\n", character->name, character->stress);
+	//Get a location for the event to go down
+	GameObject* location = getRandomRoom(cc, dre);
+	Task** tasksToDelete = new Task*[characters.size()-1];
+	int i = 0;
+	if (location == nullptr) {
+		printf("%s is trying to hold their birthday, but can't find any location\n", currChar->name);
+		return;
+	}
+	printf("Ordering %s to celebrate their birthday\n", currChar->name);
+	for (CharacterObject* cobj : characters) {
+		if (cobj == currChar) {
+			Task* currCharTask = new Task(location, birthdayEffect,
+				(void*)(new BirthdayEffectPars{ currChar, characters, relatonships, tasksToDelete, cc }),
+				10000, 0, "BIRTHDAYPARTY", FORLOVE);
+			currChar->addTask(currCharTask);
+		} else {
+			Task* otherCharTask = new Task(location, nullptr, nullptr, 100, 0,
+				"Nothing", FORLOVE | WAITINGFOR, currChar);
+			cobj->addTask(otherCharTask);
+			tasksToDelete[i] = otherCharTask;
+			i++;
+		}
+	}
+	for (int i = 0; i < characters.size() - 1; i++) {
+		printf("OHOHOHOH %p\n", tasksToDelete[i]);
 	}
 }
 
@@ -219,13 +240,22 @@ void cuddles(CurrentClick *cc, vector<CharacterObject*>& characters, CharacterOb
 	for (CharacterObject* cobj : chars) {
 		if (cobj == currChar) continue;
 		if (relatonships.getEdgeValue(currChar, cobj) == Dating) {
-			printf("%s is cuddling with %s, it is hella great\n", currChar->name, cobj->name);
+			//Get a location for the event to go down
+			GameObject* location = getRandomRoom(cc, dre);
 
-			//changeStress(-20, currChar);
-			printf("%s's stress just decreased, it is now %d\n", currChar->name, currChar->stress);
-			//changeStress(-20, cobj);
-			printf("%s's stress just decreased, it is now %d\n", cobj->name, cobj->stress);
-			return;
+			if (location == nullptr) {
+				printf("%s is trying to cuddle with %s, but can't find a good cuddle spot\n", currChar->name, cobj->name);
+				return;
+			}
+			printf("Ordering %s to cuddle with %s\n", currChar->name,
+				cobj->name);
+			Task* currCharTask = new Task(location, cuddleEffect,
+				(void*)(new CuddleEffectPars{ currChar, cobj, relatonships }),
+				100, 0, "CUDDLE", FORLOVE | WAITINGFOR, cobj);
+			Task* otherCharTask = new Task(location, nullptr, nullptr, 100, 0,
+				"Nothing", FORLOVE | WAITINGFOR, currChar);
+			currChar->addTask(currCharTask);
+			cobj->addTask(otherCharTask);
 		}
 	}
 	printf("%s wants to cuddle, but can't find anyone.\n", currChar->name);
@@ -234,16 +264,24 @@ void cuddles(CurrentClick *cc, vector<CharacterObject*>& characters, CharacterOb
 void support(CurrentClick *cc, vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine dre) {
 	vector<CharacterObject*> chars(characters);
 	shuffle(chars.begin(), chars.end(), dre);
-	for (CharacterObject* otherChar : chars) {
-		if (otherChar == currChar) continue;
-		if (relatonships.getEdgeValue(currChar, otherChar) != Dating) {
-			relatonships.updateEdge(currChar, otherChar, Friends);
-			relatonships.updateEdge(otherChar, currChar, Friends);
-		}
+	for (CharacterObject* cobj : chars) {
+		if (cobj == currChar) continue;
+		//Get a location for the event to go down
+		GameObject* location = getRandomRoom(cc, dre);
 
-		printf("%s is being supprotive and supporting %s, so %s is less stressed and this makes them more positive to each other\n", currChar->name, otherChar->name, otherChar->name);
-		//changeStress(-20, otherChar);
-		printf("%s's stress just decreased, it is now %d\n", otherChar->name, otherChar->stress);
+		if (location == nullptr) {
+			printf("%s is trying to support %s, but can't find a good quiet spot\n", currChar->name, cobj->name);
+			return;
+		}
+		printf("Ordering %s to support %s\n", currChar->name,
+			cobj->name);
+		Task* currCharTask = new Task(location, supportEffect,
+			(void*)(new SupportEffectPars{ currChar, cobj, relatonships }),
+			100, 0, "SUPPORT", FORFRIENDS | WAITINGFOR, cobj);
+		Task* otherCharTask = new Task(location, nullptr, nullptr, 100, 0,
+			"Nothing", FORFRIENDS | WAITINGFOR, currChar);
+		currChar->addTask(currCharTask);
+		cobj->addTask(otherCharTask);
 		return;
 	}
 }

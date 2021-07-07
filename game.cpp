@@ -110,10 +110,10 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
   
   //Add tasks for paulette:
 	
-	paulette->addTask(new Task(kitchen, btnHello, (void*)(new btnHelloParameter{"Paulette Kitchen!"}),1,130,"GOTO Kitchen",AIASSIGNED));
-	paulette->addTask(new Task(bRoom2, btnHello, (void*)(new btnHelloParameter{"Paulette Hello Bedroom number 2!"}),2,0,"GOTO Bedroom n2",AGAINSTFRIENDS ));
-	paul->addTask(new Task(kitchen, btnHello, (void*)(new btnHelloParameter{ "Paul Hello Kitchen!" }), 1, 200, "GOTO Kitchen", AIASSIGNED));
-	paul->addTask(new Task(bRoom2, btnHello, (void*)(new btnHelloParameter{ "Paul Hello Bedroom number 2!" }), 2, 0, "GOTO Bedroom n2", AGAINSTFRIENDS));
+	//paulette->addTask(new Task(kitchen, btnHello, (void*)(new btnHelloParameter{"Paulette Kitchen!"}),1,130,"GOTO Kitchen",AIASSIGNED));
+	//paulette->addTask(new Task(bRoom2, btnHello, (void*)(new btnHelloParameter{"Paulette Hello Bedroom number 2!"}),2,0,"GOTO Bedroom n2",AGAINSTFRIENDS ));
+	//paul->addTask(new Task(kitchen, btnHello, (void*)(new btnHelloParameter{ "Paul Hello Kitchen!" }), 1, 200, "GOTO Kitchen", AIASSIGNED));
+	//paul->addTask(new Task(bRoom2, btnHello, (void*)(new btnHelloParameter{ "Paul Hello Bedroom number 2!" }), 2, 0, "GOTO Bedroom n2", AGAINSTFRIENDS));
 
 	/* Doors */
 	// Bridge Door
@@ -623,10 +623,10 @@ int main(int argc, char *argv[]){
 			if (arrived) {
 				if (c->currentTask != nullptr) {
 					if (c->currentTask->flag & WAITINGFOR) {
-						printf("Waiting for should never happen!\n");
 						if (whichRoom(&currClick.rooms,
 							c->currentTask->waitingFor) !=
 							whichRoom(&currClick.rooms, c)){
+							//printf("Waiting for %s\n", c->currentTask->waitingFor->name);
 							continue;
 						}
 					}
@@ -739,7 +739,7 @@ int main(int argc, char *argv[]){
 					// Call the apropriate function for the event
 					functions[i](&currClick, characters, cobj,
 								*relGraph, generator);
-					//printf("\n");
+					printf("\n");
 					break;
 				}
 				prev += chances[i];

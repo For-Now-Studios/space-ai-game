@@ -274,6 +274,7 @@ struct Task {
 		flag{ f } {}
 
 	~Task() {
+		printf("AHAHAH DELET DATA %p\n", data);
 		delete data;
 		data = nullptr;
 		printf("Data for a task has been freed!\n");
@@ -304,11 +305,11 @@ enum Role {
 struct relationEventChances {
 	//The default chances for each event, just arbitary numbers
 	int falloutChance = 10; //Both of you count to ten before you do anything irrational.
-	int confessionChance = 0;//16; // 14+2 valentines day.
-	int cheatingChance = 0;//69; //Nice, gotta get that lay
-	int birthdayChance = 0;// 12; //The year I stopped having birthday parties.
-	int cuddleChance = 0;//33; //Spooning
-	int supportChance = 0;//29; //0+8+1+2+3+4+9+2+0+0
+	int confessionChance = 16; // 14+2 valentines day.
+	int cheatingChance = 69; //Nice, gotta get that lay
+	int birthdayChance = 12; //The year I stopped having birthday parties.
+	int cuddleChance = 33; //Spooning
+	int supportChance = 29; //0+8+1+2+3+4+9+2+0+0
 	int noChance = 999; //1/1000 chance for each character.
 };
 
@@ -386,8 +387,8 @@ struct CharacterObject : GameObjClick{
 	struct compGreater {
 		Task* last = nullptr;
 		bool operator()(const Task* l, const Task* r) {
-			if (l == last) return l->actualPrio + 10000 < r->actualPrio;
-			if (r == last) return l->actualPrio < r->actualPrio + 10000;
+			if (l == last) return l->actualPrio + 0000 < r->actualPrio;
+			if (r == last) return l->actualPrio < r->actualPrio + 0000;
 			return l->actualPrio < r->actualPrio;
 		}
 	};
@@ -417,6 +418,13 @@ struct CharacterObject : GameObjClick{
 	void removeTask() {
 		delete tasks.back();
 		tasks.pop_back();
+		changeCurrentTask();
+	}
+
+	void removeTask(Task* toDelete) {
+		printf("AAAH REMOVE THIS %p", toDelete);
+		tasks.remove(toDelete);
+		delete toDelete;
 		changeCurrentTask();
 	}
 

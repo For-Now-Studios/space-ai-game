@@ -1,4 +1,5 @@
 #pragma once
+#include<random>
 #include "click.h"
 
 /*
@@ -26,7 +27,6 @@ struct roomPopupPars : popPopUpPars {
 	Room *room;
 	closePopUpPars *close;
 };
-
 struct DoorClickPars {
 	Door *door;
 	MouseStruct *mouse;
@@ -60,5 +60,46 @@ struct FalloutEffectPars {
 	CharacterObject* otherChar;
 	Graph<CharacterObject*, Relation>& relatonships;
 };
-
 void falloutEffect(void*);
+
+struct CheatingEffectPars {
+	CharacterObject* currChar;
+	CharacterObject* cobj;
+	Graph<CharacterObject*, Relation>& relatonships;
+	default_random_engine dre;
+};
+void cheatingEffect(void*);
+
+struct ConfessionEffectPars {
+	CharacterObject* currChar;
+	CharacterObject* cobj;
+	Graph<CharacterObject*, Relation>& relatonships;
+};
+void confessionEffect(void*);
+
+struct BirthdayEffectPars {
+	CharacterObject* currChar;
+	vector<CharacterObject*>& characters;
+	Graph<CharacterObject*, Relation>& relatonships;
+	Task **tasksToDelete;
+	CurrentClick *cc;
+
+	~BirthdayEffectPars() {
+		delete tasksToDelete;
+	}
+};
+void birthdayEffect(void*);
+
+struct CuddleEffectPars {
+	CharacterObject* currChar;
+	CharacterObject* cobj;
+	Graph<CharacterObject*, Relation>& relatonships;
+};
+void cuddleEffect(void*);
+
+struct SupportEffectPars {
+	CharacterObject* currChar;
+	CharacterObject* otherChar;
+	Graph<CharacterObject*, Relation>& relatonships;
+};
+void supportEffect(void*);

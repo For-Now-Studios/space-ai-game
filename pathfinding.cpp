@@ -298,14 +298,14 @@ bool updateMovement(CharacterObject *object, vector<Room *> *rooms,
 
 		if(object->path == nullptr) return false;
 
-		printf("%s: ", object->name);
+		/*printf("%s: ", object->name);
 		for(GameObject *go : *object->path){
 			printf("%s, ", go->n);
 		}
-		printf("\n");
+		printf("\n");*/
 
 		//targetDoor(object, sharedDoor(start, object->path->back()));
-		if(object->path->size() > 1){
+		if(object->path->size() > 1) {
 			/*printf("(%d, %d) -> (%d, %d), char: (%d, %d)\n",
 				object->path->back()->x, object->path->back()->y,
 				object->path->at(object->path->size() - 2)->x,
