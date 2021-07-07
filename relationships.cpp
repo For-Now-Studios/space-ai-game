@@ -1,3 +1,5 @@
+#include<algorithm>
+#include<random>
 #include "structs.h"
 #include "graph.h"
 
@@ -83,4 +85,136 @@ Graph<CharacterObject *, Relation> *initRelations(vector<CharacterObject *> *cha
 	}
 
 	return g;
+}
+
+/*
+Changes the stress level
+Just checks so it doesn't go below zero
+and if a character is paranoid it increases.
+*/
+void changeStress(int amnt, CharacterObject* cobj) {
+	int newStress = cobj->stress + amnt + ((cobj->traitFlags & PARANOID) != 0) * abs(amnt >> 1);
+	cobj->stress = newStress > -1 ? newStress : 0;
+}
+
+/*
+	### THE DIFFERENT RELATIONSHIP EVENTS ###
+	Each function should have the same return value and the same parameters.
+	* Characters, for all characters alive
+	* currChar for the current character this event activated for
+	* relationships, the relationship graph
+	* dre, the random engine.
+*/
+
+void fallout(vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine dre) {
+	vector<CharacterObject*> chars(characters);
+	shuffle(chars.begin(), chars.end(), dre);
+	for (CharacterObject* otherChar : chars) {
+		if (otherChar == currChar) continue;
+		printf("%s had a fallout with %s, so they are on bad terms now\n", currChar->name, otherChar->name);
+		if (relatonships.getEdgeValue(currChar, otherChar) == Dating) {
+			printf("%s and %s have broken up\n", currChar->name, otherChar->name);
+			currChar->dating = false;
+			otherChar->dating = false;
+		}
+		relatonships.updateEdge(currChar, otherChar, On_Bad_Terms);
+		relatonships.updateEdge(otherChar, currChar, On_Bad_Terms);
+		changeStress(20, currChar);
+		printf("%s's stress just increased, it is now %d\n", currChar->name, currChar->stress);
+		changeStress(20, otherChar);
+		printf("%s's stress just increased, it is now %d\n", otherChar->name, otherChar->stress);
+		return;
+	}
+}
+
+void cheating(vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine dre) {
+	uniform_int_distribution<int> distribution(1, 100);
+	vector<CharacterObject*> chars(characters);
+	shuffle(chars.begin(), chars.end(), dre);
+	for (CharacterObject* cobj : chars) {
+		if (cobj == currChar) continue;
+		if (relatonships.getEdgeValue(currChar, cobj) != Dating && validSex(currChar, cobj)) {
+			printf("%s is cheating with %s, that is bad\n", currChar->name, cobj->name);
+			int roll = distribution(dre);
+			if (roll < 50) {
+				changeStress(20, currChar);
+				printf("%s's stress just increased, it is now %d\n", currChar->name, currChar->stress);
+			}
+			roll = distribution(dre);
+			if (roll < 50) {
+				changeStress(20, cobj);
+				printf("%s's stress just increased, it is now %d\n", cobj->name, cobj->stress);
+			}
+			return;
+		}
+	}
+	printf("%s is trying to cheat, but can't find someone to cheat with\n", currChar->name);
+}
+/*
+Two people that are on bad terms can start dating.
+*/
+void confession(vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine dre) {
+	vector<CharacterObject*> chars(characters);
+	shuffle(chars.begin(), chars.end(), dre);
+	for (CharacterObject* cobj : chars) {
+		if (cobj == currChar) continue;
+		if (relatonships.getEdgeValue(currChar, cobj) != Dating && validRomance(currChar, cobj)) {
+			printf("%s just confessed to %s, they are now dating\n", currChar->name, cobj->name);
+
+			currChar->dating = true;
+			cobj->dating = true;
+
+			changeStress(-20, currChar);
+			printf("%s's stress just decreased, it is now %d\n", currChar->name, currChar->stress);
+			changeStress(-20, cobj);
+			printf("%s's stress just decreased, it is now %d\n", cobj->name, cobj->stress);
+			relatonships.updateEdge(currChar, cobj, Dating);
+			relatonships.updateEdge(cobj, currChar, Dating);
+			return;
+		}
+	}
+	printf("%s is trying to confess to someone, but can't find someone who wants to date them\n", currChar->name);
+}
+
+void birthday(vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine dre) {
+	printf("%s is throwing a birthday, everyones stress is lowered.\n", currChar->name);
+	for (CharacterObject* character : characters) {
+		changeStress(-10, character);
+		printf("%s's stress: %d\n", character->name, character->stress);
+	}
+}
+
+void cuddles(vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine dre) {
+	vector<CharacterObject*> chars(characters);
+	shuffle(chars.begin(), chars.end(), dre);
+	for (CharacterObject* cobj : chars) {
+		if (cobj == currChar) continue;
+		if (relatonships.getEdgeValue(currChar, cobj) == Dating) {
+			printf("%s is cuddling with %s, it is hella great\n", currChar->name, cobj->name);
+
+			changeStress(-20, currChar);
+			printf("%s's stress just decreased, it is now %d\n", currChar->name, currChar->stress);
+			changeStress(-20, cobj);
+			printf("%s's stress just decreased, it is now %d\n", cobj->name, cobj->stress);
+			return;
+		}
+	}
+	printf("%s wants to cuddle, but can't find anyone.\n", currChar->name);
+}
+
+void support(vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine dre) {
+	vector<CharacterObject*> chars(characters);
+	shuffle(chars.begin(), chars.end(), dre);
+	for (CharacterObject* otherChar : chars) {
+		if (otherChar == currChar) continue;
+		if (relatonships.getEdgeValue(currChar, otherChar) != Dating) {
+			relatonships.updateEdge(currChar, otherChar, Friends);
+			relatonships.updateEdge(otherChar, currChar, Friends);
+		}
+
+		printf("%s is being supprotive and supporting %s, so %s is less stressed and this makes them more positive to each other\n", currChar->name, otherChar->name, otherChar->name);
+		changeStress(-20, otherChar);
+		printf("%s's stress just decreased, it is now %d\n", otherChar->name, otherChar->stress);
+		return;
+	}
 }

@@ -2,6 +2,7 @@
 #include<stdio.h>
 #include<vector>
 #include<string.h>
+#include<chrono>
 #include "engine.h"
 #include "structs.h"
 #include "globals.h"
@@ -1054,28 +1055,28 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	CharacterObject *paul = new CharacterObject(r16->x + 100, 1831 - 100,
 		media->images.at(7), btnHello, (void *)(new btnHelloParameter{"Paul"}),
 		"Paul", intersex, labels->genders->at(0), labels->romance->at(0),
-							labels->sexuality->at(0), pilot);
+							labels->sexuality->at(0), pilot, TRUSTING|SENSATIVE);
 
 	// Paulette
 	CharacterObject *paulette = new CharacterObject(r17->x + 20, 1831 - 50,
 		media->images.at(7), btnHello,
 		(void *)(new btnHelloParameter{"Paulette"}), "Paulette", intersex,
 					labels->genders->at(3), labels->romance->at(1),
-							labels->sexuality->at(1), engineer);
+							labels->sexuality->at(1), engineer, BIGOT|LIER);
 	
 	// Paulus
 	CharacterObject *paulus = new CharacterObject(r18->x + 10, 1831 - 50,
 		media->images.at(7), btnHello,
 		(void *)(new btnHelloParameter{"Paulus"}), "Paulus", female,
 		labels->genders->at(2), labels->romance->at(2),
-							labels->sexuality->at(2), doctor);
+							labels->sexuality->at(2), doctor, PARANOID);
 
 	// Paulob
 	CharacterObject *paulob = new CharacterObject(r19->x + 50, 1831 - 50,
 		media->images.at(7), btnHello,
 		(void *)(new btnHelloParameter{"Paulob"}), "Paulob", male,
 		labels->genders->at(2), labels->romance->at(3),
-							labels->sexuality->at(3), captain);
+							labels->sexuality->at(3), captain, CARING);
   
   //Add tasks for paulette:
 	paulette->addTask(new Task{ 120,120,btnHello,(void*)(new btnHelloParameter{"Start!"}),1,0,10,"Start",AIASSIGNED });
@@ -1292,6 +1293,9 @@ int main(int argc, char *argv[]){
 	Graph<GameObject *, int> *pathGraph = new Graph<GameObject *, int>();
 	vector<CharacterObject *> characters;
 
+	unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+	default_random_engine generator(seed);
+
 	if(running){
 		labels.genders = loadGender("gender.jpeg");
 		labels.romance = loadAffectionTrait("romance.jpeg");
@@ -1304,6 +1308,32 @@ int main(int argc, char *argv[]){
 			for(int i = 0; i < currClick.Characters.size(); i++){
 				characters.push_back((CharacterObject *)
 							currClick.Characters.at(i));
+			}
+
+			//Check for flags and edit chances
+			for (CharacterObject* cobj : characters) {
+				if (cobj->traitFlags & SENSATIVE) {
+					cobj->rec.noChance -= 5;
+				}
+				if (cobj->traitFlags & BIGOT) {
+					cobj->rec.falloutChance += 10;
+				}
+				if (cobj->traitFlags & LIER) {
+					cobj->rec.birthdayChance += 40;
+					cobj->rec.cheatingChance += 40;
+				}
+				if (cobj->traitFlags & CARING) {
+					cobj->rec.confessionChance += 40;
+					cobj->rec.supportChance += 40;
+					cobj->rec.cuddleChance += 40;
+					cobj->rec.cheatingChance -= 40;
+				}
+				if (cobj->sexuality->n == 0) {
+					cobj->rec.cheatingChance = 0;
+				}
+				if (cobj->romance->n == 0) {
+					cobj->rec.confessionChance = 0;
+				}
 			}
 
 			relGraph = initRelations(&characters);
@@ -1474,6 +1504,59 @@ int main(int argc, char *argv[]){
 		if(key[5]) cam.zoomLevel -= 0.01;
     
 		updateClickAreas(&currClick);
+
+		//Simple implementation of events
+		/*
+			If you want to add more events you have to increase the number of events we handle.
+			And then you have to add another chance in the struct relationEventChances
+			And add that in the "chances" array
+			And its corresponding function in the function array "functions"
+			TODO: Make the addition of events better.
+		*/
+		uniform_int_distribution<int> d1000(0, 999);
+		for (CharacterObject* cobj : characters) {
+			//Roll a d1000 to see if *this* character has an event.
+			int roll = d1000(generator);
+			if (roll < cobj->rec.noChance) continue; //If it rolls under then we skip to the next character in the iteration
+			const int numEvents = 6; //Number of events we check
+			int chances[numEvents] = {
+				cobj->rec.falloutChance+cobj->stress,
+				cobj->rec.confessionChance,
+				cobj->dating ? cobj->rec.cheatingChance : 0, //If you are dating, you can cheat
+				cobj->rec.birthdayChance,
+				cobj->dating ? cobj->rec.cuddleChance : 0, //If you are dating, you can cuddle.
+				cobj->rec.supportChance,
+			};
+			//Array of functions for each event
+			void(*functions[numEvents])(vector<CharacterObject*>&, CharacterObject*, Graph<CharacterObject *, Relation>&, default_random_engine) = {
+				fallout,
+				confession,
+				cheating,
+				birthday,
+				cuddles,
+				support
+			};
+			int allChances = 0;
+			//Need summarize all chances
+			for (int chance : chances) {
+				allChances += chance;
+			}
+			uniform_int_distribution<int> chanceDist(1, allChances);
+			
+			roll = chanceDist(generator);
+			int prev = 0;
+			for (int i = 0; i < numEvents; i++) {
+				/*Check the first range 0 to chance-of-first-event, 
+				and then prev-chance to chance-of-secound-event, and so on.*/
+				if (roll < chances[i] + prev) {
+					//if it rolls under then we call that related function in the array
+					functions[i](characters, cobj, *relGraph, generator);
+					printf("\n");
+					break;
+				}
+				prev += chances[i];
+			}
+		}
 		
 		//Render
 		render(&window, media.images.at(12), 0, 0, &cam); //Render background

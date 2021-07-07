@@ -285,6 +285,25 @@ enum Role {
 	generalist
 };
 
+struct relationEventChances {
+	//The default chances for each event, just arbitary numbers
+	int falloutChance = 10; //Both of you count to ten before you do anything irrational.
+	int confessionChance = 16; // 14+2 valentines day.
+	int cheatingChance = 69; //Nice, gotta get that lay
+	int birthdayChance = 12; //The year I stopped having birthday parties.
+	int cuddleChance = 33; //Spooning
+	int supportChance = 29; //0+8+1+2+3+4+9+2+0+0
+	int noChance = 999; //1/1000 chance for each character.
+};
+
+//The traits a character have, see doc
+#define BIGOT (1 << 0)
+#define CARING (1 << 1)
+#define PARANOID (1 << 2)
+#define TRUSTING (1 << 3)
+#define SENSATIVE (1 << 4)
+#define LIER (1 << 5) //Increases the chances for birthdays and cheating
+
 struct CharacterObject : GameObjClick{
 	int stress;
 	int loyalty;
@@ -295,6 +314,9 @@ struct CharacterObject : GameObjClick{
 	affectionTrait *sexuality;
 	Role role;
 	std::list<Task*> tasks;
+	int traitFlags; //The traits they have.
+	relationEventChances rec; //The chance *this* characters has for each event.
+	bool dating = false; //If they are currently dating anyone.
 
 	//Pathfinding
 	std::vector<GameObject *> *path;
@@ -305,18 +327,18 @@ struct CharacterObject : GameObjClick{
 	int speed;
 
 	CharacterObject(int xPos, int yPos, Image *img, void(*func)(void*), void* d,
-		const char *n, Sex s, char *g, affectionTrait *r, affectionTrait *se, Role roly) :
+		const char *n, Sex s, char *g, affectionTrait *r, affectionTrait *se, Role roly, int traits) :
 						 GameObjClick(xPos, yPos, img, func, d){
-		setParam(n, s, g, r, se, roly);
+		setParam(n, s, g, r, se, roly, traits);
 	}
 	CharacterObject(int xPos, int yPos, Image *img, SDL_Rect ar, void(*func)(void*),
-	void* d, const char *n, Sex s, char *g, affectionTrait *r, affectionTrait *se, Role roly) :
+	void* d, const char *n, Sex s, char *g, affectionTrait *r, affectionTrait *se, Role roly, int traits) :
 					 GameObjClick(xPos, yPos, img, ar, func, d){
-		setParam(n, s, g, r, se, roly);
+		setParam(n, s, g, r, se, roly, traits);
 	}
 	
 	void setParam(const char *n, Sex s, char *g, affectionTrait *r,
-						affectionTrait *se, Role roly){
+					affectionTrait *se, Role roly, int traits){
 		name = n;
 		sex = s;
 		gender = g;
@@ -325,15 +347,16 @@ struct CharacterObject : GameObjClick{
 
 		stress = 0;
 		loyalty = 100;
-
-		role = roly;
-
-		path = nullptr;
+    
+    		path = nullptr;
 		goal = nullptr;
 		target = nullptr;
 		xDist = 0;
 		yDist = 0;
 		speed = 1;
+
+		role = roly;
+		traitFlags = traits;
 	}
 
 
