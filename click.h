@@ -59,8 +59,11 @@ struct CurrentClick {
 	The only thing we would have to change the in the function is if we wanna add more clickable areas.
 	Then you have to create it, specify its position and area and put it in the relevant function (which should be clear)
 */
-void buildClickAreas(CurrentClick*, initializer_list<IsClickable*> characters, initializer_list<Room*> rooms,
-	initializer_list<IsClickable*> UIElems, initializer_list<IsClickable*> popupElems, initializer_list<IsClickable*> gameElems);
+void buildClickAreas(CurrentClick *cc, initializer_list<IsClickable*> characters,
+					vector<Room *> &rooms,
+					vector<IsClickable *> &UIElems,
+					vector<IsClickable *> &popupElems,
+					vector<IsClickable *> &gameElems);
 /*
 	Cleans the memory of the clickable areas.
 */

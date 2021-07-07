@@ -97,7 +97,7 @@ template<class N, class V> class Node{
 	}
 
 	void print(){
-		printf("Node: %p, Data: %d\n", this, data);
+		printf("Node: %p, Data: %p\n", this, data);
 		for(typename unordered_map<pair<N, N>, Edge<N, V> *>::iterator it =
 						edges.begin(); it != edges.end(); it++){
 			printf("\t");

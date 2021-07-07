@@ -338,7 +338,7 @@ struct CharacterObject : GameObjClick{
 	}
 	
 	void setParam(const char *n, Sex s, char *g, affectionTrait *r,
-						affectionTrait *se, Role roly, int traits){
+					affectionTrait *se, Role roly, int traits){
 		name = n;
 		sex = s;
 		gender = g;
@@ -348,7 +348,7 @@ struct CharacterObject : GameObjClick{
 		stress = 0;
 		loyalty = 100;
     
-    path = nullptr;
+    		path = nullptr;
 		goal = nullptr;
 		target = nullptr;
 		xDist = 0;
@@ -396,6 +396,7 @@ struct CharacterObject : GameObjClick{
 		}
 		printf("Deleted a task, for there is no need to do anything when you are heading to the void!\n");
 	}
+
 };
 
 /*
