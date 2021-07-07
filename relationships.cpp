@@ -100,33 +100,58 @@ Graph<CharacterObject *, Relation> *initRelations(vector<CharacterObject *> *cha
 */
 
 GameObject* getRandomRoom(CurrentClick *cc, default_random_engine dre) {
+	//Randomly order the rooms
 	vector<Room*> rooms(cc->rooms);
 	shuffle(rooms.begin(), rooms.end(), dre);
+
+	//Select the first room that isn't private
 	Room* chosen = nullptr;
 	for (Room* r : rooms) {
 		if (r->flag & PRIVATE) continue;
 		chosen = r;
 		break;
 	}
+
 	return (GameObject*)chosen;
 }
+
 bool test = false;
-void fallout(CurrentClick *cc, vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine dre) {
+void fallout(CurrentClick *cc, vector<CharacterObject*>& characters,
+			CharacterObject* currChar, Graph<CharacterObject*,
+				Relation>& relatonships, default_random_engine dre) {
+
 	//if (test) return;
 	test = true;
+
+	// Randomly order the characters
 	vector<CharacterObject*> chars(characters);
 	shuffle(chars.begin(), chars.end(), dre);
+
+	// Select the first available character to be the second half of the event
 	for (CharacterObject* otherChar : chars) {
+		//Skip self
 		if (otherChar == currChar) continue;
+
+		//Get a location for the event to go down
 		GameObject* location = getRandomRoom(cc, dre); //whichRoom(&cc->rooms, currChar);
-		if (location == nullptr) {whichRoom(&cc->rooms, currChar);
+		if (location == nullptr) {
+			whichRoom(&cc->rooms, currChar);
 			printf("%s is trying to have a fallout with %s, but can't find a appropiate location\n", currChar->name, otherChar->name);
 		}
-		printf("Ordering %s and %s to have a fallout\n", currChar->name, otherChar->name);
-		Task* currCharTask = new Task(location, nullptr, (void*)(new FalloutEffectPars{currChar, otherChar, relatonships}),1,200,"FALLOUT", AGAINSTENEMY);
-		Task* otherCharTask = new Task(location, nullptr, nullptr, 100, 300, "Nothing", AGAINSTENEMY);
+
+		printf("Ordering %s and %s to have a fallout\n", currChar->name,
+									otherChar->name);
+
+		Task* currCharTask = new Task(location, nullptr,
+		(void*)(new FalloutEffectPars{currChar, otherChar, relatonships}),
+							1, 200, "FALLOUT", AGAINSTENEMY);
+
+		Task* otherCharTask = new Task(location, nullptr, nullptr, 100, 300,
+								"Nothing", AGAINSTENEMY);
+
 		currChar->addTask(currCharTask);
 		otherChar->addTask(otherCharTask);
+
 		return;
 	}
 }

@@ -109,6 +109,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 							labels->sexuality->at(3), captain, CARING);
   
   //Add tasks for paulette:
+	
 	paulette->addTask(new Task(kitchen, btnHello, (void*)(new btnHelloParameter{"Paulette Kitchen!"}),1,130,"GOTO Kitchen",AIASSIGNED));
 	paulette->addTask(new Task(bRoom2, btnHello, (void*)(new btnHelloParameter{"Paulette Hello Bedroom number 2!"}),2,0,"GOTO Bedroom n2",AGAINSTFRIENDS ));
 	paul->addTask(new Task(kitchen, btnHello, (void*)(new btnHelloParameter{ "Paul Hello Kitchen!" }), 1, 200, "GOTO Kitchen", AIASSIGNED));
@@ -121,7 +122,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(2);
 	DCP->closed = media->images.at(3);
 	DCP->locked = media->images.at(4);
-	Door *bridgeDoor = new Door(128, 0, media->images.at(3), doorClick, DCP);
+	Door *bridgeDoor = new Door(127, 0, media->images.at(3), doorClick, DCP);
 	DCP->door = bridgeDoor;
 	cockpit->doors.push_back(bridgeDoor);
 	bridgeHall->doors.push_back(bridgeDoor);
@@ -133,7 +134,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(2);
 	DCP->closed = media->images.at(3);
 	DCP->locked = media->images.at(4);
-	Door *t = new Door(129, 0, media->images.at(3), doorClick, DCP);
+	Door *t = new Door(128, 0, media->images.at(3), doorClick, DCP);
 	DCP->door = t;
 	pG->addNode(t);
 	pG->addEdge(bridgeDoor, t, 1);
@@ -175,7 +176,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(2);
 	DCP->closed = media->images.at(3);
 	DCP->locked = media->images.at(4);
-	Door *bRoom1Door = new Door(256, 0, media->images.at(3), doorClick, DCP);
+	Door *bRoom1Door = new Door(255, 0, media->images.at(3), doorClick, DCP);
 	DCP->door = bRoom1Door;
 	bridgeHall->doors.push_back(bRoom1Door);
 	bRoom1->doors.push_back(bRoom1Door);
@@ -191,7 +192,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(2);
 	DCP->closed = media->images.at(3);
 	DCP->locked = media->images.at(4);
-	t = new Door(257, 0, media->images.at(3), doorClick, DCP);
+	t = new Door(256, 0, media->images.at(3), doorClick, DCP);
 	DCP->door = t;
 	pG->addNode(t);
 	pG->addEdge(bRoom1Door, t, 1);
@@ -498,7 +499,8 @@ int main(int argc, char *argv[]){
 	vector<CharacterObject *> characters;
 
 	unsigned seed = chrono::system_clock::now().time_since_epoch().count();
-	default_random_engine generator(seed);
+	//default_random_engine generator(seed);
+	default_random_engine generator(1);
 
 	if(running){
 		labels.genders = loadGender("gender.jpeg");
@@ -621,12 +623,16 @@ int main(int argc, char *argv[]){
 			if (arrived) {
 				if (c->currentTask != nullptr) {
 					if (c->currentTask->flag & WAITINGFOR) {
-						if (whichRoom(&currClick.rooms, c->currentTask->waitingFor) != whichRoom(&currClick.rooms, c)) {
+						printf("Waiting for should never happen!\n");
+						if (whichRoom(&currClick.rooms,
+							c->currentTask->waitingFor) !=
+							whichRoom(&currClick.rooms, c)){
 							continue;
 						}
 					}
+
 					if (c->currentTask->waitTime < 1) {
-						if (c->currentTask->function != nullptr) {
+						if (c->currentTask->function != nullptr){
 							c->currentTask->function(c->currentTask->data);
 						}
 						c->removeTask();
@@ -642,15 +648,16 @@ int main(int argc, char *argv[]){
 		/*for(CharacterObject *c : characters){
 			updateMovement(c, &currClick.rooms, pathGraph);
 		}*/
+		/*updateMovement(characters.at(2), &currClick.rooms, pathGraph);
 
 		//TEST!!! TODO: REMOVE!
-		/*if(characters.at(0)->goal == nullptr){
-			if(whichRoom(&currClick.rooms, characters.at(0)) !=
-								currClick.rooms.at(7)){
-				characters.at(0)->goal = currClick.rooms.at(7);
+		if(characters.at(2)->goal == nullptr){
+			if(whichRoom(&currClick.rooms, characters.at(2)) !=
+								currClick.rooms.at(1)){
+				characters.at(2)->goal = currClick.rooms.at(1);
 			}
 			else{
-				characters.at(0)->goal = currClick.rooms.at(2);
+				characters.at(2)->goal = currClick.rooms.at(2);
 			}
 		}*/
 

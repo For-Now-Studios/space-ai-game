@@ -395,7 +395,9 @@ struct CharacterObject : GameObjClick{
 	void changeCurrentTask() {
 		if (!tasks.empty()) {
 			if (currentTask != tasks.back()) {
-				printf("Change of main tasks\n");
+				printf("Change of main tasks (%s) for %s\n",
+								tasks.back()->name,
+										name);
 				Task* task = tasks.back();
 				delete path;
 				path = nullptr;
