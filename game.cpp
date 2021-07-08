@@ -1302,6 +1302,13 @@ void close(WindowStruct *window, Media& media, vector<GameObject*>& objects,
 	SDL_Quit();
 }
 
+bool checkStillAlive(vector<CharacterObject *>& characters, CharacterObject *charCheck) {
+	for (CharacterObject * cobj : characters) {
+		if (cobj == charCheck) return true;
+	}
+	return false;
+}
+
 int main(int argc, char *argv[]){
 	WindowStruct window;
 
@@ -1508,26 +1515,29 @@ int main(int argc, char *argv[]){
 
 		for(CharacterObject *c : characters) {
 			bool arrived = updateMovement(c, &currClick.rooms, pathGraph);
-			if (arrived) {
-				if (c->currentTask != nullptr) {
-					if (c->currentTask->flag & WAITINGFOR) {
+			if (arrived && c->currentTask != nullptr) {
+				if (c->currentTask->flag & WAITINGFOR) {
+					if (checkStillAlive(characters, c->currentTask->waitingFor)) {
 						if (whichRoom(&currClick.rooms,
 							c->currentTask->waitingFor) !=
-							whichRoom(&currClick.rooms, c)){
-							//printf("Waiting for %s\n", c->currentTask->waitingFor->name);
+							whichRoom(&currClick.rooms, c)) {
+							printf("Waiting for %s\n", c->currentTask->waitingFor->name);
 							continue;
 						}
 					}
-
-					if (c->currentTask->waitTime < 1) {
-						if(c->currentTask->function != nullptr){
-							c->currentTask->function(c->currentTask->data);
-						}
+					else {
+						printf("It seems that the person %s is waiting for is dead, so they will skip this task\n", c->name);
 						c->removeTask();
 					}
-					else {
-						c->currentTask->waitTime--;
+				}
+				if (c->currentTask->waitTime < 1) {
+					if (c->currentTask->function != nullptr) {
+						c->currentTask->function(c->currentTask->data);
 					}
+					c->removeTask();
+				}
+				else {
+					c->currentTask->waitTime--;
 				}
 			}
 		}
@@ -1693,6 +1703,7 @@ int main(int argc, char *argv[]){
 		// If we were too quick, wait until it is time
 		Uint32 time = SDL_GetTicks() - startTime;
 		if(time < targetTime){
+			//printf("This frame took: %dms\n", targetTime - time);
 			SDL_Delay(targetTime - time);
 		}
 
@@ -1700,7 +1711,7 @@ int main(int argc, char *argv[]){
 
 		SDL_RenderPresent(window.render);
 		if (winTimer < 1) break;
-		else winTimer--;
+		//else winTimer--;
 		//printf("Ticks until win: %d\n", winTimer);
 	}
 
@@ -1737,7 +1748,8 @@ int main(int argc, char *argv[]){
 			break;
 		}
 		printf("\n");
-	} else {
+	}
+	else {
 		printf("\n#####################");
 		printf("\n## YOU WIN!! ##");
 		printf("\n#####################");
