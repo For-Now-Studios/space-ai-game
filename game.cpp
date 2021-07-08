@@ -356,6 +356,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	pG->addNode(r5Dtl); //Add the door to the pathfinder graph
 	pG->addEdge(r5Dtl, r4Dr, 1);
 	pG->addEdge(r4Dr, r5Dtl, 1);
+	pG->addEdge(r5Dtl, r2Dl, 1);
+	pG->addEdge(r2Dl, r5Dtl, 1);
 	doors.push_back(r5Dtl);
 
 	// Room 5 bottom left door
