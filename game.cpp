@@ -12,6 +12,7 @@
 
 const int SCREEN_WIDTH = 1920;
 const int SCREEN_HEIGHT = 1080;
+const int GAME_LENGTH = 5*60;
 
 struct Labels {
 	vector<char *> *genders = nullptr;
@@ -355,6 +356,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	pG->addNode(r5Dtl); //Add the door to the pathfinder graph
 	pG->addEdge(r5Dtl, r4Dr, 1);
 	pG->addEdge(r4Dr, r5Dtl, 1);
+	pG->addEdge(r5Dtl, r2Dl, 1);
+	pG->addEdge(r2Dl, r5Dtl, 1);
 	doors.push_back(r5Dtl);
 
 	// Room 5 bottom left door
@@ -404,6 +407,25 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->door = r5Dbb;
 	pG->addNode(r5Dbb); //Add the door to the pathfinder graph
 	doors.push_back(r5Dbb);
+
+	//Room 5 Beacon
+	GameObject *r5B = new GameObject();
+	r5B->x = r5->x + (r5->area.w / 2);
+	r5B->y = r5->y + (r5->area.h / 2);
+	r5B->image = nullptr;
+	pG->addNode(r5B);
+	pG->addEdge(r5B, r5Dtr, 1);
+	pG->addEdge(r5Dtr, r5B, 1);
+	pG->addEdge(r5B, r5Dbr, 1);
+	pG->addEdge(r5Dbr, r5B, 1);
+	pG->addEdge(r5B, r5Dtl, 1);
+	pG->addEdge(r5Dtl, r5B, 1);
+	pG->addEdge(r5B, r5Dbl, 1);
+	pG->addEdge(r5Dbl, r5B, 1);
+	pG->addEdge(r5B, r5Dbb, 1);
+	pG->addEdge(r5Dbb, r5B, 1);
+	objects->push_back(r5B);
+	strcpy(r5B->n, "r5B");
 
 	// Room 6 left door
 	DCP = new DoorClickPars;
@@ -574,6 +596,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	pG->addEdge(r7Db, r11Dt, 1);
 	pG->addEdge(r11Dt, r7Db, 1);
 	doors.push_back(r11Dt);
+	strcpy(r11Dt->n, "r11Dt");
 
 	// Room 11 right door
 	DCP = new DoorClickPars;
@@ -586,6 +609,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->door = r11Dr;
 	pG->addNode(r11Dr); //Add the door to the pathfinder graph
 	doors.push_back(r11Dr);
+	strcpy(r11Dr->n, "r11Dr");
 
 	// Room 12 left door
 	DCP = new DoorClickPars;
@@ -599,6 +623,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	pG->addNode(r12D); //Add the door to the pathfinder graph
 	pG->addEdge(r7Dr, r12D, 1);
 	pG->addEdge(r12D, r7Dr, 1);
+	pG->addEdge(r8D, r12D, 1);
+	pG->addEdge(r12D, r8D, 1);
 	doors.push_back(r12D);
 
 	// Room 13 bot door
@@ -626,6 +652,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	pG->addNode(r13Dt); //Add the door to the pathfinder graph
 	pG->addEdge(r9D, r13Dt, 1);
 	pG->addEdge(r13Dt, r9D, 1);
+	pG->addEdge(r4Dl, r13Dt, 1);
+	pG->addEdge(r13Dt, r4Dl, 1);
 	doors.push_back(r13Dt);
 
 	// Room 13 right door
@@ -695,6 +723,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	pG->addEdge(r11Dr, r15Dl, 1);
 	pG->addEdge(r15Dl, r11Dr, 1);
 	doors.push_back(r15Dl);
+	strcpy(r15Dl->n, "r15Dl");
 
 	// Room 15 right door
 	DCP = new DoorClickPars;
@@ -707,6 +736,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->door = r15Dr;
 	pG->addNode(r15Dr); //Add the door to the pathfinder graph
 	doors.push_back(r15Dr);
+	strcpy(r15Dr->n, "r15Dr");
 
 	// Room 16 left door
 	DCP = new DoorClickPars;
@@ -721,6 +751,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	pG->addEdge(r15Dr, r16Dl, 1);
 	pG->addEdge(r16Dl, r15Dr, 1);
 	doors.push_back(r16Dl);
+	strcpy(r16Dl->n, "r16Dl");
 
 	// Room 16 right door
 	DCP = new DoorClickPars;
@@ -733,6 +764,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->door = r16Dr;
 	pG->addNode(r16Dr); //Add the door to the pathfinder graph
 	doors.push_back(r16Dr);
+	strcpy(r16Dr->n, "r16Dr");
 
 	// Room 17 left door
 	DCP = new DoorClickPars;
@@ -747,6 +779,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	pG->addEdge(r16Dr, r17Dl, 1);
 	pG->addEdge(r17Dl, r16Dr, 1);
 	doors.push_back(r17Dl);
+	strcpy(r17Dl->n, "r17Dl");
 
 	// Room 17 right door
 	DCP = new DoorClickPars;
@@ -759,6 +792,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->door = r17Dr;
 	pG->addNode(r17Dr); //Add the door to the pathfinder graph
 	doors.push_back(r17Dr);
+	strcpy(r17Dr->n, "r17Dr");
 
 	// Room 18 left door
 	DCP = new DoorClickPars;
@@ -773,6 +807,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	pG->addEdge(r17Dr, r18Dl, 1);
 	pG->addEdge(r18Dl, r17Dr, 1);
 	doors.push_back(r18Dl);
+	strcpy(r18Dl->n, "r18Dl");
 
 	// Room 18 right door
 	DCP = new DoorClickPars;
@@ -785,6 +820,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->door = r18Dr;
 	pG->addNode(r18Dr); //Add the door to the pathfinder graph
 	doors.push_back(r18Dr);
+	strcpy(r18Dr->n, "r18Dr");
 
 	// Room 19 left door
 	DCP = new DoorClickPars;
@@ -799,6 +835,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	pG->addEdge(r17Dr, r19D, 1);
 	pG->addEdge(r19D, r17Dr, 1);
 	doors.push_back(r19D);
+	strcpy(r19D->n, "r19Dl");
 
 	// Room 20 top door
 	DCP = new DoorClickPars;
@@ -856,6 +893,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	pG->addNode(r22Dl); //Add the door to the pathfinder graph
 	pG->addEdge(r11Dr, r22Dl, 1);
 	pG->addEdge(r22Dl, r11Dr, 1);
+	pG->addEdge(r15Dl, r22Dl, 1);
+	pG->addEdge(r22Dl, r15Dl, 1);
 	doors.push_back(r22Dl);
 
 	// Room 22 right door
@@ -1042,8 +1081,15 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 		for(int j = i+1; j < doors.size(); j++){
 			GameObject *d1 = (GameObject *)((Door *) doors.at(i));
 			GameObject *d2 = (GameObject *)((Door *) doors.at(j));
-			if(whichRoom(&rooms, d1) == whichRoom(&rooms, d2)){
-				if(whichRoom(&rooms, d1) == nullptr)
+
+			Room *tr1 = whichRoom(&rooms, d1);
+			Room *tr2 = whichRoom(&rooms, d2);
+
+			//Skip the rooms in room 5 (TODO: THIS WAS A QUICK FIX)
+			if(tr1 == r5 || tr2 == r5) continue;
+
+			if(tr1 == tr2){
+				if(tr1 == nullptr)
 					printf("Door at x: %d y: %d is not in a room\n",
 									d1->x, d1->y);
 				pG->addEdge(d1, d2, 1);
@@ -1095,6 +1141,9 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	//paulette->addTask(new Task(bRoom2, btnHello, (void*)(new btnHelloParameter{"Paulette Hello Bedroom number 2!"}),2,0,"GOTO Bedroom n2",AGAINSTFRIENDS ));
 	//paul->addTask(new Task(kitchen, btnHello, (void*)(new btnHelloParameter{ "Paul Hello Kitchen!" }), 1, 200, "GOTO Kitchen", AIASSIGNED));
 	//paul->addTask(new Task(bRoom2, btnHello, (void*)(new btnHelloParameter{ "Paul Hello Bedroom number 2!" }), 2, 0, "GOTO Bedroom n2", AGAINSTFRIENDS));
+
+	paul->addTask(new Task(r5, btnHello, (void *)(new btnHelloParameter{"done!"}),
+				100000, 5, "Room 5 Beacon test", AIASSIGNED));
 
 #pragma endregion
 
@@ -1255,6 +1304,13 @@ void close(WindowStruct *window, Media& media, vector<GameObject*>& objects,
 	SDL_Quit();
 }
 
+bool checkStillAlive(vector<CharacterObject *>& characters, CharacterObject *charCheck) {
+	for (CharacterObject * cobj : characters) {
+		if (cobj == charCheck) return true;
+	}
+	return false;
+}
+
 int main(int argc, char *argv[]){
 	WindowStruct window;
 
@@ -1354,7 +1410,7 @@ int main(int argc, char *argv[]){
 	for(bool k : key) k = false;
 	
 	//Number of ticks until you win!
-	int winTimer = 1000;
+	int winTimer = targetFrequency * GAME_LENGTH;
 	while(running && !characters.empty()) {
 		SDL_RenderClear(window.render);
 
@@ -1461,26 +1517,29 @@ int main(int argc, char *argv[]){
 
 		for(CharacterObject *c : characters) {
 			bool arrived = updateMovement(c, &currClick.rooms, pathGraph);
-			if (arrived) {
-				if (c->currentTask != nullptr) {
-					if (c->currentTask->flag & WAITINGFOR) {
+			if (arrived && c->currentTask != nullptr) {
+				if (c->currentTask->flag & WAITINGFOR) {
+					if (checkStillAlive(characters, c->currentTask->waitingFor)) {
 						if (whichRoom(&currClick.rooms,
 							c->currentTask->waitingFor) !=
-							whichRoom(&currClick.rooms, c)){
-							//printf("Waiting for %s\n", c->currentTask->waitingFor->name);
+							whichRoom(&currClick.rooms, c)) {
+							printf("Waiting for %s\n", c->currentTask->waitingFor->name);
 							continue;
 						}
 					}
-
-					if (c->currentTask->waitTime < 1) {
-						if (c->currentTask->function != nullptr){
-							c->currentTask->function(c->currentTask->data);
-						}
+					else {
+						printf("It seems that the person %s is waiting for is dead, so they will skip this task\n", c->name);
 						c->removeTask();
 					}
-					else {
-						c->currentTask->waitTime--;
+				}
+				if (c->currentTask->waitTime < 1) {
+					if (c->currentTask->function != nullptr) {
+						c->currentTask->function(c->currentTask->data);
 					}
+					c->removeTask();
+				}
+				else {
+					c->currentTask->waitTime--;
 				}
 			}
 		}
@@ -1646,6 +1705,7 @@ int main(int argc, char *argv[]){
 		// If we were too quick, wait until it is time
 		Uint32 time = SDL_GetTicks() - startTime;
 		if(time < targetTime){
+			//printf("This frame took: %dms\n", targetTime - time);
 			SDL_Delay(targetTime - time);
 		}
 
@@ -1653,7 +1713,7 @@ int main(int argc, char *argv[]){
 
 		SDL_RenderPresent(window.render);
 		if (winTimer < 1) break;
-		else winTimer--;
+		//else winTimer--;
 		//printf("Ticks until win: %d\n", winTimer);
 	}
 
@@ -1690,7 +1750,8 @@ int main(int argc, char *argv[]){
 			break;
 		}
 		printf("\n");
-	} else {
+	}
+	else {
 		printf("\n#####################");
 		printf("\n## YOU WIN!! ##");
 		printf("\n#####################");

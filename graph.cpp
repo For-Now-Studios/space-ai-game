@@ -177,6 +177,11 @@ template<class N, class V> class Graph{
 		return edges.at(pair<N, N>(from, to))->value;
 	}
 
+	bool hasEdge(N from, N to){
+		auto it = edges.find(pair<N, N>(from, to));
+		return it != edges.end();
+	}
+
 	void print(){
 		printf("Nodes:\n");
 		for(typename unordered_map<N, Node<N, V> *>::iterator it = nodes.begin();
@@ -227,7 +232,8 @@ template<class N> std::vector<N> *dijkstra(Graph<N, int> *g, N a, N b){
 			N neighbour = p.second->to->data;
 			int weight = p.second->value;
 
-			if(dist.at(neighbour) > dist.at(cur) + weight){
+			if((unsigned int) dist.at(neighbour) >
+						(unsigned int) dist.at(cur) + weight){
 				dist.at(neighbour) = dist.at(cur) + weight;
 				prev.at(neighbour) = cur;
 

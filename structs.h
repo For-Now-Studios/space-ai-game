@@ -380,7 +380,7 @@ struct CharacterObject : GameObjClick{
 		target = nullptr;
 		xDist = 0;
 		yDist = 0;
-		speed = 1;
+		speed = 4;
 
 		role = roly;
 		traitFlags = traits;
@@ -408,7 +408,9 @@ struct CharacterObject : GameObjClick{
 				printf("Change of main tasks (%s) for %s\n",
 								tasks.back()->name,
 										name);
+				printf("(%d, %d)\n", x, y);
 				Task* task = tasks.back();
+				printf("\t(%d, %d)\n", task->location->x, task->location->y);
 				delete path;
 				path = nullptr;
 				target = nullptr;
