@@ -232,7 +232,8 @@ template<class N> std::vector<N> *dijkstra(Graph<N, int> *g, N a, N b){
 			N neighbour = p.second->to->data;
 			int weight = p.second->value;
 
-			if(dist.at(neighbour) > dist.at(cur) + weight){
+			if((unsigned int) dist.at(neighbour) >
+						(unsigned int) dist.at(cur) + weight){
 				dist.at(neighbour) = dist.at(cur) + weight;
 				prev.at(neighbour) = cur;
 

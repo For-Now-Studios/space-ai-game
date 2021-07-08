@@ -193,7 +193,7 @@ void target(CharacterObject *c, GameObject *obj){
 void blockDoorPath(CharacterObject *object, Door *d, vector<Room *> *rooms,
 							Graph<GameObject *, int> *g){
 	//Remember the next object we were heading towards
-	GameObject *r = nullptr;
+	/*GameObject *r = nullptr;
 	if(!object->path->empty()){
 		r = object->path->back();
 	}
@@ -202,26 +202,65 @@ void blockDoorPath(CharacterObject *object, Door *d, vector<Room *> *rooms,
 		printf("locked door in pathfinding ");
 		printf("after reaching the final ");
 		printf("room of that path!\n");
+	}*/
+
+	Node<GameObject *, int> *n = g->nodes.at(d);
+	vector<int> t;
+	Room *r = whichRoom(rooms, d);
+	for(pair<pair<GameObject *, GameObject *>, Edge<GameObject *, int> *> p :
+									n->edges){
+		pair<GameObject *, GameObject *> pp = p.first;
+
+		//If the other object is in a separate room, temp block it in the graph
+		if(r != whichRoom(rooms, pp.second)){
+			t.push_back(p.second->value);
+			g->updateEdge(d, pp.second, INT_MAX);
+			g->updateEdge(pp.second, d, INT_MAX);
+		}
 	}
+
+	//printf("\tDone blocking paths, total blocked edges: %d\n", t.size());
+
 
 	// Forget the current path to the goal
 	delete object->path;
 	object->path = nullptr;
 	object->target = nullptr;
+	
+	//printf("\tDeleted the old path!\n");
 
 	//Make a new mental model of the ship
-	int t = g->getEdgeValue(d, r);
+	/*int t = g->getEdgeValue(d, r);
 	g->updateEdge(d, r, INT_MAX);
-	g->updateEdge(r, d, INT_MAX);
+	g->updateEdge(r, d, INT_MAX);*/
 
 	//Figure out where to go
 	//Room *start = whichRoom(rooms, object);
+	GameObject *start = closestNode(object, g, rooms);
+	//printf("\t Found were to start!\n");
 	GameObject *end = closestNode(object->goal, g, rooms);
-	object->path = findPathTo(g, d, end);
+	//printf("\t Found were to end!\n");
+	object->path = findPathTo(g, start, end);
+
+	//printf("\t Found a path \n");
 
 	//Restore the graph
-	g->updateEdge(d, r, t);
-	g->updateEdge(r, d, t);
+	//g->updateEdge(d, r, t);
+	//g->updateEdge(r, d, t);
+	int i = 0;
+	for(pair<pair<GameObject *, GameObject *>, Edge<GameObject *, int> *> p :
+									n->edges){
+		pair<GameObject *, GameObject *> pp = p.first;
+
+		//Restore all the edges leading out of the room
+		if(r != whichRoom(rooms, pp.second)){
+			g->updateEdge(d, pp.second, t.at(i));
+			g->updateEdge(pp.second, d, t.at(i));
+			i++;
+		}
+	}
+
+	//printf("Restored the path!\n");
 
 	if(object->path == nullptr) return;
 
@@ -229,7 +268,7 @@ void blockDoorPath(CharacterObject *object, Door *d, vector<Room *> *rooms,
 	//Room *room = dynamic_cast<Room *>(object->path->back());
 
 	//Remove the door we are standing at from the path
-	object->path->pop_back();
+	//object->path->pop_back();
 	target(object, object->path->back());
 	object->path->pop_back();
 }
@@ -258,6 +297,7 @@ void checkDoor(CharacterObject *object, Door *d, vector<Room *> *rooms,
 	//Make sure that the room of arrival isn't dangerous
 	Room *r = whichRoom(rooms, arrival);
 	if((r->flag & CLEARLYFATAL) != 0){
+		printf("Fatality!\n");
 		blockDoorPath(object, d, rooms, g);
 		return;
 	}
@@ -277,8 +317,8 @@ void checkDoor(CharacterObject *object, Door *d, vector<Room *> *rooms,
 	else{
 
 		if(arrival->IsLocked){
-			//printf("Door %s (arrival) is locked \n", arrival->n);
-			blockDoorPath(object, d, rooms, g);
+			printf("Door %s (arrival) is locked \n", arrival->n);
+			blockDoorPath(object, arrival, rooms, g);
 		}
 		else{
 			//Close the door behind you
