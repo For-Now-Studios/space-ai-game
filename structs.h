@@ -406,7 +406,9 @@ struct CharacterObject : GameObjClick{
 				printf("Change of main tasks (%s) for %s\n",
 								tasks.back()->name,
 										name);
+				printf("(%d, %d)\n", x, y);
 				Task* task = tasks.back();
+				printf("\t(%d, %d)\n", task->location->x, task->location->y);
 				delete path;
 				path = nullptr;
 				target = nullptr;
@@ -429,7 +431,7 @@ struct CharacterObject : GameObjClick{
 	}
 
 	void removeTask(Task* toDelete) {
-		printf("AAAH REMOVE THIS %p", toDelete);
+		//printf("AAAH REMOVE THIS %p", toDelete);
 		tasks.remove(toDelete);
 		delete toDelete;
 		changeCurrentTask();

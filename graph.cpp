@@ -177,6 +177,11 @@ template<class N, class V> class Graph{
 		return edges.at(pair<N, N>(from, to))->value;
 	}
 
+	bool hasEdge(N from, N to){
+		auto it = edges.find(pair<N, N>(from, to));
+		return it != edges.end();
+	}
+
 	void print(){
 		printf("Nodes:\n");
 		for(typename unordered_map<N, Node<N, V> *>::iterator it = nodes.begin();

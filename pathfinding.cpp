@@ -324,13 +324,15 @@ bool updateMovement(CharacterObject *object, vector<Room *> *rooms,
 				object->x, object->y);*/
 			if(object->path->back()->x > object->x &&
 			object->path->at(object->path->size() - 2)->x < object->x){
+				//printf("%s decided to disregard a door\n", object->name);
 				object->path->pop_back();
 			}
 			else if(object->path->back()->x <= object->x &&
 			object->path->at(object->path->size() - 2)->x > object->x){
+				//printf("%s decided to disregard a door\n", object->name);
 				object->path->pop_back();
 			}
-
+			printf("\t%s path size is %d before first target!\n", object->name, object->path->size());
 			target(object, object->path->back());
 			object->path->pop_back();
 		}
