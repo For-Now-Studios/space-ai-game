@@ -313,7 +313,16 @@ bool updateMovement(CharacterObject *object, vector<Room *> *rooms,
 		GameObject *end = closestNode(object->goal, g, rooms);
 		object->path = findPathTo(g, start, end);
 
-		if(object->path == nullptr) return false;
+		// If we can't find a path
+		if(object->path == nullptr){
+			//If it was because we were allready there, then just walk
+			if(start == end){
+				object->path = new vector<GameObject *>();
+				
+			}
+			
+			return false;
+		}
 
 		/*printf("%s: ", object->name);
 		for(GameObject *go : *object->path){
@@ -339,21 +348,22 @@ bool updateMovement(CharacterObject *object, vector<Room *> *rooms,
 					object->path->at(object->path->size() - 2)->x
 									< object->x){
 
-					printf("%s decided to disregard a door\n",
-									object->name);
+					//printf("%s decided to disregard a door\n",
+					//				object->name);
 					object->path->pop_back();
 				}
 				else if(object->path->back()->x <= object->x &&
 						object->x <= object->path->at(
 							object->path->size() - 2)->x){
 
-					printf("%s decided to disregard a door\n",
-									object->name);
+					//printf("%s decided to disregard a door\n",
+					//				object->name);
 					object->path->pop_back();
 				}
 			}
 
-			printf("\t%s path size is %d before first target!\n", object->name, object->path->size());
+			//printf("\t%s path size is %d before first target!\n",
+			//			object->name, object->path->size());
 			target(object, object->path->back());
 			object->path->pop_back();
 		}
@@ -409,7 +419,7 @@ bool updateMovement(CharacterObject *object, vector<Room *> *rooms,
 	if(object->xDist == 0 && object->yDist == 0){
 		//If the target was the goal, then we are done
 		if(object->target == object->goal){
-			printf("%s reached their goal!\n", object->name);
+			//printf("%s reached their goal!\n", object->name);
 
 			object->goal = nullptr;
 			delete object->path;
