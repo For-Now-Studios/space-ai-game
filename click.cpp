@@ -57,7 +57,7 @@ void buildClickAreas(CurrentClick *cc, initializer_list<IsClickable*> characters
 
 	//## UI ##
 	initializer_list<ClickArea*> UIAreas = {
-		new ClickArea(SDL_Rect{ 0, 420, SCREEN_WIDTH, 60 })
+		new ClickArea(SDL_Rect{ 0, SCREEN_HEIGHT - 60, SCREEN_WIDTH, 60 })
 	};
 	addClickablesToAreas(UIAreas, UIElems);
 	for (ClickArea* ca : UIAreas) {
@@ -76,9 +76,11 @@ void buildClickAreas(CurrentClick *cc, initializer_list<IsClickable*> characters
 		cc->numChars[i] = 0;
 	}
 		//The game part areas
+		//TODO: This section contains multiple magical numbers, representing
+		//the background image. Please replace them by a proper constant
 	initializer_list<ClickArea*> gameAreas = {
-		new ClickArea(SDL_Rect{ 0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT }),
-		new ClickArea(SDL_Rect{ SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT })
+		new ClickArea(SDL_Rect{ 0, 0, 7733 / 2, 4583 }),
+		new ClickArea(SDL_Rect{ 7733 / 2, 0, 7733 / 2, 4583 })
 	};
 		//Add them rooms to rooms vector and the correct part of the game.
 	for (Room* room : rooms) {
@@ -122,9 +124,11 @@ void cleanClickAreas(CurrentClick *cc) {
 	delete cc->numChars;
 }
 
-ClickReciept* createPopup(const vector<IsClickable*>& clicks, const vector<GameObject*>& objs, vector<GameObject*>* currentObjects, CurrentClick *cc, const SDL_Rect& area) {
+ClickReciept* createPopup(const vector<IsClickable*>& clicks,
+		const vector<GameObject*>& objs, vector<GameObject*>* currentObjects,
+						CurrentClick *cc, const SDL_Rect& area) {
 	ClickReciept* cr = new ClickReciept;
-	cr->renderObjs = new vector<GameObject*>(objs);
+	cr->renderObjs = new vector<GameObject *>(objs);
 	cc->toRender.push_back(cr->renderObjs);
 
 	cr->ca = new ClickAreaPopup(area);
@@ -172,11 +176,14 @@ void updateClickAreas(CurrentClick *cc) {
 }
 
 IsClickable* checkArea(CurrentClick *cc, int x, int y, ClickArea* ca, Camera *cam) {
-	for (vector<IsClickable*>::reverse_iterator jt = ca->clicks.rbegin(); jt != ca->clicks.rend(); ++jt) {
+	for (vector<IsClickable *>::reverse_iterator jt = ca->clicks.rbegin();
+							jt != ca->clicks.rend(); ++jt) {
 		IsClickable* ic = *jt;
+		//printf("\t (%d, %d, %d, %d) ", ic->area.x, ic->area.y, ic->area.w, ic->area.h);
 		SDL_Rect rec = translateToCamera(cam, &ic->area);
-		if (rec.x < x && x < rec.x + rec.w &&
-			rec.y < y && y < rec.y + rec.h) {
+		//printf("\t (%d, %d, %d, %d)\n", rec.x, rec.y, rec.w, rec.h);
+		if (rec.x <= x && x < rec.x + rec.w &&
+			rec.y <= y && y < rec.y + rec.h) {
 			return ic;
 		}
 	}
@@ -245,11 +252,13 @@ void movePopup(CurrentClick *cc, ClickAreaPopup* ca, MouseStruct& mouse) {
 IsClickable* checkCord(CurrentClick *cc, MouseStruct& mouse, Camera* cam) {
 	int x = mouse.x;
 	int y = mouse.y;
+	//printf("(%d, %d)\n", x, y);
 
 	for (vector<ClickArea*>::reverse_iterator it = cc->UI.rbegin(); it != cc->UI.rend(); ++it) {
 		ClickArea* ca = *it;
 		if (ca->area.x < x && x < ca->area.x + ca->area.w &&
 			ca->area.y < y && y < ca->area.y + ca->area.h) {
+			printf("In UI!\n");
 			return checkArea(cc, x, y, ca);
 		}
 	}
@@ -270,15 +279,19 @@ IsClickable* checkCord(CurrentClick *cc, MouseStruct& mouse, Camera* cam) {
 				}
 				cc->currentlySelected = ca;
 			}
+			printf("Popup\n");
 			return checkArea(cc, x, y, ca);
 		}
 	}
 
 	for (vector<ClickArea*>::reverse_iterator it = cc->Game.rbegin(); it != cc->Game.rend(); ++it) {
 		ClickArea* ca = *it;
+		//SDL_Rect rec = ca->area;
 		SDL_Rect rec = translateToCamera(cam, &ca->area);
+		//printf("%d %d\n", rec.x, rec.y);
 		if (rec.x < x && x < rec.x + rec.w &&
 			rec.y < y && y < rec.y + rec.h) {
+			//printf("%d %d\n", ca->area.x, ca->area.y);
 			return checkArea(cc, x, y, ca, cam);
 		}
 	}

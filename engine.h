@@ -33,6 +33,7 @@ int playSound(Sound *sound);
 // Graphics.cpp
 void render(WindowStruct *window, Image *image, int x, int y);
 void render(WindowStruct *window, Image *image, int x, int y, Camera *cam);
+void render(WindowStruct *window, GameObject *obj);
 void render(WindowStruct *window, GameObject *obj, Camera *cam);
 
 // Camera.cpp

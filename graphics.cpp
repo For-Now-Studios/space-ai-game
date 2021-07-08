@@ -19,6 +19,12 @@ void render(WindowStruct *window, Image *image, int x, int y, Camera *cam){
 	SDL_RenderCopyEx(window->render, image->image, NULL, &dst, 0, NULL,
 									SDL_FLIP_NONE);
 }
+void render(WindowStruct *window, GameObject *obj){
+	SDL_Rect dst = {obj->x, obj->y, obj->image->width, obj->image->height};
+
+	SDL_RenderCopyEx(window->render, obj->image->image, NULL, &dst,
+								0, NULL, SDL_FLIP_NONE);
+}
 void render(WindowStruct *window, GameObject *obj, Camera *cam){
 	SDL_Rect rect = {obj->x, obj->y, obj->image->width, obj->image->height};
 

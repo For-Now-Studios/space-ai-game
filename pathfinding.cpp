@@ -52,46 +52,10 @@ Room *whichRoom(vector<Room *> *v, GameObject *obj){
 	return nullptr;
 }
 
-GameObject *closestNode(GameObject *obj, Graph<GameObject *, int> *g){
-	GameObject *res = nullptr;
-	int dist = INT_MAX;
-
-	int objX = obj->x;
-	int objY = obj->y;
-	if(obj->image != nullptr){
-		objX += obj->image->width / 2;
-		objY += obj->image->height / 2;
-	}
-
-	//printf("(%d %d) : (%d %d)\n", obj->x, obj->y, objX, objY);
-
-	for(pair<GameObject *, Node<GameObject *, int> *> p : g->nodes){
-		GameObject *n = p.first;
-
-		int nX = n->x;
-		int nY = n->y;
-		if(n->image != nullptr){
-			nX += n->image->width / 2;
-			nY += n->image->height / 2;
-		}
-		//printf("\t(%d %d) : (%d %d)\n", n->x, n->y, nX, nY);
-		
-		//Calculate the euclidean distance between the two objects
-		int newDist = sqrt((objX - nX)*(objX - nX) + (objY - nY)*(objY - nY));
-		//printf("\tdist: %d newDist: %d\n", dist, newDist);
-		if(newDist < dist){
-			res = n;
-			dist = newDist;
-		}
-	}
-
-	return res;
-}
-
 /*
 	Returns all game objects present in the room from a  pathfinding graph
 */
-vector<GameObject *> *RoomToGraph(Room *r, Graph<GameObject *, int> *g){
+vector<GameObject *> *roomToGraph(Room *r, Graph<GameObject *, int> *g){
 	vector<GameObject *> *res = new vector<GameObject *>();
 
 	for(pair<GameObject *, Node<GameObject *, int> *> p : g->nodes){
@@ -107,6 +71,43 @@ vector<GameObject *> *RoomToGraph(Room *r, Graph<GameObject *, int> *g){
 
 		if(SDL_HasIntersection(&r->area, &area)) {
 			res->push_back(obj);
+		}
+	}
+
+	return res;
+}
+
+GameObject *closestNode(GameObject *obj, Graph<GameObject *, int> *g, vector<Room *> *r){
+	GameObject *res = nullptr;
+	int dist = INT_MAX;
+
+	int objX = obj->x;
+	int objY = obj->y;
+	if(obj->image != nullptr){
+		objX += obj->image->width / 2;
+		objY += obj->image->height / 2;
+	}
+
+	//printf("(%d %d) : (%d %d)\n", obj->x, obj->y, objX, objY);
+
+	//for(pair<GameObject *, Node<GameObject *, int> *> p : g->nodes){
+	for(GameObject *n : *roomToGraph(whichRoom(r, obj), g)){
+		//GameObject *n = p.first;
+
+		int nX = n->x;
+		int nY = n->y;
+		if(n->image != nullptr){
+			nX += n->image->width / 2;
+			nY += n->image->height / 2;
+		}
+		//printf("\t(%d %d) : (%d %d)\n", n->x, n->y, nX, nY);
+		
+		//Calculate the euclidean distance between the two objects
+		int newDist = sqrt((objX - nX)*(objX - nX) + (objY - nY)*(objY - nY));
+		//printf("\tdist: %d newDist: %d\n", dist, newDist);
+		if(newDist < dist){
+			res = n;
+			dist = newDist;
 		}
 	}
 
@@ -204,7 +205,7 @@ void blockDoorPath(CharacterObject *object, Door *d, vector<Room *> *rooms,
 
 	//Figure out where to go
 	//Room *start = whichRoom(rooms, object);
-	GameObject *end = closestNode(object->goal, g);
+	GameObject *end = closestNode(object->goal, g, rooms);
 	object->path = findPathTo(g, d, end);
 
 	//Restore the graph
@@ -273,8 +274,8 @@ void checkDoor(CharacterObject *object, Door *d, vector<Room *> *rooms,
 			arrival->image = data->open;
 			arrival->IsOpen = true;
 			
-			object->x = arrival->x;
-			object->y = arrival->y + (arrival->area.h - object->area.h);
+			object->moveTo(arrival->x, 
+					arrival->y + (arrival->area.h - object->area.h));
 
 			//Remove the second door and the room of arrival from the path
 			object->path->pop_back();
@@ -292,8 +293,8 @@ bool updateMovement(CharacterObject *object, vector<Room *> *rooms,
 	if(object->path == nullptr){
 		//Room *start = whichRoom(rooms, object);
 		//Room *end = whichRoom(rooms, object->goal);
-		GameObject *start = closestNode(object, g);
-		GameObject *end = closestNode(object->goal, g);
+		GameObject *start = closestNode(object, g, rooms);
+		GameObject *end = closestNode(object->goal, g, rooms);
 		object->path = findPathTo(g, start, end);
 
 		if(object->path == nullptr) return false;
