@@ -164,9 +164,18 @@ void targetDoor(CharacterObject *c, Door *d){
 	}
 }
 
+void targetRoom(CharacterObject *c, Room *r){
+	c->target = r;
+
+	c->xDist = (r->x + r->area.w / 2) - c->x;
+	c->yDist = (r->y + r->area.h) - (c->y + c->area.h);
+}
+
 void target(CharacterObject *c, GameObject *obj){
 	Door *d = dynamic_cast<Door *>(obj);
+	Room *r = dynamic_cast<Room *>(obj);
 	if(d != nullptr) targetDoor(c, d);
+	else if(r != nullptr) targetRoom(c, r);
 	else targetGameObject(c, obj);
 }
 
@@ -216,6 +225,11 @@ void blockDoorPath(CharacterObject *object, Door *d, vector<Room *> *rooms,
 
 void checkDoor(CharacterObject *object, Door *d, vector<Room *> *rooms,
 							Graph<GameObject *, int> *g){
+
+	if(object->path->size() == 0){
+		object->target = nullptr;
+		return;
+	}
 
 	Door *arrival = dynamic_cast<Door *>(object->path->back());
 	if(arrival == nullptr){
@@ -270,10 +284,10 @@ void checkDoor(CharacterObject *object, Door *d, vector<Room *> *rooms,
 	}
 }
 
-void updateMovement(CharacterObject *object, vector<Room *> *rooms,
+bool updateMovement(CharacterObject *object, vector<Room *> *rooms,
 							Graph<GameObject *, int> *g){
 	//Check if the character wants to move anywhere
-	if(object->goal == nullptr) return;
+	if(object->goal == nullptr) return true;
 
 	//Calculate a path to the target if no such path has been calculated yet
 	if(object->path == nullptr){
@@ -283,23 +297,26 @@ void updateMovement(CharacterObject *object, vector<Room *> *rooms,
 		GameObject *end = closestNode(object->goal, g, rooms);
 		object->path = findPathTo(g, start, end);
 
-		//printf("%p %p\n", start, end);
+		if(object->path == nullptr) return false;
 
-		//printf("Paul is searching for the way\n");
-		if(object->path == nullptr) return;
-		//printf("Paul knows the way\n");
-
-		/*for(GameObject *go : *object->path){
-			printf("%s\n", go->n);
-		}*/
+		/*printf("%s: ", object->name);
+		for(GameObject *go : *object->path){
+			printf("%s, ", go->n);
+		}
+		printf("\n");*/
 
 		//targetDoor(object, sharedDoor(start, object->path->back()));
-		if(object->path->size() > 1){
+		if(object->path->size() > 1) {
+			/*printf("(%d, %d) -> (%d, %d), char: (%d, %d)\n",
+				object->path->back()->x, object->path->back()->y,
+				object->path->at(object->path->size() - 2)->x,
+				object->path->at(object->path->size() - 2)->y,
+				object->x, object->y);*/
 			if(object->path->back()->x > object->x &&
 			object->path->at(object->path->size() - 2)->x < object->x){
 				object->path->pop_back();
 			}
-			else if(object->path->back()->x < object->x &&
+			else if(object->path->back()->x <= object->x &&
 			object->path->at(object->path->size() - 2)->x > object->x){
 				object->path->pop_back();
 			}
@@ -322,6 +339,8 @@ void updateMovement(CharacterObject *object, vector<Room *> *rooms,
 		}
 	}
 
+	//printf("%s's path is %d\n", object->name, object->path->size());
+
 	if(object->target == nullptr){
 		if(!object->path->empty()){
 			target(object, object->path->back());
@@ -329,7 +348,7 @@ void updateMovement(CharacterObject *object, vector<Room *> *rooms,
 		}
 		else{
 			//The character is in the correct room, so walk to the goal
-			targetGameObject(object, object->goal);
+			target(object, object->goal);
 		}
 	}
 
@@ -357,10 +376,13 @@ void updateMovement(CharacterObject *object, vector<Room *> *rooms,
 	if(object->xDist == 0 && object->yDist == 0){
 		//If the target was the goal, then we are done
 		if(object->target == object->goal){
+			printf("%s reached their goal!\n", object->name);
+
 			object->goal = nullptr;
 			delete object->path;
 			object->path = nullptr;
 			object->target = nullptr;
+			return true;
 		}
 		else{
 			//Check if door
@@ -373,6 +395,7 @@ void updateMovement(CharacterObject *object, vector<Room *> *rooms,
 			}
 		}
 	}
+	return false;
 
 	//printf("%d, %d\n", xSpeed, ySpeed);
 }
