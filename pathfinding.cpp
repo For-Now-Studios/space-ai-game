@@ -152,7 +152,8 @@ Door *sharedDoor(Room *a, Room *b){
 void targetGameObject(CharacterObject *c, GameObject *obj){
 		c->target = obj;
 		c->xDist = obj->x - c->x;
-		c->yDist = (obj->y + obj->image->height) - (c->y + c->area.h);
+		if(obj->image == nullptr) c->yDist = obj->y - c->y;
+		else c->yDist = (obj->y + obj->image->height) - (c->y + c->area.h);
 }
 
 /*
@@ -236,10 +237,15 @@ void blockDoorPath(CharacterObject *object, Door *d, vector<Room *> *rooms,
 void checkDoor(CharacterObject *object, Door *d, vector<Room *> *rooms,
 							Graph<GameObject *, int> *g){
 
-	if(object->path->size() == 0){
+	//If this was the last door on the path, or if the real door out is another door
+	if(object->path->size() == 0 ||
+			whichRoom(rooms, object->path->back()) == whichRoom(rooms, d)){
 		object->target = nullptr;
 		return;
 	}
+
+	printf("%s is at a door (%d %d)! Path size %d\n", object->name, d->x, d->y,
+								object->path->size());
 
 	Door *arrival = dynamic_cast<Door *>(object->path->back());
 	if(arrival == nullptr){
@@ -247,6 +253,7 @@ void checkDoor(CharacterObject *object, Door *d, vector<Room *> *rooms,
 		printf("Someone probably forgot to initialize the level's");
 		printf("path graph properly....\n");
 	}
+
 
 	//Make sure that the room of arrival isn't dangerous
 	Room *r = whichRoom(rooms, arrival);
@@ -290,6 +297,7 @@ void checkDoor(CharacterObject *object, Door *d, vector<Room *> *rooms,
 			//Remove the second door and the room of arrival from the path
 			object->path->pop_back();
 			object->target = nullptr;
+			printf("%s is in the next room and ready to go!\n", object->name);
 		}
 	}
 }
@@ -301,13 +309,20 @@ bool updateMovement(CharacterObject *object, vector<Room *> *rooms,
 
 	//Calculate a path to the target if no such path has been calculated yet
 	if(object->path == nullptr){
-		//Room *start = whichRoom(rooms, object);
-		//Room *end = whichRoom(rooms, object->goal);
 		GameObject *start = closestNode(object, g, rooms);
 		GameObject *end = closestNode(object->goal, g, rooms);
 		object->path = findPathTo(g, start, end);
 
-		if(object->path == nullptr) return false;
+		// If we can't find a path
+		if(object->path == nullptr){
+			//If it was because we were allready there, then just walk
+			if(start == end){
+				object->path = new vector<GameObject *>();
+				
+			}
+			
+			return false;
+		}
 
 		/*printf("%s: ", object->name);
 		for(GameObject *go : *object->path){
@@ -322,15 +337,33 @@ bool updateMovement(CharacterObject *object, vector<Room *> *rooms,
 				object->path->at(object->path->size() - 2)->x,
 				object->path->at(object->path->size() - 2)->y,
 				object->x, object->y);*/
-			if(object->path->back()->x > object->x &&
-			object->path->at(object->path->size() - 2)->x < object->x){
-				object->path->pop_back();
-			}
-			else if(object->path->back()->x <= object->x &&
-			object->path->at(object->path->size() - 2)->x > object->x){
-				object->path->pop_back();
+
+			//Check if the two beacons are in the same room 
+			if(whichRoom(rooms, object->path->back()) ==
+				whichRoom(rooms, object->path->at(
+							object->path->size() - 2))){
+
+				//If so, make sure that we don't go the wrong way
+				if(object->path->back()->x > object->x &&
+					object->path->at(object->path->size() - 2)->x
+									< object->x){
+
+					//printf("%s decided to disregard a door\n",
+					//				object->name);
+					object->path->pop_back();
+				}
+				else if(object->path->back()->x <= object->x &&
+						object->x <= object->path->at(
+							object->path->size() - 2)->x){
+
+					//printf("%s decided to disregard a door\n",
+					//				object->name);
+					object->path->pop_back();
+				}
 			}
 
+			//printf("\t%s path size is %d before first target!\n",
+			//			object->name, object->path->size());
 			target(object, object->path->back());
 			object->path->pop_back();
 		}
@@ -386,7 +419,7 @@ bool updateMovement(CharacterObject *object, vector<Room *> *rooms,
 	if(object->xDist == 0 && object->yDist == 0){
 		//If the target was the goal, then we are done
 		if(object->target == object->goal){
-			printf("%s reached their goal!\n", object->name);
+			//printf("%s reached their goal!\n", object->name);
 
 			object->goal = nullptr;
 			delete object->path;
