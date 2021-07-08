@@ -1,0 +1,41 @@
+Notes for all rooms in the ship, with the coordinates to the top most left pixel of the
+room, and bottom most right pixel of the room. The rooms have been counted in the order
+of horizontal lines, from the left to right, with the top most room in each "column"
+that has yet to be counted being prioritized first
+
+1: 2418, 520 -> 3077, 624
+2: 3161, 650 -> 5747, 742
+3: 6314, 721 -> 7297, 871
+
+4: 1614, 674 -> 2903, 871
+5: 3203, 797 -> 4450, 1672
+6: 4775, 1270 -> 5049, 1428
+7: 5491, 1110 -> 6054, 1428
+8: 6244, 1094 -> 7515, 1226
+
+9: 1001, 1092 -> 1304, 1242
+10: 2591, 1219 -> 3008, 1753 (AI core, so actually just an estimate)
+11: 5225, 1531 -> 6013, 1672
+12: 6244, 1295 -> 7515, 1427
+
+13: 1305, 1442 -> 2199, 1584
+14: 3186, 1839 -> 5101, 2213
+15: 6244, 1707 -> 6366, 1831 
+16: 6387, 1709 -> 6578, 1831 (uses the beedroom sprite, currently offset 16 for rooms) 
+17: 6599, 1709 -> 6790, 1831 (uses the beedroom sprite, currently offset 16 for rooms) 
+18: 6811, 1709 -> 7002, 1831 (uses the beedroom sprite, currently offset 16 for rooms)  
+19: 7021, 1709 -> 7212, 1831 (uses the beedroom sprite, currently offset 16 for rooms) 
+                              
+20: 1373, 2574 -> 2054, 2801
+21: 2900, 2521 -> 4116, 2626
+22: 6387, 1929 -> 6578, 2051 (uses the beedroom sprite, currently offset 16 for rooms) 
+23: 6599, 1929 -> 6790, 2051 (uses the beedroom sprite, currently offset 16 for rooms) 
+24: 6811, 1929 -> 7002, 2051 (uses the beedroom sprite, currently offset 16 for rooms) 
+25: 7021, 1929 -> 7212, 2051 (uses the beedroom sprite, currently offset 16 for rooms) 
+
+26: 2900, 2696 -> 4116, 2801
+27: 4385, 2780 -> 4515, 2866
+
+28: 2900, 2867 -> 4116, 2972
+
+29: 1231, 3084 -> 4912, 3952 (the bottom room, so actuall just an estimate)
