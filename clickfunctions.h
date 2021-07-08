@@ -50,6 +50,10 @@ void closeRoomPopup(void*);
 */
 void doorClick(void*);
 
+struct StressCharacterPars {
+	CharacterObject* currChar;
+};
+void stressCharacter(void *cntxt);
 /*
 	###########################
 	### Relationship events ###

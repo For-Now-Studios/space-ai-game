@@ -229,9 +229,6 @@ void birthday(CurrentClick *cc, vector<CharacterObject*>& characters, CharacterO
 			i++;
 		}
 	}
-	for (int i = 0; i < characters.size() - 1; i++) {
-		printf("OHOHOHOH %p\n", tasksToDelete[i]);
-	}
 }
 
 void cuddles(CurrentClick *cc, vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine dre) {
