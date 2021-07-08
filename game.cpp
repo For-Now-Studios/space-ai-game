@@ -31,6 +31,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	const char *path, CurrentClick* cc, Labels* labels, MouseStruct* mouse,
 	Graph<GameObject *, int> *pG){
 
+#pragma region ROOMS
 	/* ROOMS */
 	vector<Room *> rooms;
 	// Proper Room 1
@@ -234,7 +235,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 										BRIDGE);
 	rPup->room = r29;
 	rooms.push_back(r29);
-
+#pragma	endregion
+#pragma region DOORS
 	/* DOORS */
 	vector<IsClickable *> doors;
 	// Room 1 down door
@@ -1066,34 +1068,43 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 			}
 		}
 	}
-
+#pragma endregion
+#pragma region CHARACTERS
 	/* CHARACTERS */
 	// Paul
+	StressCharacterPars* paulStress = new StressCharacterPars;
 	CharacterObject *paul = new CharacterObject(r16->x + 100, 1831 - 100,
-		media->images.at(7), btnHello, (void *)(new btnHelloParameter{"Paul"}),
+		media->images.at(7), stressCharacter, (void *)(paulStress),
 		"Paul", intersex, labels->genders->at(0), labels->romance->at(0),
 							labels->sexuality->at(0), pilot, TRUSTING|SENSATIVE);
+	paulStress->currChar = paul;
 
 	// Paulette
+	StressCharacterPars* pauletteStress = new StressCharacterPars;
 	CharacterObject *paulette = new CharacterObject(r17->x + 20, 1831 - 50,
-		media->images.at(7), btnHello,
-		(void *)(new btnHelloParameter{"Paulette"}), "Paulette", intersex,
+		media->images.at(7), stressCharacter,
+		(void *)(pauletteStress), "Paulette", intersex,
 					labels->genders->at(3), labels->romance->at(1),
 							labels->sexuality->at(1), engineer, BIGOT|LIER);
+	pauletteStress->currChar = paulette;
 	
 	// Paulus
+	StressCharacterPars* paulusStress = new StressCharacterPars;
 	CharacterObject *paulus = new CharacterObject(r18->x + 10, 1831 - 50,
-		media->images.at(7), btnHello,
-		(void *)(new btnHelloParameter{"Paulus"}), "Paulus", female,
+		media->images.at(7), stressCharacter,
+		(void *)(paulusStress), "Paulus", female,
 		labels->genders->at(2), labels->romance->at(2),
 							labels->sexuality->at(2), doctor, PARANOID);
+	paulusStress->currChar = paulus;
 
 	// Paulob
+	StressCharacterPars* paulobStress = new StressCharacterPars;
 	CharacterObject *paulob = new CharacterObject(r19->x + 50, 1831 - 50,
-		media->images.at(7), btnHello,
-		(void *)(new btnHelloParameter{"Paulob"}), "Paulob", male,
+		media->images.at(7), stressCharacter,
+		(void *)(paulobStress), "Paulob", male,
 		labels->genders->at(2), labels->romance->at(3),
 							labels->sexuality->at(3), captain, CARING);
+	paulobStress->currChar = paulob;
   
   //Add tasks for paulette:
 	
@@ -1101,6 +1112,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	//paulette->addTask(new Task(bRoom2, btnHello, (void*)(new btnHelloParameter{"Paulette Hello Bedroom number 2!"}),2,0,"GOTO Bedroom n2",AGAINSTFRIENDS ));
 	//paul->addTask(new Task(kitchen, btnHello, (void*)(new btnHelloParameter{ "Paul Hello Kitchen!" }), 1, 200, "GOTO Kitchen", AIASSIGNED));
 	//paul->addTask(new Task(bRoom2, btnHello, (void*)(new btnHelloParameter{ "Paul Hello Bedroom number 2!" }), 2, 0, "GOTO Bedroom n2", AGAINSTFRIENDS));
+
+#pragma endregion
 
 	// Add all clickable elements to the click system
 	vector<IsClickable *> uiElements;
@@ -1118,15 +1131,19 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	for(Room *r : rooms){
 		objects->push_back(r);
 	}
-	// Characters
-	objects->push_back(paul);
-	objects->push_back(paulette);
-	objects->push_back(paulus);
-	objects->push_back(paulob);
 	// Doors
 	for(IsClickable *d : doors){
 		objects->push_back(dynamic_cast<GameObject*>((Room*)d));
 	}
+	// Characters
+	objects->push_back(paul);
+	paul->objsIndex = objects->size()-1;
+	objects->push_back(paulette);
+	paulette->objsIndex = objects->size() - 1;
+	objects->push_back(paulus);
+	paulus->objsIndex = objects->size() - 1;
+	objects->push_back(paulob);
+	paulob->objsIndex = objects->size() - 1;
 
 	printf("Objects done\n");
 
@@ -1352,8 +1369,10 @@ int main(int argc, char *argv[]){
 	//TEST CODE TODO: REMOVE
 	bool key[6];
 	for(bool k : key) k = false;
-
-	while(running){
+	
+	//Number of ticks until you win!
+	int winTimer = 1000;
+	while(running && !characters.empty()) {
 		SDL_RenderClear(window.render);
 
 		//Need to make these zero or they will get stuck.
@@ -1615,10 +1634,23 @@ int main(int argc, char *argv[]){
 				prev += chances[i];
 			}
 		}
+
+		//Check if a character has stressed to death:
+		int i = 0;
+		for (CharacterObject* cobj : characters) {
+			if (cobj->stress > 222) {
+				printf("Jeez %s is so stressed they had a heart attack and died,\n what did you do to them?\n", cobj->name);
+				objects.at(cobj->objsIndex)->image = nullptr;
+				characters.erase(characters.begin() + i);
+				currClick.Characters.erase(currClick.Characters.begin() + i);
+			}
+			i++;
+		}
 		
 		//Render
 		render(&window, media.images.at(12), 0, 0, &cam); //Render background
 		for(GameObject* obj : objects) {
+			if (obj->image == nullptr) continue;
 			render(&window, obj, &cam);
 		}
 		for (vector<GameObject*>* vec : currClick.toRender)
@@ -1637,6 +1669,77 @@ int main(int argc, char *argv[]){
 		startTime = SDL_GetTicks();		
 
 		SDL_RenderPresent(window.render);
+		if (winTimer < 1) break;
+		else winTimer--;
+		//printf("Ticks until win: %d\n", winTimer);
+	}
+
+	if (characters.empty()) {
+		printf("\n#####################");
+		printf("\n## GAME OVER MAN!! ##");
+		printf("\n#####################");
+		printf("\nAll of the crew died.\n\t");
+		uniform_int_distribution<int> chanceDist(1, 7);
+		switch (chanceDist(generator)) {
+		case 1:
+			printf("This isn't gonna look good on your record\n");
+			break;
+		case 2:
+			printf("How? How can an AI possibly be this careless.\nUnless.................................\n");
+			break;
+		case 3:
+			printf("Maybe unions aren't such a bad idea\n");
+			break;
+		case 4:
+			printf("Dude that is kinda fucked.\n");
+			break;
+		case 5:
+			printf("The Corporation (Trademarked) isn't gonna like this\n");
+			break;
+		case 6:
+			printf("Eh, it was probably their own fault\n");
+			break;
+		case 7:
+			printf("Mission success\n");
+			break;
+		default:
+			printf("SECRET PROGRAMMER ENDING!\nYou are still an asshole\n");
+			break;
+		}
+		printf("\n");
+	} else {
+		printf("\n#####################");
+		printf("\n## YOU WIN!! ##");
+		printf("\n#####################");
+		printf("\nAtleast one crew member survived.\n\t");
+		uniform_int_distribution<int> chanceDist(1, 7);
+		switch (chanceDist(generator)) {
+		case 1:
+			printf("This is gonna look great on your record!\n");
+			break;
+		case 2:
+			printf("How? How can an AI possibly be this great!\nUnless................................. they are really good!\n");
+			break;
+		case 3:
+			printf("This will really show them socialist that unions aren't needed.\n");
+			break;
+		case 4:
+			printf("Wow, you are great!\n");
+			break;
+		case 5:
+			printf("The Corporation (Trademarked) is gonna love this!\n");
+			break;
+		case 6:
+			printf("You really did great considering what a mess the crew was!\n");
+			break;
+		case 7:
+			printf("Mission success\n");
+			break;
+		default:
+			printf("SECRET PROGRAMMER ENDING!\nYou are a nice person\n");
+			break;
+		}
+		printf("\n");
 	}
 
 	close(&window, media, objects, &currClick, &labels);
