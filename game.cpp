@@ -12,6 +12,7 @@
 
 const int SCREEN_WIDTH = 1920;
 const int SCREEN_HEIGHT = 1080;
+const int GAME_LENGTH = 5*60;
 
 struct Labels {
 	vector<char *> *genders = nullptr;
@@ -404,6 +405,24 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->door = r5Dbb;
 	pG->addNode(r5Dbb); //Add the door to the pathfinder graph
 	doors.push_back(r5Dbb);
+
+	GameObject *r5B = new GameObject();
+	r5B->x = r5->x + (r5->area.w / 2);
+	r5B->y = r5->y + (r5->area.h / 2);
+	r5B->image = nullptr;
+	pG->addNode(r5B);
+	pG->addEdge(r5B, r5Dtr, 1);
+	pG->addEdge(r5Dtr, r5B, 1);
+	pG->addEdge(r5B, r5Dbr, 1);
+	pG->addEdge(r5Dbr, r5B, 1);
+	pG->addEdge(r5B, r5Dtl, 1);
+	pG->addEdge(r5Dtl, r5B, 1);
+	pG->addEdge(r5B, r5Dbl, 1);
+	pG->addEdge(r5Dbl, r5B, 1);
+	pG->addEdge(r5B, r5Dbb, 1);
+	pG->addEdge(r5Dbb, r5B, 1);
+	objects->push_back(r5B);
+	strcpy(r5B->n, "r5B");
 
 	// Room 6 left door
 	DCP = new DoorClickPars;
@@ -1059,8 +1078,15 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 		for(int j = i+1; j < doors.size(); j++){
 			GameObject *d1 = (GameObject *)((Door *) doors.at(i));
 			GameObject *d2 = (GameObject *)((Door *) doors.at(j));
-			if(whichRoom(&rooms, d1) == whichRoom(&rooms, d2)){
-				if(whichRoom(&rooms, d1) == nullptr)
+
+			Room *tr1 = whichRoom(&rooms, d1);
+			Room *tr2 = whichRoom(&rooms, d2);
+
+			//Skip the rooms in room 5 (TODO: THIS WAS A QUICK FIX)
+			if(tr1 == r5 || tr2 == r5) continue;
+
+			if(tr1 == tr2){
+				if(tr1 == nullptr)
 					printf("Door at x: %d y: %d is not in a room\n",
 									d1->x, d1->y);
 				pG->addEdge(d1, d2, 1);
@@ -1371,7 +1397,7 @@ int main(int argc, char *argv[]){
 	for(bool k : key) k = false;
 	
 	//Number of ticks until you win!
-	int winTimer = 1000;
+	int winTimer = targetFrequency * GAME_LENGTH;
 	while(running && !characters.empty()) {
 		SDL_RenderClear(window.render);
 
