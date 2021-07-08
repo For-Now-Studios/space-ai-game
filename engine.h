@@ -7,6 +7,7 @@
 #include<random>
 #include "structs.h"
 #include "graph.h"
+#include "click.h"
 
 using namespace std;
 
@@ -50,7 +51,7 @@ Graph<Room *, int> *initPathfinding(vector<Room *> *v);
 Room *whichRoom(vector<Room *> *v, GameObject *obj);
 vector<GameObject *> *findPathTo(Graph<GameObject *, int> *g, GameObject *from,
 								GameObject *to);
-void updateMovement(CharacterObject *object, vector<Room *> *rooms,
+bool updateMovement(CharacterObject *object, vector<Room *> *rooms,
 							Graph<GameObject *, int> *g);
 
 // Relationships.cpp
@@ -58,9 +59,9 @@ Graph<CharacterObject *, Relation> *initRelations(vector<CharacterObject *> *cha
 bool validRomance(CharacterObject *a, CharacterObject *b);
 bool validSex(CharacterObject *a, CharacterObject *b);
 
-void fallout(vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine);
-void cheating(vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine);
-void confession(vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine);
-void birthday(vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine);
-void cuddles(vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine);
-void support(vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine);
+void fallout(CurrentClick *cc, vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine);
+void cheating(CurrentClick *cc, vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine);
+void confession(CurrentClick *cc, vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine);
+void birthday(CurrentClick *cc, vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine);
+void cuddles(CurrentClick *cc, vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine);
+void support(CurrentClick *cc, vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine);

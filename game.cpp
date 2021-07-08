@@ -1079,10 +1079,11 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 							labels->sexuality->at(3), captain, CARING);
   
   //Add tasks for paulette:
-	paulette->addTask(new Task{ 120,120,btnHello,(void*)(new btnHelloParameter{"Start!"}),1,0,10,"Start",AIASSIGNED });
-	paulette->addTask(new Task{ 240,120,btnHello,(void*)(new btnHelloParameter{"Place0!"}),2,0,10,"Place0",AGAINSTFRIENDS });
-	paulette->addTask(new Task{ 240,240,btnHello,(void*)(new btnHelloParameter{"Place1!"}),3,0,10,"Place1",FORLOVE });
-	paulette->addTask(new Task{ 120,240,btnHello,(void*)(new btnHelloParameter{"Place2!"}),4,0,10,"Place2",FORENEMIES });
+	
+	//paulette->addTask(new Task(kitchen, btnHello, (void*)(new btnHelloParameter{"Paulette Kitchen!"}),1,130,"GOTO Kitchen",AIASSIGNED));
+	//paulette->addTask(new Task(bRoom2, btnHello, (void*)(new btnHelloParameter{"Paulette Hello Bedroom number 2!"}),2,0,"GOTO Bedroom n2",AGAINSTFRIENDS ));
+	//paul->addTask(new Task(kitchen, btnHello, (void*)(new btnHelloParameter{ "Paul Hello Kitchen!" }), 1, 200, "GOTO Kitchen", AIASSIGNED));
+	//paul->addTask(new Task(bRoom2, btnHello, (void*)(new btnHelloParameter{ "Paul Hello Bedroom number 2!" }), 2, 0, "GOTO Bedroom n2", AGAINSTFRIENDS));
 
 	// Add all clickable elements to the click system
 	vector<IsClickable *> uiElements;
@@ -1097,35 +1098,6 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 
 	/* Add all objects to the objects list */
 	// Rooms
-	/*objects->push_back(r1);
-	objects->push_back(r2);
-	objects->push_back(r3);
-	objects->push_back(r4);
-	objects->push_back(r5);
-	objects->push_back(r6);
-	objects->push_back(r7);
-	objects->push_back(r8);
-	objects->push_back(r9);
-	objects->push_back(r10);
-	objects->push_back(r11);
-	objects->push_back(r12);
-	objects->push_back(r13);
-	objects->push_back(r14);
-	objects->push_back(r15);
-	objects->push_back(r16);
-	objects->push_back(r17);
-	objects->push_back(r18);
-	objects->push_back(r19);
-	objects->push_back(r20);
-	objects->push_back(r21);
-	objects->push_back(r22);
-	objects->push_back(r23);
-	objects->push_back(r24);
-	objects->push_back(r25);
-	objects->push_back(r26);
-	objects->push_back(r27);
-	objects->push_back(r28);
-	objects->push_back(r29);*/
 	for(Room *r : rooms){
 		objects->push_back(r);
 	}
@@ -1294,7 +1266,8 @@ int main(int argc, char *argv[]){
 	vector<CharacterObject *> characters;
 
 	unsigned seed = chrono::system_clock::now().time_since_epoch().count();
-	default_random_engine generator(seed);
+	//default_random_engine generator(seed);
+	default_random_engine generator(1);
 
 	if(running){
 		labels.genders = loadGender("gender.jpeg");
@@ -1467,21 +1440,48 @@ int main(int argc, char *argv[]){
 			}
 		}
 
-		//Update the movment of a character
-		for(CharacterObject *c : characters){
-			updateMovement(c, &currClick.rooms, pathGraph);
+		for(CharacterObject *c : characters) {
+			bool arrived = updateMovement(c, &currClick.rooms, pathGraph);
+			if (arrived) {
+				if (c->currentTask != nullptr) {
+					if (c->currentTask->flag & WAITINGFOR) {
+						if (whichRoom(&currClick.rooms,
+							c->currentTask->waitingFor) !=
+							whichRoom(&currClick.rooms, c)){
+							//printf("Waiting for %s\n", c->currentTask->waitingFor->name);
+							continue;
+						}
+					}
+
+					if (c->currentTask->waitTime < 1) {
+						if (c->currentTask->function != nullptr){
+							c->currentTask->function(c->currentTask->data);
+						}
+						c->removeTask();
+					}
+					else {
+						c->currentTask->waitTime--;
+					}
+				}
+			}
 		}
 
+		//Update the movment of a character
+		/*for(CharacterObject *c : characters){
+			updateMovement(c, &currClick.rooms, pathGraph);
+		}*/
+		/*updateMovement(characters.at(2), &currClick.rooms, pathGraph);
+
 		//TEST!!! TODO: REMOVE!
-		if(characters.at(0)->goal == nullptr){
-			if(whichRoom(&currClick.rooms, characters.at(0)) !=
-								currClick.rooms.at(7)){
-				characters.at(0)->goal = currClick.rooms.at(7);
+		if(characters.at(2)->goal == nullptr){
+			if(whichRoom(&currClick.rooms, characters.at(2)) !=
+								currClick.rooms.at(1)){
+				characters.at(2)->goal = currClick.rooms.at(1);
 			}
 			else{
-				characters.at(0)->goal = currClick.rooms.at(2);
+				characters.at(2)->goal = currClick.rooms.at(2);
 			}
-		}
+		}*/
 
 
 		//More advanced simple button test
@@ -1507,28 +1507,37 @@ int main(int argc, char *argv[]){
 
 		//Simple implementation of events
 		/*
-			If you want to add more events you have to increase the number of events we handle.
-			And then you have to add another chance in the struct relationEventChances
-			And add that in the "chances" array
-			And its corresponding function in the function array "functions"
+			If you want to add more events you have to increase the number
+			of events handled, add its chance in the struct
+			relationEventChances, and add that in the "chances" array.
+			Finally add its corresponding function in the function array
+			"functions"
 			TODO: Make the addition of events better.
 		*/
 		uniform_int_distribution<int> d1000(0, 999);
 		for (CharacterObject* cobj : characters) {
 			//Roll a d1000 to see if *this* character has an event.
 			int roll = d1000(generator);
-			if (roll < cobj->rec.noChance) continue; //If it rolls under then we skip to the next character in the iteration
+			// Check if the roll was too low to trigger an event
+			if (roll < cobj->rec.noChance) continue;
+
 			const int numEvents = 6; //Number of events we check
 			int chances[numEvents] = {
 				cobj->rec.falloutChance+cobj->stress,
 				cobj->rec.confessionChance,
-				cobj->dating ? cobj->rec.cheatingChance : 0, //If you are dating, you can cheat
+				//If you are dating, you can cheat
+				cobj->dating ? cobj->rec.cheatingChance : 0,
 				cobj->rec.birthdayChance,
-				cobj->dating ? cobj->rec.cuddleChance : 0, //If you are dating, you can cuddle.
+				//If you are dating, you can cuddle.
+				cobj->dating ? cobj->rec.cuddleChance : 0,
 				cobj->rec.supportChance,
 			};
+
 			//Array of functions for each event
-			void(*functions[numEvents])(vector<CharacterObject*>&, CharacterObject*, Graph<CharacterObject *, Relation>&, default_random_engine) = {
+			void(*functions[numEvents])(CurrentClick *cc,
+				vector<CharacterObject*>&, CharacterObject *,
+					Graph<CharacterObject *, Relation>&,
+							default_random_engine) = {
 				fallout,
 				confession,
 				cheating,
@@ -1536,6 +1545,7 @@ int main(int argc, char *argv[]){
 				cuddles,
 				support
 			};
+
 			int allChances = 0;
 			//Need summarize all chances
 			for (int chance : chances) {
@@ -1546,11 +1556,16 @@ int main(int argc, char *argv[]){
 			roll = chanceDist(generator);
 			int prev = 0;
 			for (int i = 0; i < numEvents; i++) {
-				/*Check the first range 0 to chance-of-first-event, 
-				and then prev-chance to chance-of-secound-event, and so on.*/
+				/*
+					Check if the roll is in between the max of the
+					previous event's chance and this even'ts change,
+					with the  first event being checked in the range
+					0 to chance-of-first-event
+				*/
 				if (roll < chances[i] + prev) {
-					//if it rolls under then we call that related function in the array
-					functions[i](characters, cobj, *relGraph, generator);
+					// Call the apropriate function for the event
+					functions[i](&currClick, characters, cobj,
+								*relGraph, generator);
 					printf("\n");
 					break;
 				}

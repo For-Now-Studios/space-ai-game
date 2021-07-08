@@ -167,3 +167,124 @@ void doorClick(void *cntxt) {
 		pars->door->image = pars->closed;
 	}
 }
+
+/*
+	###########################
+	### Relationship events ###
+	###########################
+*/
+
+/*
+Changes the stress level
+Just checks so it doesn't go below zero
+and if a character is paranoid it increases.
+*/
+void changeStress(int amnt, CharacterObject* cobj) {
+	int newStress = cobj->stress + amnt +
+			((cobj->traitFlags & PARANOID) != 0) * abs(amnt >> 1);
+
+	cobj->stress = newStress > -1 ? newStress : 0;
+}
+
+void falloutEffect(void *cntxt) {
+	FalloutEffectPars *pars = (FalloutEffectPars*)cntxt;
+
+	printf("%s had a fallout with %s, so they are on bad terms now\n",
+					pars->currChar->name, pars->otherChar->name);
+
+	if(pars->relatonships.getEdgeValue(pars->currChar, pars->otherChar) == Dating){
+		printf("%s and %s have broken up\n", pars->currChar->name,
+								pars->otherChar->name);
+		pars->currChar->dating = false;
+		pars->otherChar->dating = false;
+	}
+
+	pars->relatonships.updateEdge(pars->currChar, pars->otherChar, On_Bad_Terms);
+	pars->relatonships.updateEdge(pars->otherChar, pars->currChar, On_Bad_Terms);
+
+	changeStress(20, pars->currChar);
+	printf("%s's stress just increased, it is now %d\n", pars->currChar->name,
+								pars->currChar->stress);
+
+	changeStress(20, pars->otherChar);
+	printf("%s's stress just increased, it is now %d\n", pars->otherChar->name,
+								pars->otherChar->stress);
+}
+
+void cheatingEffect(void *cntxt) {
+	CheatingEffectPars *pars = (CheatingEffectPars*)cntxt;
+	uniform_int_distribution<int> distribution(1, 100);
+	printf("%s is cheating with %s, that is bad\n", pars->currChar->name, pars->cobj->name);
+	int roll = distribution(pars->dre);
+	if (roll < 50) {
+		changeStress(20, pars->currChar);
+		printf("%s's stress just increased, it is now %d\n", pars->currChar->name, pars->currChar->stress);
+	}
+	roll = distribution(pars->dre);
+	if (roll < 50) {
+		changeStress(20, pars->cobj);
+		printf("%s's stress just increased, it is now %d\n", pars->cobj->name, pars->cobj->stress);
+	}
+}
+
+void confessionEffect(void *cntxt) {
+	ConfessionEffectPars *pars = (ConfessionEffectPars*)cntxt;
+	printf("%s just confessed to %s, they are now dating\n", pars->currChar->name, pars->cobj->name);
+
+	pars->currChar->dating = true;
+	pars->cobj->dating = true;
+
+	changeStress(-20, pars->currChar);
+	printf("%s's stress just decreased, it is now %d\n", pars->currChar->name, pars->currChar->stress);
+	changeStress(-20, pars->cobj);
+	printf("%s's stress just decreased, it is now %d\n", pars->cobj->name, pars->cobj->stress);
+	pars->relatonships.updateEdge(pars->currChar, pars->cobj, Dating);
+	pars->relatonships.updateEdge(pars->cobj, pars->currChar, Dating);
+}
+
+/*
+	TODO: If no one shows up, the birthday child gets more stressed.
+*/
+void birthdayEffect(void *cntxt) {
+	BirthdayEffectPars *pars = (BirthdayEffectPars*)cntxt;
+	printf("%s is throwing a birthday,\n everyone there has their stress is lowered.\n", pars->currChar->name);
+	GameObject* location = whichRoom(&pars->cc->rooms, pars->currChar);
+	int i = 0;
+	for (CharacterObject* character : pars->characters) {
+		if (character == pars->currChar) {
+			changeStress(-10, character);
+			printf("%s's stress: %d\n", character->name, character->stress);
+		} else if (location == whichRoom(&pars->cc->rooms, character)) {
+			changeStress(-10, character);
+			printf("%s's stress: %d\n", character->name, character->stress);
+			i++;
+		} else {
+			pars->tasksToDelete[i]->flag = pars->tasksToDelete[i]->flag & ~WAITINGFOR;
+			pars->tasksToDelete[i]->waitingFor = nullptr;
+			i++;
+		}
+	}
+}
+
+void cuddleEffect(void *cntxt) {
+	CuddleEffectPars *pars = (CuddleEffectPars*)cntxt;
+	printf("%s is cuddling with %s, it is hella great\n", pars->currChar->name, pars->cobj->name);
+
+	changeStress(-20, pars->currChar);
+	printf("%s's stress just decreased, it is now %d\n", pars->currChar->name, pars->currChar->stress);
+	changeStress(-20, pars->cobj);
+	printf("%s's stress just decreased, it is now %d\n", pars->cobj->name, pars->cobj->stress);
+}
+
+void supportEffect(void *cntxt) {
+	SupportEffectPars *pars = (SupportEffectPars*)cntxt;
+	if (pars->relatonships.getEdgeValue(pars->currChar, pars->otherChar) != Dating) {
+		pars->relatonships.updateEdge(pars->currChar, pars->otherChar, Friends);
+		pars->relatonships.updateEdge(pars->otherChar, pars->currChar, Friends);
+	}
+
+	printf("%s is being supprotive and supporting %s,\nso %s is less stressed and this makes them more positive to each other\n",
+		pars->currChar->name, pars->otherChar->name, pars->otherChar->name);
+	changeStress(-20, pars->otherChar);
+	printf("%s's stress just decreased, it is now %d\n", pars->otherChar->name, pars->otherChar->stress);
+}

@@ -228,6 +228,8 @@ struct GameObjClick : GameObject, IsClickable {
 	}
 };
 
+struct CharacterObject;
+
 #define AIASSIGNED (1 << 0)
 #define SELFCARE (1 << 1)
 #define EMERGENCY (1 << 2)
@@ -239,11 +241,11 @@ struct GameObjClick : GameObject, IsClickable {
 #define AGAINSTENEMY (1 << 8)
 #define AGAINSTLOVE (1 << 9)
 #define AGAINSTFRIENDS (1 << 10)
+#define WAITINGFOR (1 << 11)
 
 struct Task {
 	// Location
-	int x;
-	int y;
+	GameObject *location;
 
 	// Effect
 	void(*function)(void*); //The function that does its effect
@@ -253,11 +255,26 @@ struct Task {
 	int actualPrio; //How ACTUALLY important is this?
 	int waitTime;
 
+	CharacterObject* waitingFor;
+
 	const char* name;
 
 	int flag;
 
+	Task(GameObject* loc, void(*func)(void*), void* d, int prio, int wait,
+		const char* n, int f) : 
+		location{loc}, function{func}, data{d}, priority{prio},
+		actualPrio{0}, waitTime{wait}, waitingFor{nullptr}, name{ n }, 
+		flag{ f } {}
+	
+	Task(GameObject* loc, void(*func)(void*), void* d, int prio, int wait,
+		const char* n, int f, CharacterObject* cobj) :
+		location{ loc }, function{ func }, data{ d }, priority{ prio },
+		actualPrio{ 0 }, waitTime{ wait }, waitingFor{ cobj }, name{ n },
+		flag{ f } {}
+
 	~Task() {
+		printf("AHAHAH DELET DATA %p\n", data);
 		delete data;
 		data = nullptr;
 		printf("Data for a task has been freed!\n");
@@ -314,6 +331,7 @@ struct CharacterObject : GameObjClick{
 	affectionTrait *sexuality;
 	Role role;
 	std::list<Task*> tasks;
+	Task* currentTask = nullptr;
 	int traitFlags; //The traits they have.
 	relationEventChances rec; //The chance *this* characters has for each event.
 	bool dating = false; //If they are currently dating anyone.
@@ -360,34 +378,75 @@ struct CharacterObject : GameObjClick{
 	}
 
 
-	void makeActualPriority(int &val, int flags)
-	{
+	void makeActualPriority(int &val, int flags) {
 		val *= flags & AIASSIGNED ? loyalty / 100 : 1;
 		val += ((flags & EMERGENCY) != 0) * 100
 			+ ((flags & (FORFRIENDS | FORHATE | FORLOVE | AGAINSTENEMY)) != 0) * 69
 			+ ((flags & (FORENEMIES | AGAINSTLOVE | AGAINSTFRIENDS)) != 0) * -96;
 	}
 	struct compGreater {
+		Task* last = nullptr;
 		bool operator()(const Task* l, const Task* r) {
+			if (l == last) return l->actualPrio + 0000 < r->actualPrio;
+			if (r == last) return l->actualPrio < r->actualPrio + 0000;
 			return l->actualPrio < r->actualPrio;
 		}
 	};
+
+	void changeCurrentTask() {
+		if (!tasks.empty()) {
+			if (currentTask != tasks.back()) {
+				printf("Change of main tasks (%s) for %s\n",
+								tasks.back()->name,
+										name);
+				Task* task = tasks.back();
+				delete path;
+				path = nullptr;
+				target = nullptr;
+				goal = task->location;
+				currentTask = tasks.back();
+			}
+		} else {
+			goal = nullptr;
+			delete path;
+			path = nullptr;
+			currentTask = nullptr;
+			target = nullptr;
+		}
+	}
 	
+	void removeTask() {
+		delete tasks.back();
+		tasks.pop_back();
+		changeCurrentTask();
+	}
+
+	void removeTask(Task* toDelete) {
+		printf("AAAH REMOVE THIS %p", toDelete);
+		tasks.remove(toDelete);
+		delete toDelete;
+		changeCurrentTask();
+	}
 
 	void addTask(Task* task) {
 		task->actualPrio = task->priority;
 		makeActualPriority(task->actualPrio, task->flag);
+
 		tasks.push_back(task);
-		tasks.sort(compGreater());
+		compGreater cg{ currentTask };
+		tasks.sort(cg);
+
+		changeCurrentTask();
 	}
 
-	//Currently calculates actual priority each time it compares
 	void rethinkOrder() {
 		for (Task* t : tasks) {
 			t->actualPrio = t->priority;
 			makeActualPriority(t->actualPrio, t->flag);
 		}
+
 		tasks.sort(compGreater());
+		changeCurrentTask();
 	}
 
 	~CharacterObject() {
