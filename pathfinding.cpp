@@ -58,6 +58,11 @@ Room *whichRoom(vector<Room *> *v, GameObject *obj){
 vector<GameObject *> *roomToGraph(Room *r, Graph<GameObject *, int> *g){
 	vector<GameObject *> *res = new vector<GameObject *>();
 
+	if(r == nullptr){
+		printf("WARNING: THE ROOM IS A NULLPOINTER!\n");
+		return res;
+	}
+
 	for(pair<GameObject *, Node<GameObject *, int> *> p : g->nodes){
 		GameObject *obj = p.first;
 
@@ -119,6 +124,11 @@ GameObject *closestNode(GameObject *obj, Graph<GameObject *, int> *g, vector<Roo
 */
 vector<GameObject *> *findPathTo(Graph<GameObject *, int> *g, GameObject *from,
 								GameObject *to){	
+	if(from == nullptr || to == nullptr){
+		printf("WARNING: TRIED TO PATHFIND FROM OR TO A NULL POINTER!\n");
+		return nullptr;
+	}
+
 	return dijkstra(g, from, to);
 }
 
