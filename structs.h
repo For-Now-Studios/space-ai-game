@@ -380,7 +380,7 @@ struct CharacterObject : GameObjClick{
 		target = nullptr;
 		xDist = 0;
 		yDist = 0;
-		speed = 1;
+		speed = 4;
 
 		role = roly;
 		traitFlags = traits;

@@ -406,6 +406,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	pG->addNode(r5Dbb); //Add the door to the pathfinder graph
 	doors.push_back(r5Dbb);
 
+	//Room 5 Beacon
 	GameObject *r5B = new GameObject();
 	r5B->x = r5->x + (r5->area.w / 2);
 	r5B->y = r5->y + (r5->area.h / 2);
@@ -1139,6 +1140,9 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	//paul->addTask(new Task(kitchen, btnHello, (void*)(new btnHelloParameter{ "Paul Hello Kitchen!" }), 1, 200, "GOTO Kitchen", AIASSIGNED));
 	//paul->addTask(new Task(bRoom2, btnHello, (void*)(new btnHelloParameter{ "Paul Hello Bedroom number 2!" }), 2, 0, "GOTO Bedroom n2", AGAINSTFRIENDS));
 
+	paul->addTask(new Task(r5, btnHello, (void *)(new btnHelloParameter{"done!"}),
+				100000, 5, "Room 5 Beacon test", AIASSIGNED));
+
 #pragma endregion
 
 	// Add all clickable elements to the click system
@@ -1516,7 +1520,7 @@ int main(int argc, char *argv[]){
 					}
 
 					if (c->currentTask->waitTime < 1) {
-						if (c->currentTask->function != nullptr){
+						if(c->currentTask->function != nullptr){
 							c->currentTask->function(c->currentTask->data);
 						}
 						c->removeTask();
