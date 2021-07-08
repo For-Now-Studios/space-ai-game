@@ -9,7 +9,6 @@ void btnHello(void *cntxt)
 	btnHelloParameter *parameters = (btnHelloParameter*)cntxt;
 	printf("Hello %s!\n", parameters->name);
 }
-
 void testClosePopUp(void *cntxt) {
 	closePopUpPars *pars = (closePopUpPars*)cntxt;
 
@@ -26,7 +25,6 @@ void testClosePopUp(void *cntxt) {
 	closePopup(cr);
 	printf("Hello %s!\n", "Closed a popup");
 }
-
 void testPopPopUp(void *cntxt) {
 	popPopUpPars *pars = (popPopUpPars*)cntxt;
 	if (!pars->poppedUp) {
@@ -56,7 +54,6 @@ void testPopPopUp(void *cntxt) {
 		pars->poppedUp = true;
 	}
 }
-
 void testPopPopUp0(void *cntxt) {
 	popPopUpPars *pars = (popPopUpPars*)cntxt;
 	if (!pars->poppedUp) {
@@ -106,7 +103,6 @@ void closeRoomPopup(void *cntxt) {
 	closePopup(cr);
 	printf("Hello %s!\n", "Closed a popup");
 }
-
 void roomPopup(void *cntxt) {
 	roomPopupPars *pars = (roomPopupPars*)cntxt;
 	if (!pars->poppedUp) {
@@ -148,7 +144,6 @@ void roomPopup(void *cntxt) {
 		pars->close = cPUP;
 	}
 }
-
 void doorClick(void *cntxt) {
 	DoorClickPars *pars = (DoorClickPars*)cntxt;
 	if (pars->mouse->buttons[0].isReleased) {
@@ -166,6 +161,13 @@ void doorClick(void *cntxt) {
 	} else {
 		pars->door->image = pars->closed;
 	}
+}
+
+void stressCharacter(void *cntxt) {
+	StressCharacterPars *pars = (StressCharacterPars*)cntxt;
+	pars->currChar->stress += 20;
+	printf("Stressing %s, their stress is now at %d\n",
+		pars->currChar->name, pars->currChar->stress);
 }
 
 /*

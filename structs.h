@@ -281,7 +281,6 @@ struct Task {
 		flag{ f } {}
 
 	~Task() {
-		printf("AHAHAH DELET DATA %p\n", data);
 		delete data;
 		data = nullptr;
 		printf("Data for a task has been freed!\n");
@@ -329,6 +328,9 @@ struct relationEventChances {
 #define LIER (1 << 5) //Increases the chances for birthdays and cheating
 
 struct CharacterObject : GameObjClick{
+	//When we delete em
+	int objsIndex;
+
 	int stress;
 	int loyalty;
 	const char *name;
@@ -429,7 +431,6 @@ struct CharacterObject : GameObjClick{
 	}
 
 	void removeTask(Task* toDelete) {
-		printf("AAAH REMOVE THIS %p", toDelete);
 		tasks.remove(toDelete);
 		delete toDelete;
 		changeCurrentTask();
