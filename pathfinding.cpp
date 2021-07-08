@@ -244,8 +244,8 @@ void checkDoor(CharacterObject *object, Door *d, vector<Room *> *rooms,
 		return;
 	}
 
-	printf("%s is at a door (%d %d)! Path size %d\n", object->name, d->x, d->y,
-								object->path->size());
+	/*printf("%s is at a door (%d %d)! Path size %d\n", object->name, d->x, d->y,
+								object->path->size());*/
 
 	Door *arrival = dynamic_cast<Door *>(object->path->back());
 	if(arrival == nullptr){
@@ -297,7 +297,7 @@ void checkDoor(CharacterObject *object, Door *d, vector<Room *> *rooms,
 			//Remove the second door and the room of arrival from the path
 			object->path->pop_back();
 			object->target = nullptr;
-			printf("%s is in the next room and ready to go!\n", object->name);
+			//printf("%s is in the next room and ready to go!\n", object->name);
 		}
 	}
 }
