@@ -131,6 +131,10 @@ struct GameObject {
 		x += xDir;
 		y += yDir;
 	}
+	virtual void moveTo(int a, int b) {
+		x = a;
+		y = b;
+	}
 };
 
 /*
