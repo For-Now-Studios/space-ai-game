@@ -1704,12 +1704,14 @@ int main(int argc, char *argv[]){
 		}
 		//Render task icon and name above the characters heads
 		for(CharacterObject *c : characters){
-			render(&window, c->nameImage, c->x,
-					c->y - (c->nameImage->height + 3), &cam);
+			render(&window, c->nameImage, c->x +
+						(c->area.w - c->nameImage->width) / 2,
+					c->y - (c->nameImage->height + 1), &cam);
 
 			if(c->image == nullptr || c->taskIcon == nullptr) continue;
-			render(&window, c->taskIcon, c->x,
-			c->y - (c->taskIcon->height + c->nameImage->height + 3), &cam);
+			render(&window, c->taskIcon, c->x +
+						(c->area.w - c->taskIcon->width) / 2,
+			c->y - (c->taskIcon->height + c->nameImage->height + 1), &cam);
 		}
 		for (vector<GameObject*>* vec : currClick.toRender)
 		{

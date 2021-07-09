@@ -507,7 +507,8 @@ struct CharacterObject : GameObjClick{
 		for(Task* t : tasks) {
 			delete t;
 		}
-		printf("Deleted a task, for there is no need to do anything when you are heading to the void!\n");
+		//printf("Deleted a task, for there is no need to do anything when you are heading to the void!\n");
+		delete nameImage;
 	}
 
 };
