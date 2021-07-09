@@ -138,11 +138,11 @@ void fallout(CurrentClick *cc, vector<CharacterObject*>& characters,
 									otherChar->name);
 		Task* currCharTask = new Task(location, falloutEffect,
 		(void*)(new FalloutEffectPars{currChar, otherChar, relatonships}),
-			0, 0, "FALLOUT", AGAINSTENEMY | WAITINGFOR, otherChar,
-									images->at(35));
+			50, 60, "FALLOUT", AGAINSTENEMY | WAITINGFOR, otherChar,
+							images->at(35), images->at(39));
 		Task* otherCharTask = new Task(location, nullptr, nullptr, 0, 0,
 					"Nothing", AGAINSTENEMY|WAITINGFOR, currChar,
-									images->at(35));
+							images->at(35), images->at(39));
 		currChar->addTask(currCharTask);
 		otherChar->addTask(otherCharTask);
 
@@ -172,10 +172,10 @@ void cheating(CurrentClick *cc, vector<CharacterObject*>& characters,
 					(void*)(new CheatingEffectPars{ currChar, cobj,
 						relatonships, dre }), 100, 0, "CHEATING",
 							FORLOVE | WAITINGFOR, cobj,
-									images->at(36));
+							images->at(36), images->at(36));
 			Task* otherCharTask = new Task(location, nullptr, nullptr, 100,
 					0, "Nothing", FORLOVE | WAITINGFOR, currChar,
-									images->at(36));
+							images->at(36), images->at(36));
 			currChar->addTask(currCharTask);
 			cobj->addTask(otherCharTask);
 			return;
@@ -208,10 +208,10 @@ void confession(CurrentClick *cc, vector<CharacterObject*>& characters,
 				(void*)(new ConfessionEffectPars{ currChar, cobj,
 									relatonships }),
 				100, 0, "CONFESSION", FORLOVE | WAITINGFOR, cobj,
-									images->at(37));
+							images->at(37), images->at(37));
 			Task* otherCharTask = new Task(location, nullptr, nullptr, 100,
 					0, "Nothing", FORLOVE | WAITINGFOR, currChar,
-									images->at(37));
+							images->at(37), images->at(37));
 			currChar->addTask(currCharTask);
 			cobj->addTask(otherCharTask);
 			return;
@@ -238,12 +238,13 @@ void birthday(CurrentClick *cc, vector<CharacterObject*>& characters,
 			Task* currCharTask = new Task(location, birthdayEffect,
 				(void*)(new BirthdayEffectPars{ currChar, characters,
 						relatonships, tasksToDelete, cc }),
-				10000, 0, "BIRTHDAYPARTY", FORLOVE, images->at(38));
+				10000, 0, "BIRTHDAYPARTY", FORLOVE,
+							images->at(38), images->at(38));
 			currChar->addTask(currCharTask);
 		} else {
 			Task* otherCharTask = new Task(location, nullptr, nullptr, 100,
 					0, "Nothing", FORLOVE | WAITINGFOR, currChar,
-									images->at(38));
+							images->at(38), images->at(38));
 			cobj->addTask(otherCharTask);
 			tasksToDelete[i] = otherCharTask;
 			i++;
@@ -272,8 +273,8 @@ void cuddles(CurrentClick *cc, vector<CharacterObject*>& characters,
 			Task* currCharTask = new Task(location, cuddleEffect,
 				(void*)(new CuddleEffectPars{ currChar, cobj, relatonships }),
 				100, 0, "CUDDLE", FORLOVE | WAITINGFOR, cobj);
-			Task* otherCharTask = new Task(location, nullptr, nullptr, 100, 0,
-				"Nothing", FORLOVE | WAITINGFOR, currChar);
+			Task* otherCharTask = new Task(location, nullptr, nullptr, 100,
+					0, "Nothing", FORLOVE | WAITINGFOR, currChar);
 			currChar->addTask(currCharTask);
 			cobj->addTask(otherCharTask);
 		}

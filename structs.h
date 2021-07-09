@@ -260,12 +260,14 @@ struct Task {
 	
 	int priority; //How important is this job?
 	int actualPrio; //How ACTUALLY important is this?
-	int waitTime;
+	int waitTime; //Until the effect triggers when in the same room
+	int tolerance; //Unti the task is abandoned (< 0 means infinite)
 
 	CharacterObject* waitingFor;
 
 	const char* name;
 	Image *icon;
+	Image *waitingIcon;
 
 	int flag;
 
@@ -275,12 +277,14 @@ struct Task {
 			actualPrio{0}, waitTime{wait}, waitingFor{nullptr}, name{ n }, 
 			flag{ f }{
 		icon = nullptr;
+		tolerance = 60*10;
 	}
 	Task(GameObject* loc, void(*func)(void*), void* d, int prio, int wait,
-						const char* n, int f, Image *i) :
+					const char* n, int f, Image *i, Image *wi) :
 			location{loc}, function{func}, data{d}, priority{prio},
 			actualPrio{0}, waitTime{wait}, waitingFor{nullptr}, name{ n }, 
-			flag{ f }, icon{i}{
+			flag{ f }, icon{i}, waitingIcon{wi}{
+		tolerance = 60*10;
 	 }
 	
 	Task(GameObject* loc, void(*func)(void*), void* d, int prio, int wait,
@@ -289,13 +293,15 @@ struct Task {
 			actualPrio{ 0 }, waitTime{ wait }, waitingFor{ cobj }, name{ n },
 									flag{ f } {
 		icon = nullptr;
+		tolerance = 60*10;
 	}
 
 	Task(GameObject* loc, void(*func)(void*), void* d, int prio, int wait,
-				const char* n, int f, CharacterObject* cobj, Image *i) :
+		const char* n, int f, CharacterObject* cobj, Image *i, Image *wi) :
 			location{ loc }, function{ func }, data{ d }, priority{ prio },
 			actualPrio{ 0 }, waitTime{ wait }, waitingFor{ cobj }, name{ n },
-								flag{ f }, icon{i} {
+						flag{ f }, icon{i}, waitingIcon(wi) {
+		tolerance = 60*10;
 	}
 
 	~Task() {
@@ -328,6 +334,7 @@ enum Role {
 
 struct relationEventChances {
 	//The default chances for each event, just arbitary numbers
+	//int falloutChance = 10; //Both of you count to ten before you do anything irrational.
 	int falloutChance = 10; //Both of you count to ten before you do anything irrational.
 	int confessionChance = 16; // 14+2 valentines day.
 	int cheatingChance = 69; //Nice, gotta get that lay

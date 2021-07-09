@@ -1519,12 +1519,28 @@ int main(int argc, char *argv[]){
 			bool arrived = updateMovement(c, &currClick.rooms, pathGraph);
 			if (arrived && c->currentTask != nullptr) {
 				if (c->currentTask->flag & WAITINGFOR) {
-					if (checkStillAlive(characters, c->currentTask->waitingFor)) {
+					if (checkStillAlive(characters,
+							c->currentTask->waitingFor)) {
 						if (whichRoom(&currClick.rooms,
 							c->currentTask->waitingFor) !=
 							whichRoom(&currClick.rooms, c)) {
 							//printf("Waiting for %s\n", c->currentTask->waitingFor->name);
+
+							if(c->currentTask->tolerance
+										== 0){
+								c->removeTask();
+							}
+							else if(c->currentTask->
+									tolerance > 0){
+								c->currentTask->
+									tolerance--;
+							}
+
 							continue;
+						}
+						else{
+							c->taskIcon =
+							c->currentTask->waitingIcon;
 						}
 					}
 					else {
@@ -1535,7 +1551,8 @@ int main(int argc, char *argv[]){
 				}
 				if (c->currentTask->waitTime < 1) {
 					if (c->currentTask->function != nullptr) {
-						c->currentTask->function(c->currentTask->data);
+						c->currentTask->function(
+								c->currentTask->data);
 					}
 					c->removeTask();
 				}
@@ -1603,6 +1620,9 @@ int main(int argc, char *argv[]){
 		*/
 		uniform_int_distribution<int> d1000(0, 999);
 		for (CharacterObject* cobj : characters) {
+			//Check if the character allready has too many tasks
+			if(cobj->tasks.size() > 5) continue;
+
 			//Roll a d1000 to see if *this* character has an event.
 			int roll = d1000(generator);
 			// Check if the roll was too low to trigger an event
