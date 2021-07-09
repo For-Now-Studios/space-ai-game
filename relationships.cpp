@@ -169,10 +169,13 @@ void cheating(CurrentClick *cc, vector<CharacterObject*>& characters,
 			printf("Ordering %s and %s to have an affair\n", currChar->name,
 				cobj->name);
 			Task* currCharTask = new Task(location, cheatingEffect,
-				(void*)(new CheatingEffectPars{ currChar, cobj, relatonships, dre }),
-				100, 0, "CHEATING", FORLOVE | WAITINGFOR, cobj);
-			Task* otherCharTask = new Task(location, nullptr, nullptr, 100, 0,
-				"Nothing", FORLOVE | WAITINGFOR, currChar);
+					(void*)(new CheatingEffectPars{ currChar, cobj,
+						relatonships, dre }), 100, 0, "CHEATING",
+							FORLOVE | WAITINGFOR, cobj,
+									images->at(36));
+			Task* otherCharTask = new Task(location, nullptr, nullptr, 100,
+					0, "Nothing", FORLOVE | WAITINGFOR, currChar,
+									images->at(36));
 			currChar->addTask(currCharTask);
 			cobj->addTask(otherCharTask);
 			return;
@@ -196,16 +199,19 @@ void confession(CurrentClick *cc, vector<CharacterObject*>& characters,
 			GameObject* location = getRandomRoom(cc, dre);
 
 			if (location == nullptr) {
-				printf("%s is trying to cheat with %s, but can't find an appropiate location for coopulation\n", currChar->name, cobj->name);
+				printf("%s is trying to confess with %s, but can't find an appropiate location for coopulation\n", currChar->name, cobj->name);
 				return;
 			}
-			printf("Ordering %s to date %s\n", currChar->name,
-				cobj->name);
+			printf("Ordering %s to date %s\n", currChar->name, cobj->name);
+
 			Task* currCharTask = new Task(location, confessionEffect,
-				(void*)(new ConfessionEffectPars{ currChar, cobj, relatonships }),
-				100, 0, "CONFESSION", FORLOVE | WAITINGFOR, cobj);
-			Task* otherCharTask = new Task(location, nullptr, nullptr, 100, 0,
-				"Nothing", FORLOVE | WAITINGFOR, currChar);
+				(void*)(new ConfessionEffectPars{ currChar, cobj,
+									relatonships }),
+				100, 0, "CONFESSION", FORLOVE | WAITINGFOR, cobj,
+									images->at(37));
+			Task* otherCharTask = new Task(location, nullptr, nullptr, 100,
+					0, "Nothing", FORLOVE | WAITINGFOR, currChar,
+									images->at(37));
 			currChar->addTask(currCharTask);
 			cobj->addTask(otherCharTask);
 			return;
@@ -230,12 +236,14 @@ void birthday(CurrentClick *cc, vector<CharacterObject*>& characters,
 	for (CharacterObject* cobj : characters) {
 		if (cobj == currChar) {
 			Task* currCharTask = new Task(location, birthdayEffect,
-				(void*)(new BirthdayEffectPars{ currChar, characters, relatonships, tasksToDelete, cc }),
-				10000, 0, "BIRTHDAYPARTY", FORLOVE);
+				(void*)(new BirthdayEffectPars{ currChar, characters,
+						relatonships, tasksToDelete, cc }),
+				10000, 0, "BIRTHDAYPARTY", FORLOVE, images->at(38));
 			currChar->addTask(currCharTask);
 		} else {
-			Task* otherCharTask = new Task(location, nullptr, nullptr, 100, 0,
-				"Nothing", FORLOVE | WAITINGFOR, currChar);
+			Task* otherCharTask = new Task(location, nullptr, nullptr, 100,
+					0, "Nothing", FORLOVE | WAITINGFOR, currChar,
+									images->at(38));
 			cobj->addTask(otherCharTask);
 			tasksToDelete[i] = otherCharTask;
 			i++;
