@@ -84,6 +84,22 @@ void testPopPopUp0(void *cntxt) {
 	}
 }
 
+//Specifically needed so it deletes necessary buttons
+void closeCharRoomPopup(void *cntxt) {
+	closePopUpPars *pars = (closePopUpPars*)cntxt;
+
+	pars->pPUP->poppedUp = false;
+	ClickReciept *cr = pars->cr;
+
+	//Delete necessary GameObejcts and IsClickable objects.
+	//NOTE: This deletes the button which we were called from
+	for (GameObject* obj : *cr->renderObjs) {
+		delete obj;
+	}
+	closePopup(cr);
+	printf("Hello %s!\n", "Closed a popup");
+}
+
 void closeRoomPopup(void *cntxt) {
 	closePopUpPars *pars = (closePopUpPars*)cntxt;
 
@@ -103,13 +119,69 @@ void closeRoomPopup(void *cntxt) {
 	closePopup(cr);
 	printf("Hello %s!\n", "Closed a popup");
 }
-void roomPopup(void *cntxt) {
+
+struct SendCharPars {
+	CharacterObject* character;
+	Room *room;
+};
+//Adds task for character to go to specific place.
+void sendChar(void *cntxt) {
+	SendCharPars *pars = (SendCharPars*)cntxt;
+	pars->character->addTask(new Task(pars->room, nullptr, nullptr, 16, 64, "GOTO", AIASSIGNED));
+	printf("Ordering %s to go to (%d, %d)\n", pars->character->name, pars->room->x, pars->room->y);
+}
+//Creates a popup to send characters
+void sendCharPopup(void *cntxt) {
 	roomPopupPars *pars = (roomPopupPars*)cntxt;
 	if (!pars->poppedUp) {
 		vector<GameObject*> objs;
 		vector<IsClickable*> clicks;
 		int x = 320;
 		int y = 200;
+
+		GameObjClick *p = new GameObjClick(x, y, pars->media->images.at(0), btnHello,
+			(void*)(new btnHelloParameter{ "p!" }));
+
+		objs.push_back(p);
+		clicks.push_back(p);
+
+		int yLength = 0;
+		for (CharacterObject* cobj : *pars->characters) {
+			GameObjClick* goc = new GameObjClick(x, y, pars->media->images.at(1), sendChar,
+				(void*)(new SendCharPars{cobj, pars->room}));
+			goc->x = x;
+			goc->y = y + 60 * yLength;
+			goc->area.x = x;
+			goc->area.y = goc->y;
+			clicks.push_back(goc);
+			objs.push_back(goc);
+			yLength++;
+		}
+		yLength = yLength < 2 ? 2 : yLength;
+
+		//Close button need to be pushed last, so it is deleted last.
+		closePopUpPars* cPUP = new closePopUpPars;
+		cPUP->pPUP = pars;
+		GameObjClick *px = new GameObjClick(x + 60, y, pars->media->images.at(1), closeCharRoomPopup,
+			(void*)(cPUP));
+		clicks.push_back(px);
+		objs.push_back(px);
+
+		cPUP->cr = createPopup(clicks, objs, pars->objects, pars->cc, SDL_Rect{ x, y, 120, 60 * yLength });
+		printf("Called sendCharPopup\n");
+		pars->poppedUp = true;
+		pars->close = cPUP;
+	}
+}
+void roomPopup(void *cntxt) {
+	roomPopupPars *pars = (roomPopupPars*)cntxt;
+	if (!pars->poppedUp) {
+		vector<GameObject*> objs;
+		vector<IsClickable*> clicks;
+		int yLength = 0;
+		int x = 320;
+		int y = 200;
+
 		GameObjClick *p = new GameObjClick(x, y, pars->media->images.at(0), btnHello,
 			(void*)(new btnHelloParameter{ "p!" }));
 
@@ -117,10 +189,19 @@ void roomPopup(void *cntxt) {
 		cPUP->pPUP = pars;
 		GameObjClick *px = new GameObjClick(x+60, y, pars->media->images.at(1), closeRoomPopup,
 			(void*)(cPUP));
+
+		roomPopupPars* rPup = new roomPopupPars(popPopUpPars{ pars->cc, false, pars->objects, pars->media }, pars->characters);
+		rPup->room = pars->room;
+		GameObjClick* sendBtn = new GameObjClick(x, y, pars->media->images.at(1), sendCharPopup,
+			(void*)(rPup));
+		yLength++;
+
 		objs.push_back(p);
 		clicks.push_back(p);
+
+		objs.push_back(sendBtn);
+		clicks.push_back(sendBtn);
 		
-		int yLength = 0;
 		for (GameObjClick* goc : pars->room->buttons) {
 			goc->x = x;
 			goc->y = y + 60*yLength;

@@ -23,9 +23,11 @@ struct closePopUpPars {
 };
 
 struct roomPopupPars : popPopUpPars {
-	roomPopupPars(popPopUpPars pPUP) : popPopUpPars{pPUP} {}
+	roomPopupPars(popPopUpPars pPUP, vector<CharacterObject *>* chars) : 
+		popPopUpPars{ pPUP }, characters{ chars } {}
 	Room *room;
 	closePopUpPars *close;
+	vector<CharacterObject *>* characters;
 };
 struct DoorClickPars {
 	Door *door;

@@ -258,7 +258,7 @@ IsClickable* checkCord(CurrentClick *cc, MouseStruct& mouse, Camera* cam) {
 		ClickArea* ca = *it;
 		if (ca->area.x < x && x < ca->area.x + ca->area.w &&
 			ca->area.y < y && y < ca->area.y + ca->area.h) {
-			printf("In UI!\n");
+			//printf("In UI!\n");
 			return checkArea(cc, x, y, ca);
 		}
 	}
@@ -279,7 +279,7 @@ IsClickable* checkCord(CurrentClick *cc, MouseStruct& mouse, Camera* cam) {
 				}
 				cc->currentlySelected = ca;
 			}
-			printf("Popup\n");
+			//printf("Popup\n");
 			return checkArea(cc, x, y, ca);
 		}
 	}

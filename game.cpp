@@ -30,208 +30,209 @@ struct Labels {
 */
 bool loadLevel(vector<GameObject *>* objects, Media* media,
 	const char *path, CurrentClick* cc, Labels* labels, MouseStruct* mouse,
-	Graph<GameObject *, int> *pG, SDL_Renderer *renderer){
+	Graph<GameObject *, int> *pG, vector<CharacterObject *>* characters, SDL_Renderer *renderer){
 
 #pragma region ROOMS
 	/* ROOMS */
 	vector<Room *> rooms;
+	popPopUpPars pPUP{ cc, false, objects, media };
 	// Proper Room 1
-	roomPopupPars* rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	roomPopupPars* rPup = new roomPopupPars(pPUP, characters);
 	Room *r1 = new Room(2418, 520, media->images.at(13), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r1;
 	rooms.push_back(r1);
 
 	// Proper Room 2
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r2 = new Room(3161, 650, media->images.at(14), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r2;
 	rooms.push_back(r2);
 
 	// Proper Room 3
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r3 = new Room(6314, 721, media->images.at(15), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r3;
 	rooms.push_back(r3);
 
 	// Proper Room 4
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r4 = new Room(1614, 674, media->images.at(16), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r4;
 	rooms.push_back(r4);
 
 	// Proper Room 5
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r5 = new Room(3203, 797, media->images.at(17), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r5;
 	rooms.push_back(r5);
 
 	// Proper Room 6
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r6 = new Room(4775, 1270, media->images.at(18), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r6;
 	rooms.push_back(r6);
 
 	// Proper Room 7
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r7 = new Room(5491, 1110, media->images.at(19), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r7;
 	rooms.push_back(r7);
 
 	// Proper Room 8
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r8 = new Room(6244, 1094, media->images.at(20), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r8;
 	rooms.push_back(r8);
 
 	// Proper Room 9
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r9 = new Room(1001, 1092, media->images.at(21), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r9;
 	rooms.push_back(r9);
 
 	// Proper Room 10
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r10 = new Room(2591, 1219, media->images.at(22), roomPopup, (void *)(rPup), BRIDGE);
 	rPup->room = r10;
 	rooms.push_back(r10);
 
 	// Proper Room 11
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r11 = new Room(5225, 1531, media->images.at(23), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r11;
 	rooms.push_back(r11);
 
 	// Proper Room 12
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r12 = new Room(6244, 1295, media->images.at(24), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r12;
 	rooms.push_back(r12);
 
 	// Proper Room 13
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r13 = new Room(1305, 1442, media->images.at(25), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r13;
 	rooms.push_back(r13);
 
 	// Proper Room 14
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r14 = new Room(3186, 1839, media->images.at(26), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r14;
 	rooms.push_back(r14);
 
 	// Proper Room 15
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r15 = new Room(6244, 1707, media->images.at(27), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r15;
 	rooms.push_back(r15);
 
 	// Proper Room 16
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r16 = new Room(6387, 1709, media->images.at(28), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r16;
 	rooms.push_back(r16);
 
 	// Proper Room 17
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r17 = new Room(6599, 1709, media->images.at(28), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r17;
 	rooms.push_back(r17);
 
 	// Proper Room 18
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r18 = new Room(6811, 1709, media->images.at(28), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r18;
 	rooms.push_back(r18);
 
 	// Proper Room 19
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r19 = new Room(7021, 1709, media->images.at(28), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r19;
 	rooms.push_back(r19);
 
 	// Proper Room 20
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r20 = new Room(1373, 2574, media->images.at(29), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r20;
 	rooms.push_back(r20);
 
 	// Proper Room 21
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r21 = new Room(2900, 2521, media->images.at(30), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r21;
 	rooms.push_back(r21);
 
 	// Proper Room 22
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r22 = new Room(6387, 1929, media->images.at(28), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r22;
 	rooms.push_back(r22);
 
 	// Proper Room 23
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r23 = new Room(6599, 1929, media->images.at(28), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r23;
 	rooms.push_back(r23);
 
 	// Proper Room 24
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r24 = new Room(6811, 1929, media->images.at(28), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r24;
 	rooms.push_back(r24);
 
 	// Proper Room 25
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r25 = new Room(7021, 1929, media->images.at(28), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r25;
 	rooms.push_back(r25);
 
 	// Proper Room 26
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r26 = new Room(2900, 2696, media->images.at(31), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r26;
 	rooms.push_back(r26);
 
 	// Proper Room 27
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r27 = new Room(4385, 2780, media->images.at(32), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r27;
 	rooms.push_back(r27);
 
 	// Proper Room 28
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r28 = new Room(2900, 2867, media->images.at(33), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r28;
 	rooms.push_back(r28);
 
 	// Proper Room 29
-	rPup = new roomPopupPars(popPopUpPars{cc, false, objects, media});
+	rPup = new roomPopupPars(pPUP, characters);
 	Room *r29 = new Room(1231, 3084, media->images.at(34), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r29;
@@ -1352,7 +1353,7 @@ int main(int argc, char *argv[]){
 		labels.sexuality = loadAffectionTrait("sexuality.jpeg");
 
 		if(loadLevel(&objects, &media, "", &currClick, &labels, &mouse,
-							pathGraph, window.render)){
+								pathGraph, &characters, window.render)){
 			printf("Game object done!\n");
 
 			for(int i = 0; i < currClick.Characters.size(); i++){
