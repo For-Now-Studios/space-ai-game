@@ -30,7 +30,7 @@ struct Labels {
 */
 bool loadLevel(vector<GameObject *>* objects, Media* media,
 	const char *path, CurrentClick* cc, Labels* labels, MouseStruct* mouse,
-	Graph<GameObject *, int> *pG){
+	Graph<GameObject *, int> *pG, SDL_Renderer *renderer){
 
 #pragma region ROOMS
 	/* ROOMS */
@@ -1105,7 +1105,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	CharacterObject *paul = new CharacterObject(r16->x + 100, 1831 - 100,
 		media->images.at(7), stressCharacter, (void *)(paulStress),
 		"Paul", intersex, labels->genders->at(0), labels->romance->at(0),
-							labels->sexuality->at(0), pilot, TRUSTING|SENSATIVE);
+		labels->sexuality->at(0), pilot, TRUSTING|SENSATIVE,
+							media->fonts.at(0), renderer);
 	paulStress->currChar = paul;
 
 	// Paulette
@@ -1114,7 +1115,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 		media->images.at(7), stressCharacter,
 		(void *)(pauletteStress), "Paulette", intersex,
 					labels->genders->at(3), labels->romance->at(1),
-							labels->sexuality->at(1), engineer, BIGOT|LIER);
+					labels->sexuality->at(1), engineer, BIGOT|LIER,
+							media->fonts.at(0), renderer);
 	pauletteStress->currChar = paulette;
 	
 	// Paulus
@@ -1123,7 +1125,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 		media->images.at(7), stressCharacter,
 		(void *)(paulusStress), "Paulus", female,
 		labels->genders->at(2), labels->romance->at(2),
-							labels->sexuality->at(2), doctor, PARANOID);
+		labels->sexuality->at(2), doctor, PARANOID,
+							media->fonts.at(0), renderer);
 	paulusStress->currChar = paulus;
 
 	// Paulob
@@ -1132,7 +1135,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 		media->images.at(7), stressCharacter,
 		(void *)(paulobStress), "Paulob", male,
 		labels->genders->at(2), labels->romance->at(3),
-							labels->sexuality->at(3), captain, CARING);
+		labels->sexuality->at(3), captain, CARING,
+							media->fonts.at(0), renderer);
 	paulobStress->currChar = paulob;
   
   //Add tasks for paulette:
@@ -1348,7 +1352,7 @@ int main(int argc, char *argv[]){
 		labels.sexuality = loadAffectionTrait("sexuality.jpeg");
 
 		if(loadLevel(&objects, &media, "", &currClick, &labels, &mouse,
-									pathGraph)){
+							pathGraph, window.render)){
 			printf("Game object done!\n");
 
 			for(int i = 0; i < currClick.Characters.size(); i++){
@@ -1698,11 +1702,14 @@ int main(int argc, char *argv[]){
 			if (obj->image == nullptr) continue;
 			render(&window, obj, &cam);
 		}
-		//Render task icons above the character
+		//Render task icon and name above the characters heads
 		for(CharacterObject *c : characters){
+			render(&window, c->nameImage, c->x,
+					c->y - (c->nameImage->height + 3), &cam);
+
 			if(c->image == nullptr || c->taskIcon == nullptr) continue;
 			render(&window, c->taskIcon, c->x,
-					c->y - (c->taskIcon->height + 10), &cam);
+			c->y - (c->taskIcon->height + c->nameImage->height + 3), &cam);
 		}
 		for (vector<GameObject*>* vec : currClick.toRender)
 		{

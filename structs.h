@@ -371,6 +371,7 @@ struct CharacterObject : GameObjClick{
 	std::list<Task*> tasks;
 	Task* currentTask = nullptr;
 	Image *taskIcon;
+	Image *nameImage;
 
 	int traitFlags; //The traits they have.
 
@@ -386,18 +387,25 @@ struct CharacterObject : GameObjClick{
 	int speed;
 
 	CharacterObject(int xPos, int yPos, Image *img, void(*func)(void*), void* d,
-		const char *n, Sex s, char *g, affectionTrait *r, affectionTrait *se, Role roly, int traits) :
+				const char *n, Sex s, char *g, affectionTrait *r,
+					affectionTrait *se, Role roly, int traits,
+					Font *f, SDL_Renderer *render) :
 						 GameObjClick(xPos, yPos, img, func, d){
-		setParam(n, s, g, r, se, roly, traits);
+
+		setParam(n, s, g, r, se, roly, traits, f, render);
 	}
 	CharacterObject(int xPos, int yPos, Image *img, SDL_Rect ar, void(*func)(void*),
-	void* d, const char *n, Sex s, char *g, affectionTrait *r, affectionTrait *se, Role roly, int traits) :
+				void* d, const char *n, Sex s, char *g,
+				affectionTrait *r, affectionTrait *se, Role roly,
+				int traits, Font *f, SDL_Renderer *render) :
 					 GameObjClick(xPos, yPos, img, ar, func, d){
-		setParam(n, s, g, r, se, roly, traits);
+
+		setParam(n, s, g, r, se, roly, traits, f, render);
 	}
 	
 	void setParam(const char *n, Sex s, char *g, affectionTrait *r,
-					affectionTrait *se, Role roly, int traits){
+					affectionTrait *se, Role roly, int traits,
+						Font *f, SDL_Renderer *render){
 		name = n;
 		sex = s;
 		gender = g;
@@ -417,6 +425,8 @@ struct CharacterObject : GameObjClick{
 		role = roly;
 		traitFlags = traits;
 		taskIcon = nullptr;
+
+		nameImage = new Image(f, name, {0,0,0}, render);	
 	}
 
 
