@@ -1545,24 +1545,6 @@ int main(int argc, char *argv[]){
 			}
 		}
 
-		//Update the movment of a character
-		/*for(CharacterObject *c : characters){
-			updateMovement(c, &currClick.rooms, pathGraph);
-		}*/
-		/*updateMovement(characters.at(2), &currClick.rooms, pathGraph);
-
-		//TEST!!! TODO: REMOVE!
-		if(characters.at(2)->goal == nullptr){
-			if(whichRoom(&currClick.rooms, characters.at(2)) !=
-								currClick.rooms.at(1)){
-				characters.at(2)->goal = currClick.rooms.at(1);
-			}
-			else{
-				characters.at(2)->goal = currClick.rooms.at(2);
-			}
-		}*/
-
-
 		//More advanced simple button test
 		if (mouse.buttons[0].isPressed) {
 			checkCord(&currClick, mouse, &cam);
@@ -1642,7 +1624,7 @@ int main(int argc, char *argv[]){
 			void(*functions[numEvents])(CurrentClick *cc,
 				vector<CharacterObject*>&, CharacterObject *,
 					Graph<CharacterObject *, Relation>&,
-							default_random_engine) = {
+					default_random_engine, vector<Image *> *) = {
 				fallout,
 				confession,
 				cheating,
@@ -1670,7 +1652,7 @@ int main(int argc, char *argv[]){
 				if (roll < chances[i] + prev) {
 					// Call the apropriate function for the event
 					functions[i](&currClick, characters, cobj,
-								*relGraph, generator);
+						*relGraph, generator, &media.images);
 					printf("\n");
 					break;
 				}
@@ -1690,11 +1672,17 @@ int main(int argc, char *argv[]){
 			i++;
 		}
 		
-		//Render
+		// Render
 		render(&window, media.images.at(12), 0, 0, &cam); //Render background
 		for(GameObject* obj : objects) {
 			if (obj->image == nullptr) continue;
 			render(&window, obj, &cam);
+		}
+		//Render task icons above the character
+		for(CharacterObject *c : characters){
+			if(c->image == nullptr || c->taskIcon == nullptr) continue;
+			render(&window, c->taskIcon, c->x,
+					c->y - (c->taskIcon->height + 10), &cam);
 		}
 		for (vector<GameObject*>* vec : currClick.toRender)
 		{

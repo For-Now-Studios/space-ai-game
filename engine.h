@@ -60,9 +60,27 @@ Graph<CharacterObject *, Relation> *initRelations(vector<CharacterObject *> *cha
 bool validRomance(CharacterObject *a, CharacterObject *b);
 bool validSex(CharacterObject *a, CharacterObject *b);
 
-void fallout(CurrentClick *cc, vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine);
-void cheating(CurrentClick *cc, vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine);
-void confession(CurrentClick *cc, vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine);
-void birthday(CurrentClick *cc, vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine);
-void cuddles(CurrentClick *cc, vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine);
-void support(CurrentClick *cc, vector<CharacterObject*>& characters, CharacterObject* currChar, Graph<CharacterObject*, Relation>& relatonships, default_random_engine);
+void fallout(CurrentClick *cc, vector<CharacterObject*>& characters,
+				CharacterObject* currChar, Graph<CharacterObject*,
+				Relation>& relatonships, default_random_engine dre,
+							vector<Image *> *images);
+void cheating(CurrentClick *cc, vector<CharacterObject*>& characters,
+				CharacterObject* currChar, Graph<CharacterObject*,
+				Relation>& relatonships, default_random_engine dre,
+							vector<Image *> *images);
+void confession(CurrentClick *cc, vector<CharacterObject*>& characters,
+				CharacterObject* currChar, Graph<CharacterObject*,
+				Relation>& relatonships, default_random_engine dre,
+							vector<Image *> *images);
+void birthday(CurrentClick *cc, vector<CharacterObject*>& characters,
+				CharacterObject* currChar, Graph<CharacterObject*,
+				Relation>& relatonships, default_random_engine dre,
+							vector<Image *> *images);
+void cuddles(CurrentClick *cc, vector<CharacterObject*>& characters,
+				CharacterObject* currChar, Graph<CharacterObject*,
+				Relation>& relatonships, default_random_engine dre,
+							vector<Image *> *images);
+void support(CurrentClick *cc, vector<CharacterObject*>& characters,
+				CharacterObject* currChar, Graph<CharacterObject*,
+				Relation>& relatonships, default_random_engine dre,
+							vector<Image *> *images);

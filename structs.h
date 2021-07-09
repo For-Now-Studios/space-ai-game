@@ -265,20 +265,38 @@ struct Task {
 	CharacterObject* waitingFor;
 
 	const char* name;
+	Image *icon;
 
 	int flag;
 
 	Task(GameObject* loc, void(*func)(void*), void* d, int prio, int wait,
-		const char* n, int f) : 
-		location{loc}, function{func}, data{d}, priority{prio},
-		actualPrio{0}, waitTime{wait}, waitingFor{nullptr}, name{ n }, 
-		flag{ f } {}
+								const char* n, int f) : 
+			location{loc}, function{func}, data{d}, priority{prio},
+			actualPrio{0}, waitTime{wait}, waitingFor{nullptr}, name{ n }, 
+			flag{ f }{
+		icon = nullptr;
+	}
+	Task(GameObject* loc, void(*func)(void*), void* d, int prio, int wait,
+						const char* n, int f, Image *i) :
+			location{loc}, function{func}, data{d}, priority{prio},
+			actualPrio{0}, waitTime{wait}, waitingFor{nullptr}, name{ n }, 
+			flag{ f }, icon{i}{
+	 }
 	
 	Task(GameObject* loc, void(*func)(void*), void* d, int prio, int wait,
-		const char* n, int f, CharacterObject* cobj) :
-		location{ loc }, function{ func }, data{ d }, priority{ prio },
-		actualPrio{ 0 }, waitTime{ wait }, waitingFor{ cobj }, name{ n },
-		flag{ f } {}
+					const char* n, int f, CharacterObject* cobj) :
+			location{ loc }, function{ func }, data{ d }, priority{ prio },
+			actualPrio{ 0 }, waitTime{ wait }, waitingFor{ cobj }, name{ n },
+									flag{ f } {
+		icon = nullptr;
+	}
+
+	Task(GameObject* loc, void(*func)(void*), void* d, int prio, int wait,
+				const char* n, int f, CharacterObject* cobj, Image *i) :
+			location{ loc }, function{ func }, data{ d }, priority{ prio },
+			actualPrio{ 0 }, waitTime{ wait }, waitingFor{ cobj }, name{ n },
+								flag{ f }, icon{i} {
+	}
 
 	~Task() {
 		delete data;
@@ -333,15 +351,22 @@ struct CharacterObject : GameObjClick{
 
 	int stress;
 	int loyalty;
+
 	const char *name;
+
 	Sex sex;
 	char *gender;
 	affectionTrait *romance;
 	affectionTrait *sexuality;
+
 	Role role;
+
 	std::list<Task*> tasks;
 	Task* currentTask = nullptr;
+	Image *taskIcon;
+
 	int traitFlags; //The traits they have.
+
 	relationEventChances rec; //The chance *this* characters has for each event.
 	bool dating = false; //If they are currently dating anyone.
 
@@ -384,6 +409,7 @@ struct CharacterObject : GameObjClick{
 
 		role = roly;
 		traitFlags = traits;
+		taskIcon = nullptr;
 	}
 
 
@@ -416,6 +442,7 @@ struct CharacterObject : GameObjClick{
 				target = nullptr;
 				goal = task->location;
 				currentTask = tasks.back();
+				taskIcon = currentTask->icon;
 			}
 		} else {
 			goal = nullptr;
