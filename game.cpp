@@ -30,7 +30,7 @@ struct Labels {
 */
 bool loadLevel(vector<GameObject *>* objects, Media* media,
 	const char *path, CurrentClick* cc, Labels* labels, MouseStruct* mouse,
-	Graph<GameObject *, int> *pG, vector<CharacterObject *>* characters){
+	Graph<GameObject *, int> *pG, vector<CharacterObject *>* characters, SDL_Renderer *renderer){
 
 #pragma region ROOMS
 	/* ROOMS */
@@ -1106,7 +1106,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	CharacterObject *paul = new CharacterObject(r16->x + 100, 1831 - 100,
 		media->images.at(7), stressCharacter, (void *)(paulStress),
 		"Paul", intersex, labels->genders->at(0), labels->romance->at(0),
-							labels->sexuality->at(0), pilot, TRUSTING|SENSATIVE);
+		labels->sexuality->at(0), pilot, TRUSTING|SENSATIVE,
+							media->fonts.at(0), renderer);
 	paulStress->currChar = paul;
 
 	// Paulette
@@ -1115,7 +1116,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 		media->images.at(7), stressCharacter,
 		(void *)(pauletteStress), "Paulette", intersex,
 					labels->genders->at(3), labels->romance->at(1),
-							labels->sexuality->at(1), engineer, BIGOT|LIER);
+					labels->sexuality->at(1), engineer, BIGOT|LIER,
+							media->fonts.at(0), renderer);
 	pauletteStress->currChar = paulette;
 	
 	// Paulus
@@ -1124,7 +1126,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 		media->images.at(7), stressCharacter,
 		(void *)(paulusStress), "Paulus", female,
 		labels->genders->at(2), labels->romance->at(2),
-							labels->sexuality->at(2), doctor, PARANOID);
+		labels->sexuality->at(2), doctor, PARANOID,
+							media->fonts.at(0), renderer);
 	paulusStress->currChar = paulus;
 
 	// Paulob
@@ -1133,7 +1136,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 		media->images.at(7), stressCharacter,
 		(void *)(paulobStress), "Paulob", male,
 		labels->genders->at(2), labels->romance->at(3),
-							labels->sexuality->at(3), captain, CARING);
+		labels->sexuality->at(3), captain, CARING,
+							media->fonts.at(0), renderer);
 	paulobStress->currChar = paulob;
   
   //Add tasks for paulette:
@@ -1349,7 +1353,7 @@ int main(int argc, char *argv[]){
 		labels.sexuality = loadAffectionTrait("sexuality.jpeg");
 
 		if(loadLevel(&objects, &media, "", &currClick, &labels, &mouse,
-								pathGraph, &characters)){
+								pathGraph, &characters, window.render)){
 			printf("Game object done!\n");
 
 			for(int i = 0; i < currClick.Characters.size(); i++){
@@ -1520,12 +1524,28 @@ int main(int argc, char *argv[]){
 			bool arrived = updateMovement(c, &currClick.rooms, pathGraph);
 			if (arrived && c->currentTask != nullptr) {
 				if (c->currentTask->flag & WAITINGFOR) {
-					if (checkStillAlive(characters, c->currentTask->waitingFor)) {
+					if (checkStillAlive(characters,
+							c->currentTask->waitingFor)) {
 						if (whichRoom(&currClick.rooms,
 							c->currentTask->waitingFor) !=
 							whichRoom(&currClick.rooms, c)) {
 							//printf("Waiting for %s\n", c->currentTask->waitingFor->name);
+
+							if(c->currentTask->tolerance
+										== 0){
+								c->removeTask();
+							}
+							else if(c->currentTask->
+									tolerance > 0){
+								c->currentTask->
+									tolerance--;
+							}
+
 							continue;
+						}
+						else{
+							c->taskIcon =
+							c->currentTask->waitingIcon;
 						}
 					}
 					else {
@@ -1536,7 +1556,8 @@ int main(int argc, char *argv[]){
 				}
 				if (c->currentTask->waitTime < 1) {
 					if (c->currentTask->function != nullptr) {
-						c->currentTask->function(c->currentTask->data);
+						c->currentTask->function(
+								c->currentTask->data);
 					}
 					c->removeTask();
 				}
@@ -1545,24 +1566,6 @@ int main(int argc, char *argv[]){
 				}
 			}
 		}
-
-		//Update the movment of a character
-		/*for(CharacterObject *c : characters){
-			updateMovement(c, &currClick.rooms, pathGraph);
-		}*/
-		/*updateMovement(characters.at(2), &currClick.rooms, pathGraph);
-
-		//TEST!!! TODO: REMOVE!
-		if(characters.at(2)->goal == nullptr){
-			if(whichRoom(&currClick.rooms, characters.at(2)) !=
-								currClick.rooms.at(1)){
-				characters.at(2)->goal = currClick.rooms.at(1);
-			}
-			else{
-				characters.at(2)->goal = currClick.rooms.at(2);
-			}
-		}*/
-
 
 		//More advanced simple button test
 		if (mouse.buttons[0].isPressed) {
@@ -1622,6 +1625,9 @@ int main(int argc, char *argv[]){
 		*/
 		uniform_int_distribution<int> d1000(0, 999);
 		for (CharacterObject* cobj : characters) {
+			//Check if the character allready has too many tasks
+			if(cobj->tasks.size() > 5) continue;
+
 			//Roll a d1000 to see if *this* character has an event.
 			int roll = d1000(generator);
 			// Check if the roll was too low to trigger an event
@@ -1643,7 +1649,7 @@ int main(int argc, char *argv[]){
 			void(*functions[numEvents])(CurrentClick *cc,
 				vector<CharacterObject*>&, CharacterObject *,
 					Graph<CharacterObject *, Relation>&,
-							default_random_engine) = {
+					default_random_engine, vector<Image *> *) = {
 				fallout,
 				confession,
 				cheating,
@@ -1670,9 +1676,9 @@ int main(int argc, char *argv[]){
 				*/
 				if (roll < chances[i] + prev) {
 					// Call the apropriate function for the event
-					/*functions[i](&currClick, characters, cobj,
-								*relGraph, generator);
-					printf("\n");*/
+					functions[i](&currClick, characters, cobj,
+						*relGraph, generator, &media.images);
+					printf("\n");
 					break;
 				}
 				prev += chances[i];
@@ -1691,11 +1697,22 @@ int main(int argc, char *argv[]){
 			i++;
 		}
 		
-		//Render
+		// Render
 		render(&window, media.images.at(12), 0, 0, &cam); //Render background
 		for(GameObject* obj : objects) {
 			if (obj->image == nullptr) continue;
 			render(&window, obj, &cam);
+		}
+		//Render task icon and name above the characters heads
+		for(CharacterObject *c : characters){
+			render(&window, c->nameImage, c->x +
+						(c->area.w - c->nameImage->width) / 2,
+					c->y - (c->nameImage->height + 1), &cam);
+
+			if(c->image == nullptr || c->taskIcon == nullptr) continue;
+			render(&window, c->taskIcon, c->x +
+						(c->area.w - c->taskIcon->width) / 2,
+			c->y - (c->taskIcon->height + c->nameImage->height + 1), &cam);
 		}
 		for (vector<GameObject*>* vec : currClick.toRender)
 		{
