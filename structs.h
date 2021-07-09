@@ -260,25 +260,49 @@ struct Task {
 	
 	int priority; //How important is this job?
 	int actualPrio; //How ACTUALLY important is this?
-	int waitTime;
+	int waitTime; //Until the effect triggers when in the same room
+	int tolerance; //Unti the task is abandoned (< 0 means infinite)
 
 	CharacterObject* waitingFor;
 
 	const char* name;
+	Image *icon;
+	Image *waitingIcon;
 
 	int flag;
 
 	Task(GameObject* loc, void(*func)(void*), void* d, int prio, int wait,
-		const char* n, int f) : 
-		location{loc}, function{func}, data{d}, priority{prio},
-		actualPrio{0}, waitTime{wait}, waitingFor{nullptr}, name{ n }, 
-		flag{ f } {}
+								const char* n, int f) : 
+			location{loc}, function{func}, data{d}, priority{prio},
+			actualPrio{0}, waitTime{wait}, waitingFor{nullptr}, name{ n }, 
+			flag{ f }{
+		icon = nullptr;
+		tolerance = 60*10;
+	}
+	Task(GameObject* loc, void(*func)(void*), void* d, int prio, int wait,
+					const char* n, int f, Image *i, Image *wi) :
+			location{loc}, function{func}, data{d}, priority{prio},
+			actualPrio{0}, waitTime{wait}, waitingFor{nullptr}, name{ n }, 
+			flag{ f }, icon{i}, waitingIcon{wi}{
+		tolerance = 60*10;
+	 }
 	
 	Task(GameObject* loc, void(*func)(void*), void* d, int prio, int wait,
-		const char* n, int f, CharacterObject* cobj) :
-		location{ loc }, function{ func }, data{ d }, priority{ prio },
-		actualPrio{ 0 }, waitTime{ wait }, waitingFor{ cobj }, name{ n },
-		flag{ f } {}
+					const char* n, int f, CharacterObject* cobj) :
+			location{ loc }, function{ func }, data{ d }, priority{ prio },
+			actualPrio{ 0 }, waitTime{ wait }, waitingFor{ cobj }, name{ n },
+									flag{ f } {
+		icon = nullptr;
+		tolerance = 60*10;
+	}
+
+	Task(GameObject* loc, void(*func)(void*), void* d, int prio, int wait,
+		const char* n, int f, CharacterObject* cobj, Image *i, Image *wi) :
+			location{ loc }, function{ func }, data{ d }, priority{ prio },
+			actualPrio{ 0 }, waitTime{ wait }, waitingFor{ cobj }, name{ n },
+						flag{ f }, icon{i}, waitingIcon(wi) {
+		tolerance = 60*10;
+	}
 
 	~Task() {
 		delete data;
@@ -310,6 +334,7 @@ enum Role {
 
 struct relationEventChances {
 	//The default chances for each event, just arbitary numbers
+	//int falloutChance = 10; //Both of you count to ten before you do anything irrational.
 	int falloutChance = 10; //Both of you count to ten before you do anything irrational.
 	int confessionChance = 16; // 14+2 valentines day.
 	int cheatingChance = 69; //Nice, gotta get that lay
@@ -333,15 +358,23 @@ struct CharacterObject : GameObjClick{
 
 	int stress;
 	int loyalty;
+
 	const char *name;
+
 	Sex sex;
 	char *gender;
 	affectionTrait *romance;
 	affectionTrait *sexuality;
+
 	Role role;
+
 	std::list<Task*> tasks;
 	Task* currentTask = nullptr;
+	Image *taskIcon;
+	Image *nameImage;
+
 	int traitFlags; //The traits they have.
+
 	relationEventChances rec; //The chance *this* characters has for each event.
 	bool dating = false; //If they are currently dating anyone.
 
@@ -354,18 +387,25 @@ struct CharacterObject : GameObjClick{
 	int speed;
 
 	CharacterObject(int xPos, int yPos, Image *img, void(*func)(void*), void* d,
-		const char *n, Sex s, char *g, affectionTrait *r, affectionTrait *se, Role roly, int traits) :
+				const char *n, Sex s, char *g, affectionTrait *r,
+					affectionTrait *se, Role roly, int traits,
+					Font *f, SDL_Renderer *render) :
 						 GameObjClick(xPos, yPos, img, func, d){
-		setParam(n, s, g, r, se, roly, traits);
+
+		setParam(n, s, g, r, se, roly, traits, f, render);
 	}
 	CharacterObject(int xPos, int yPos, Image *img, SDL_Rect ar, void(*func)(void*),
-	void* d, const char *n, Sex s, char *g, affectionTrait *r, affectionTrait *se, Role roly, int traits) :
+				void* d, const char *n, Sex s, char *g,
+				affectionTrait *r, affectionTrait *se, Role roly,
+				int traits, Font *f, SDL_Renderer *render) :
 					 GameObjClick(xPos, yPos, img, ar, func, d){
-		setParam(n, s, g, r, se, roly, traits);
+
+		setParam(n, s, g, r, se, roly, traits, f, render);
 	}
 	
 	void setParam(const char *n, Sex s, char *g, affectionTrait *r,
-					affectionTrait *se, Role roly, int traits){
+					affectionTrait *se, Role roly, int traits,
+						Font *f, SDL_Renderer *render){
 		name = n;
 		sex = s;
 		gender = g;
@@ -384,6 +424,9 @@ struct CharacterObject : GameObjClick{
 
 		role = roly;
 		traitFlags = traits;
+		taskIcon = nullptr;
+
+		nameImage = new Image(f, name, {0,0,0}, render);	
 	}
 
 
@@ -416,6 +459,7 @@ struct CharacterObject : GameObjClick{
 				target = nullptr;
 				goal = task->location;
 				currentTask = tasks.back();
+				taskIcon = currentTask->icon;
 			}
 		} else {
 			goal = nullptr;
@@ -463,7 +507,8 @@ struct CharacterObject : GameObjClick{
 		for(Task* t : tasks) {
 			delete t;
 		}
-		printf("Deleted a task, for there is no need to do anything when you are heading to the void!\n");
+		//printf("Deleted a task, for there is no need to do anything when you are heading to the void!\n");
+		delete nameImage;
 	}
 
 };
