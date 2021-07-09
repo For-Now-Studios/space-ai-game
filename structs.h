@@ -360,6 +360,7 @@ struct CharacterObject : GameObjClick{
 	int loyalty;
 
 	const char *name;
+	Image *nameImage;
 
 	Sex sex;
 	char *gender;
@@ -368,10 +369,12 @@ struct CharacterObject : GameObjClick{
 
 	Role role;
 
+	//Tasks
 	std::list<Task*> tasks;
 	Task* currentTask = nullptr;
 	Image *taskIcon;
-	Image *nameImage;
+
+	int actionTime; //Indicates if an action is being done (-1 is none, 0 means done)
 
 	int traitFlags; //The traits they have.
 
@@ -427,6 +430,8 @@ struct CharacterObject : GameObjClick{
 		taskIcon = nullptr;
 
 		nameImage = new Image(f, name, {0,0,0}, render);	
+
+		actionTime = -1;
 	}
 
 
