@@ -41,6 +41,15 @@ birthday_visitor.png
 fallout.png
 time.png 333 29
 marker.png 23 22
+doorBigOpen.png
+doorBigClosed.png
+doorBigLocked.png
+doorBigOpen.png 228 108
+doorBigClosed.png 228 108
+doorBigLocked.png 228 108
+r21.png
+r26.png
+r28.png
 MUSIC:
 Space_Amb_2.wav
 testMusic.wav
