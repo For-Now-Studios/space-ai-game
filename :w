@@ -1528,6 +1528,7 @@ int main(int argc, char *argv[]){
 						if (whichRoom(&currClick.rooms,
 							c->currentTask->waitingFor) !=
 							whichRoom(&currClick.rooms, c)) {
+							//printf("Waiting for %s\n", c->currentTask->waitingFor->name);
 
 							if(c->currentTask->tolerance
 										== 0){
@@ -1570,6 +1571,7 @@ int main(int argc, char *argv[]){
 						c->currentTask->function(
 								c->currentTask->data);
 					}
+					c->removeTask();
 
 					//If this was a relationship task
 					if(c->currentTask->sisterTask != nullptr){
@@ -1580,8 +1582,6 @@ int main(int argc, char *argv[]){
 						c->currentTask->waitingFor->removeTask(
 										t);
 					}
-
-					c->removeTask();
 				}
 				else {
 					c->currentTask->waitTime--;
@@ -1706,7 +1706,6 @@ int main(int argc, char *argv[]){
 				prev += chances[i];
 			}
 		}
-		printf("Done with new tasks for frame\n");
 
 		//Check if a character has stressed to death:
 		int i = 0;
@@ -1755,10 +1754,8 @@ int main(int argc, char *argv[]){
 
 		SDL_RenderPresent(window.render);
 		if (winTimer < 1) break;
-		else winTimer--;
+		//else winTimer--;
 		//printf("Ticks until win: %d\n", winTimer);
-
-		printf("Done with frame!\n");
 	}
 
 	if (characters.empty()) {

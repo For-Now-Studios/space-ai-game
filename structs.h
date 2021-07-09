@@ -263,6 +263,8 @@ struct Task {
 	int waitTime; //Until the effect triggers when in the same room
 	int tolerance; //Unti the task is abandoned (< 0 means infinite)
 
+	Task *sisterTask = nullptr; //Pointer to a related task for another character
+
 	CharacterObject* waitingFor;
 
 	const char* name;
@@ -277,6 +279,7 @@ struct Task {
 			actualPrio{0}, waitTime{wait}, waitingFor{nullptr}, name{ n }, 
 			flag{ f }{
 		icon = nullptr;
+		waitingIcon = nullptr;
 		tolerance = 60*10;
 	}
 	Task(GameObject* loc, void(*func)(void*), void* d, int prio, int wait,
@@ -305,8 +308,8 @@ struct Task {
 	}
 
 	~Task() {
-		delete data;
 		data = nullptr;
+		waitingIcon = nullptr;
 		printf("Data for a task has been freed!\n");
 	}
 };
@@ -471,20 +474,28 @@ struct CharacterObject : GameObjClick{
 			delete path;
 			path = nullptr;
 			currentTask = nullptr;
+			taskIcon = nullptr;
 			target = nullptr;
 		}
 	}
 	
 	void removeTask() {
+		printf("\t%s tries to delete %p\n", name, tasks.back());
 		delete tasks.back();
 		tasks.pop_back();
+		printf("\t%s tries to change task\n", name);
 		changeCurrentTask();
+		printf("\t%s is done with tasks\n", name);
 	}
 
 	void removeTask(Task* toDelete) {
+		printf("\t%s tries to remove %p\n", name, toDelete);
 		tasks.remove(toDelete);
+		printf("\t%s tries to delete %p\n", name, toDelete);
 		delete toDelete;
+		printf("\t%s tries to change task\n", name);
 		changeCurrentTask();
+		printf("\t%s is done with tasks\n", name);
 	}
 
 	void addTask(Task* task) {
