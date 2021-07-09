@@ -1523,13 +1523,14 @@ int main(int argc, char *argv[]){
 						if (whichRoom(&currClick.rooms,
 							c->currentTask->waitingFor) !=
 							whichRoom(&currClick.rooms, c)) {
-							printf("Waiting for %s\n", c->currentTask->waitingFor->name);
+							//printf("Waiting for %s\n", c->currentTask->waitingFor->name);
 							continue;
 						}
 					}
 					else {
 						printf("It seems that the person %s is waiting for is dead, so they will skip this task\n", c->name);
 						c->removeTask();
+						continue;
 					}
 				}
 				if (c->currentTask->waitTime < 1) {
