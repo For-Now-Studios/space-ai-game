@@ -12,7 +12,7 @@
 
 const int SCREEN_WIDTH = 1920;
 const int SCREEN_HEIGHT = 1080;
-const int GAME_LENGTH = 5*60;
+const int GAME_LENGTH = 22;//5*60;
 
 struct Labels {
 	vector<char *> *genders = nullptr;
@@ -30,7 +30,8 @@ struct Labels {
 */
 bool loadLevel(vector<GameObject *>* objects, Media* media,
 	const char *path, CurrentClick* cc, Labels* labels, MouseStruct* mouse,
-	Graph<GameObject *, int> *pG, vector<CharacterObject *>* characters, SDL_Renderer *renderer){
+	Graph<GameObject *, int> *pG, vector<CharacterObject *>* characters, SDL_Renderer *renderer,
+	vector<GameObject*> *uiElements){
 
 #pragma region ROOMS
 	/* ROOMS */
@@ -1151,14 +1152,21 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 				100000, 5, "Room 5 Beacon test", AIASSIGNED));
 
 #pragma endregion
-
 	// Add all clickable elements to the click system
-	vector<IsClickable *> uiElements;
+	vector<IsClickable *> uiElementsClick;
 	vector<IsClickable *> popupElements;
+
+	//UIElems
+	GameObjClick* marker = new GameObjClick(SCREEN_WIDTH / 2 - 165+7, 4, media->images.at(41), nullptr, nullptr);
+	GameObjClick* time = new GameObjClick(SCREEN_WIDTH/2-165,0,media->images.at(40),nullptr,nullptr);
+	uiElementsClick.push_back(marker);
+	uiElementsClick.push_back(time);
+
+	
 	buildClickAreas(cc,
 		{paul, paulette, paulus, paulob},
 		rooms,
-		uiElements,
+		uiElementsClick,
 		popupElements,
 		doors
 	);
@@ -1171,6 +1179,10 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	// Doors
 	for(IsClickable *d : doors){
 		objects->push_back(dynamic_cast<GameObject*>((Room*)d));
+	}
+	//UI Elements:
+	for (IsClickable *ui : uiElementsClick) {
+		uiElements->push_back(dynamic_cast<GameObject*>((Room*)ui));
 	}
 	// Characters
 	objects->push_back(paul);
@@ -1337,6 +1349,7 @@ int main(int argc, char *argv[]){
 
 	CurrentClick currClick;
 	vector<GameObject*> objects;
+	vector<GameObject*> uiElements;
 	
 	Labels labels;
 	Graph<CharacterObject *, Relation> *relGraph = nullptr;
@@ -1353,7 +1366,7 @@ int main(int argc, char *argv[]){
 		labels.sexuality = loadAffectionTrait("sexuality.jpeg");
 
 		if(loadLevel(&objects, &media, "", &currClick, &labels, &mouse,
-								pathGraph, &characters, window.render)){
+						pathGraph, &characters, window.render, &uiElements)){
 			printf("Game object done!\n");
 
 			for(int i = 0; i < currClick.Characters.size(); i++){
@@ -1669,7 +1682,7 @@ int main(int argc, char *argv[]){
 			};
 
 			//Array of functions for each event
-			void(*functions[numEvents])(CurrentClick *cc,
+			void(*functions[numEvents])(CurrentClick *,
 				vector<CharacterObject*>&, CharacterObject *,
 					Graph<CharacterObject *, Relation>&,
 					default_random_engine, vector<Image *> *) = {
@@ -1744,6 +1757,10 @@ int main(int argc, char *argv[]){
 				render(&window, obj);
 			}
 		}
+		for (GameObject* elem : uiElements)
+		{
+			render(&window, elem);
+		}
 
 		// If we were too quick, wait until it is time
 		Uint32 time = SDL_GetTicks() - startTime;
@@ -1757,9 +1774,9 @@ int main(int argc, char *argv[]){
 		SDL_RenderPresent(window.render);
 		if (winTimer < 1) break;
 		else winTimer--;
-		//printf("Ticks until win: %d\n", winTimer);
-
-		printf("Done with frame!\n");
+		printf("Ticks until win: %d\n", winTimer);
+		double bar = (((double)targetFrequency * (double)GAME_LENGTH - (double)winTimer) / ((double)targetFrequency * (double)GAME_LENGTH));
+		uiElements.at(0)->moveTo(300 * bar + SCREEN_WIDTH / 2 - 165+7, uiElements.at(0)->y);
 	}
 
 	if (characters.empty()) {
