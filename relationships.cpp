@@ -143,6 +143,9 @@ void fallout(CurrentClick *cc, vector<CharacterObject*>& characters,
 		Task* otherCharTask = new Task(location, nullptr, nullptr, 0, 0,
 					"Nothing", AGAINSTENEMY|WAITINGFOR, currChar,
 							images->at(35), images->at(39));
+		currCharTask->sisterTask = otherCharTask;
+		otherCharTask->sisterTask = currCharTask;
+
 		currChar->addTask(currCharTask);
 		otherChar->addTask(otherCharTask);
 
@@ -176,6 +179,9 @@ void cheating(CurrentClick *cc, vector<CharacterObject*>& characters,
 			Task* otherCharTask = new Task(location, nullptr, nullptr, 100,
 					0, "Nothing", FORLOVE | WAITINGFOR, currChar,
 							images->at(36), images->at(36));
+			currCharTask->sisterTask = otherCharTask;
+			otherCharTask->sisterTask = currCharTask;
+
 			currChar->addTask(currCharTask);
 			cobj->addTask(otherCharTask);
 			return;
@@ -212,6 +218,9 @@ void confession(CurrentClick *cc, vector<CharacterObject*>& characters,
 			Task* otherCharTask = new Task(location, nullptr, nullptr, 100,
 					0, "Nothing", FORLOVE | WAITINGFOR, currChar,
 							images->at(37), images->at(37));
+			currCharTask->sisterTask = otherCharTask;
+			otherCharTask->sisterTask = currCharTask;
+
 			currChar->addTask(currCharTask);
 			cobj->addTask(otherCharTask);
 			return;
@@ -227,12 +236,14 @@ void birthday(CurrentClick *cc, vector<CharacterObject*>& characters,
 	//Get a location for the event to go down
 	GameObject* location = getRandomRoom(cc, dre);
 	Task** tasksToDelete = new Task*[characters.size()-1];
-	int i = 0;
 	if (location == nullptr) {
 		printf("%s is trying to hold their birthday, but can't find any location\n", currChar->name);
 		return;
 	}
+
 	printf("Ordering %s to celebrate their birthday\n", currChar->name);
+
+	int i = 0;
 	for (CharacterObject* cobj : characters) {
 		if (cobj == currChar) {
 			Task* currCharTask = new Task(location, birthdayEffect,
@@ -242,9 +253,9 @@ void birthday(CurrentClick *cc, vector<CharacterObject*>& characters,
 							images->at(38), images->at(38));
 			currChar->addTask(currCharTask);
 		} else {
-			Task* otherCharTask = new Task(location, nullptr, nullptr, 100,
-					0, "Nothing", FORLOVE | WAITINGFOR, currChar,
-							images->at(38), images->at(38));
+			Task* otherCharTask = new Task(location, nullptr, nullptr,
+					100, 0, "nothing", FORLOVE | WAITINGFOR,
+					currChar, images->at(38), images->at(38));
 			cobj->addTask(otherCharTask);
 			tasksToDelete[i] = otherCharTask;
 			i++;
@@ -272,9 +283,14 @@ void cuddles(CurrentClick *cc, vector<CharacterObject*>& characters,
 				cobj->name);
 			Task* currCharTask = new Task(location, cuddleEffect,
 				(void*)(new CuddleEffectPars{ currChar, cobj, relatonships }),
-				100, 0, "CUDDLE", FORLOVE | WAITINGFOR, cobj);
+				100, 0, "CUDDLE", FORLOVE | WAITINGFOR, cobj,
+							images->at(38), images->at(38));
 			Task* otherCharTask = new Task(location, nullptr, nullptr, 100,
-					0, "Nothing", FORLOVE | WAITINGFOR, currChar);
+					0, "Nothing", FORLOVE | WAITINGFOR, currChar,
+							images->at(39), images->at(39));
+			currCharTask->sisterTask = otherCharTask;
+			otherCharTask->sisterTask = currCharTask;
+
 			currChar->addTask(currCharTask);
 			cobj->addTask(otherCharTask);
 		}
@@ -290,6 +306,7 @@ void support(CurrentClick *cc, vector<CharacterObject*>& characters,
 	shuffle(chars.begin(), chars.end(), dre);
 	for (CharacterObject* cobj : chars) {
 		if (cobj == currChar) continue;
+
 		//Get a location for the event to go down
 		GameObject* location = getRandomRoom(cc, dre);
 
@@ -297,13 +314,19 @@ void support(CurrentClick *cc, vector<CharacterObject*>& characters,
 			printf("%s is trying to support %s, but can't find a good quiet spot\n", currChar->name, cobj->name);
 			return;
 		}
+
 		printf("Ordering %s to support %s\n", currChar->name,
 			cobj->name);
 		Task* currCharTask = new Task(location, supportEffect,
 			(void*)(new SupportEffectPars{ currChar, cobj, relatonships }),
-			100, 0, "SUPPORT", FORFRIENDS | WAITINGFOR, cobj);
+			100, 0, "SUPPORT", FORFRIENDS | WAITINGFOR, cobj,
+							images->at(38), images->at(38));
 		Task* otherCharTask = new Task(location, nullptr, nullptr, 100, 0,
-			"Nothing", FORFRIENDS | WAITINGFOR, currChar);
+			"Nothing", FORFRIENDS | WAITINGFOR, currChar,
+							images->at(40), images->at(40));
+		currCharTask->sisterTask = otherCharTask;
+		otherCharTask->sisterTask = currCharTask;
+
 		currChar->addTask(currCharTask);
 		cobj->addTask(otherCharTask);
 		return;
