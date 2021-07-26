@@ -282,12 +282,19 @@ void checkDoor(CharacterObject *object, Door *d, vector<Room *> *rooms,
 		if(d->IsLocked){
 			//printf("Door %s is locked\n", d->n);
 			blockDoorPath(object, d, rooms, g);
+			object->actionTime = -1;
 		}
 		else{
-			//Open the door
-			DoorClickPars *data = (DoorClickPars *) d->data;
-			d->image = data->open;
-			d->IsOpen = true;
+			//The door is closed, wait to open it
+			if(object->actionTime < 0) object->actionTime = 60 / 4;
+			else if(object->actionTime > 0) object->actionTime--;
+			else{
+				//Open the door
+				DoorClickPars *data = (DoorClickPars *) d->data;
+				d->image = data->open;
+				d->IsOpen = true;
+				object->actionTime = -1;
+			}
 		}
 	}
 	else{
@@ -295,12 +302,13 @@ void checkDoor(CharacterObject *object, Door *d, vector<Room *> *rooms,
 		if(arrival->IsLocked){
 			//printf("Door %s (arrival) is locked \n", arrival->n);
 			blockDoorPath(object, arrival, rooms, g);
+			object->actionTime = -1;
 		}
 		else{
 			//Close the door behind you
 			DoorClickPars *data = (DoorClickPars *) d->data;
 			d->image = data->closed;
-			d->IsOpen = true;
+			d->IsOpen = false;
 
 			//Open the door of arrival
 			data = (DoorClickPars *) arrival->data;

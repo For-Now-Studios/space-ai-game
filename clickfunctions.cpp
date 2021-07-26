@@ -357,9 +357,15 @@ void birthdayEffect(void *cntxt) {
 			i++;
 		}
 		else {
+			if(pars->tasksToDelete[i] == nullptr){
+				i++;
+				continue;
+			}
+
 			pars->tasksToDelete[i]->flag =
 					pars->tasksToDelete[i]->flag & ~WAITINGFOR;
 			pars->tasksToDelete[i]->waitingFor = nullptr;
+
 			i++;
 		}
 	}
