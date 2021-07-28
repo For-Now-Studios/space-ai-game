@@ -129,8 +129,8 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 
 	// Proper Room 14
 	rPup = new roomPopupPars(pPUP, characters);
-	Room *r14 = new Room(3186, 1839, media->images.at(26), roomPopup, (void *)(rPup),
-										BRIDGE);
+	Room *r14 = new Room(3186, 2213 - media->images.at(26)->height,
+			media->images.at(26), roomPopup, (void *)(rPup), BRIDGE);
 	rPup->room = r14;
 	rooms.push_back(r14);
 
@@ -606,7 +606,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	DCP->open = media->images.at(2);
 	DCP->closed = media->images.at(3);
 	DCP->locked = media->images.at(4);
-	Door *r11Dr = new Door(6013, 1672 - media->images.at(3)->height,
+	Door *r11Dr = new Door(6010, 1672 - media->images.at(3)->height,
 						media->images.at(3), doorClick, DCP);
 	DCP->door = r11Dr;
 	pG->addNode(r11Dr); //Add the door to the pathfinder graph
@@ -1735,7 +1735,7 @@ int main(int argc, char *argv[]){
 		
 		// Render
 		render(&window, media.images.at(5), 0, 0, &cam); //Render space
-		render(&window, media.images.at(12), 0, 0, &cam); //Render ship backgrnd
+		render(&window, media.images.at(12), 121, -39, &cam); //Render ship
 		for(GameObject* obj : objects) {
 			if (obj->image == nullptr) continue;
 			render(&window, obj, &cam);
