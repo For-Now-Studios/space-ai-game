@@ -12,7 +12,7 @@
 
 const int SCREEN_WIDTH = 1920;
 const int SCREEN_HEIGHT = 1080;
-const int GAME_LENGTH = 22;//5*60;
+const int GAME_LENGTH = 3*60;
 
 struct Labels {
 	vector<char *> *genders = nullptr;
@@ -1141,16 +1141,6 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 							media->fonts.at(0), renderer);
 	paulobStress->currChar = paulob;
   
-  //Add tasks for paulette:
-	
-	//paulette->addTask(new Task(kitchen, btnHello, (void*)(new btnHelloParameter{"Paulette Kitchen!"}),1,130,"GOTO Kitchen",AIASSIGNED));
-	//paulette->addTask(new Task(bRoom2, btnHello, (void*)(new btnHelloParameter{"Paulette Hello Bedroom number 2!"}),2,0,"GOTO Bedroom n2",AGAINSTFRIENDS ));
-	//paul->addTask(new Task(kitchen, btnHello, (void*)(new btnHelloParameter{ "Paul Hello Kitchen!" }), 1, 200, "GOTO Kitchen", AIASSIGNED));
-	//paul->addTask(new Task(bRoom2, btnHello, (void*)(new btnHelloParameter{ "Paul Hello Bedroom number 2!" }), 2, 0, "GOTO Bedroom n2", AGAINSTFRIENDS));
-
-	paul->addTask(new Task(r5, btnHello, (void *)(new btnHelloParameter{"done!"}),
-				100000, 5, "Room 5 Beacon test", AIASSIGNED));
-
 #pragma endregion
 	// Add all clickable elements to the click system
 	vector<IsClickable *> uiElementsClick;
@@ -1228,7 +1218,7 @@ bool init(WindowStruct *window) {
 	}
 
 	//Set the background colour of the window
-	SDL_SetRenderDrawColor(window->render, 102, 102, 102, 255);
+	SDL_SetRenderDrawColor(window->render, 0, 0, 0, 255);
 
 	//Initialize Sound Drivers
 	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
@@ -1357,8 +1347,8 @@ int main(int argc, char *argv[]){
 	vector<CharacterObject *> characters;
 
 	unsigned seed = chrono::system_clock::now().time_since_epoch().count();
-	//default_random_engine generator(seed);
-	default_random_engine generator(1);
+	default_random_engine generator(seed);
+	//default_random_engine generator(1);
 
 	if(running){
 		labels.genders = loadGender("gender.jpeg");
@@ -1615,38 +1605,14 @@ int main(int argc, char *argv[]){
 			currClick.currentlySelected = nullptr;
 		}
 
-		/*SDL_Rect pTemp = translateToCamera(&cam, &characters.at(0)->area);
-		mouse.x = pTemp.x;
-		mouse.y = pTemp.y;
-		if(checkCord(&currClick, mouse, &cam) != nullptr){
-			printf("Paul can be found at (%d %d)\n", mouse.x, mouse.y);
-		}
-		else{
-			printf("Paul is in the shadow realm :( !\n");
-			for(ClickArea *area : currClick.Game){
-				for(IsClickable *ic : area->clicks){
-					if(ic == (IsClickable *)characters.at(0)){
-						printf("Paul was found!\n");
-						printf("\t(%d, %d)\n", characters.at(0)->x, characters.at(0)->y);
-						printf("\tIn: (%d, %d)\n", area->area.x, area->area.y);
-						break;
-					}
-				}
-			}
-		}*/
-		/*SDL_Rect pTemp = translateToCamera(&cam, &characters.at(0)->area);
-		printf("\t(%d, %d)\n", pTemp.x, pTemp.y);
-		printf("\t\t(%d, %d) - (%d, %d)\n", characters.at(0)->x,
-				characters.at(0)->y, characters.at(0)->area.x,
-				characters.at(0)->area.y);
-		*/
-		
-		if(key[0]) cam.y -= 20;
-		if(key[1]) cam.x -= 20;
-		if(key[2]) cam.y += 20;
-		if(key[3]) cam.x += 20;
-		if(key[4]) cam.zoomLevel += 0.01;
-		if(key[5]) cam.zoomLevel -= 0.01;
+		if(key[0]) cam.y -= cam.y >= 20 ? 20 : 0;
+		if(key[1]) cam.x -= cam.x >= 20 ? 20 : 0;
+		if(key[2]) cam.y += cam. y + (SCREEN_HEIGHT / cam.zoomLevel) <= 4582 ?
+										20 : 0;
+		if(key[3]) cam.x += cam.x + (SCREEN_WIDTH / cam.zoomLevel) <= 7713 ?
+										20 : 0;
+		if(key[4]) cam.zoomLevel += cam.zoomLevel < 1.00 ? 0.01 : 0.00;
+		if(key[5]) cam.zoomLevel -= cam.zoomLevel > 0.25 ? 0.01 : 0.00;
     
 		updateClickAreas(&currClick);
 
@@ -1773,7 +1739,7 @@ int main(int argc, char *argv[]){
 
 		SDL_RenderPresent(window.render);
 		if (winTimer < 1) break;
-		//else winTimer--;
+		else winTimer--;
 		//printf("Ticks until win: %d\n", winTimer);
 		double bar = (((double)targetFrequency * (double)GAME_LENGTH - (double)winTimer) / ((double)targetFrequency * (double)GAME_LENGTH));
 		uiElements.at(0)->moveTo(300 * bar + SCREEN_WIDTH / 2 - 165+7, uiElements.at(0)->y);
