@@ -178,7 +178,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 
 	// Proper Room 21
 	rPup = new roomPopupPars(pPUP, characters);
-	Room *r21 = new Room(2900, 2521, media->images.at(48), roomPopup, (void *)(rPup),
+	Room *r21 = new Room(2900, 2521, media->images.at(30), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r21;
 	rooms.push_back(r21);
@@ -213,7 +213,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 
 	// Proper Room 26
 	rPup = new roomPopupPars(pPUP, characters);
-	Room *r26 = new Room(2900, 2696, media->images.at(49), roomPopup, (void *)(rPup),
+	Room *r26 = new Room(2900, 2696, media->images.at(31), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r26;
 	rooms.push_back(r26);
@@ -227,7 +227,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 
 	// Proper Room 28
 	rPup = new roomPopupPars(pPUP, characters);
-	Room *r28 = new Room(2900, 2867, media->images.at(50), roomPopup, (void *)(rPup),
+	Room *r28 = new Room(2900, 2867, media->images.at(33), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r28;
 	rooms.push_back(r28);
