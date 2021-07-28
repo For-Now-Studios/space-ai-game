@@ -272,6 +272,10 @@ void checkDoor(CharacterObject *object, Door *d, vector<Room *> *rooms,
 
 	//Make sure that the room of arrival isn't dangerous
 	Room *r = whichRoom(rooms, arrival);
+	if(r == nullptr){
+		printf("WARNING: The door that %s is accessing", object->name);
+		printf(" is outside of a room!\n");
+	}
 	if((r->flag & CLEARLYFATAL) != 0){
 		//printf("Fatality!\n");
 		blockDoorPath(object, arrival, rooms, g);

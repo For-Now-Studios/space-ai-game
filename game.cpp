@@ -1720,7 +1720,6 @@ int main(int argc, char *argv[]){
 				prev += chances[i];
 			}
 		}
-		printf("Done with new tasks for frame\n");
 
 		//Check if a character has stressed to death:
 		int i = 0;
@@ -1735,7 +1734,8 @@ int main(int argc, char *argv[]){
 		}
 		
 		// Render
-		render(&window, media.images.at(12), 0, 0, &cam); //Render background
+		render(&window, media.images.at(5), 0, 0, &cam); //Render space
+		render(&window, media.images.at(12), 0, 0, &cam); //Render ship backgrnd
 		for(GameObject* obj : objects) {
 			if (obj->image == nullptr) continue;
 			render(&window, obj, &cam);

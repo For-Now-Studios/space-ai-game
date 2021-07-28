@@ -4,18 +4,18 @@ hal9000.png 60 60
 doorOpen.png
 doorClosed.png
 doorLocked.png
-room1.png
+background.png
 hall.png
 worker.png
 doorWallOpen.png
 doorWallClosed.png
 doorWallLocked.png
 ladder.png
-Ship.png
-hall.png 660 105
+ship.png
+r4.png
 hall.png 2587 93
 hall.png 984 151
-r4.png
+hall.png 1290 198
 r5.png
 hall.png 275 159
 hall.png 564 319
