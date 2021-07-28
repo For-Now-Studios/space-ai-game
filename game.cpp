@@ -178,7 +178,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 
 	// Proper Room 21
 	rPup = new roomPopupPars(pPUP, characters);
-	Room *r21 = new Room(2900, 2521, media->images.at(30), roomPopup, (void *)(rPup),
+	Room *r21 = new Room(2900, 2521, media->images.at(48), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r21;
 	rooms.push_back(r21);
@@ -213,7 +213,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 
 	// Proper Room 26
 	rPup = new roomPopupPars(pPUP, characters);
-	Room *r26 = new Room(2900, 2696, media->images.at(31), roomPopup, (void *)(rPup),
+	Room *r26 = new Room(2900, 2696, media->images.at(49), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r26;
 	rooms.push_back(r26);
@@ -227,7 +227,7 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 
 	// Proper Room 28
 	rPup = new roomPopupPars(pPUP, characters);
-	Room *r28 = new Room(2900, 2867, media->images.at(33), roomPopup, (void *)(rPup),
+	Room *r28 = new Room(2900, 2867, media->images.at(50), roomPopup, (void *)(rPup),
 										BRIDGE);
 	rPup->room = r28;
 	rooms.push_back(r28);
@@ -687,11 +687,11 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	// Room 14 bot door
 	DCP = new DoorClickPars;
 	DCP->mouse = mouse;
-	DCP->open = media->images.at(8);
-	DCP->closed = media->images.at(9);
-	DCP->locked = media->images.at(10);
-	Door *r14Db = new Door(3893, 2213 - media->images.at(9)->height,
-						media->images.at(9), doorClick, DCP);
+	DCP->open = media->images.at(42);
+	DCP->closed = media->images.at(43);
+	DCP->locked = media->images.at(44);
+	Door *r14Db = new Door(3872, 2213 - media->images.at(43)->height,
+						media->images.at(43), doorClick, DCP);
 	DCP->door = r14Db;
 	pG->addNode(r14Db); //Add the door to the pathfinder graph
 	doors.push_back(r14Db);
@@ -870,11 +870,11 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	// Room 21 top door
 	DCP = new DoorClickPars;
 	DCP->mouse = mouse;
-	DCP->open = media->images.at(8);
-	DCP->closed = media->images.at(9);
-	DCP->locked = media->images.at(10);
-	Door *r21D = new Door(3893, 2626 - media->images.at(9)->height,
-						media->images.at(9), doorClick, DCP);
+	DCP->open = media->images.at(45);
+	DCP->closed = media->images.at(46);
+	DCP->locked = media->images.at(47);
+	Door *r21D = new Door(3893, 2626 - media->images.at(46)->height,
+						media->images.at(46), doorClick, DCP);
 	DCP->door = r21D;
 	r21D->bottom = r14Db; //Indicate that this is a vertical door
 	r14Db->bottom = r21D; //Indicate that this is a vertical door
@@ -994,11 +994,11 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	// Room 26 top door
 	DCP = new DoorClickPars;
 	DCP->mouse = mouse;
-	DCP->open = media->images.at(8);
-	DCP->closed = media->images.at(9);
-	DCP->locked = media->images.at(10);
-	Door *r26Dt = new Door(3893, 2801 - media->images.at(9)->height,
-						media->images.at(9), doorClick, DCP);
+	DCP->open = media->images.at(45);
+	DCP->closed = media->images.at(46);
+	DCP->locked = media->images.at(47);
+	Door *r26Dt = new Door(3893, 2801 - media->images.at(46)->height,
+						media->images.at(46), doorClick, DCP);
 	DCP->door = r26Dt;
 	r26Dt->bottom = r14Db; //Indicate that this is a vertical door
 	r14Db->bottom = r26Dt; //Indicate that this is a vertical door
@@ -1038,11 +1038,11 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	// Room 28 top door
 	DCP = new DoorClickPars;
 	DCP->mouse = mouse;
-	DCP->open = media->images.at(8);
-	DCP->closed = media->images.at(9);
-	DCP->locked = media->images.at(10);
-	Door *r28D = new Door(3893, 2972 - media->images.at(9)->height,
-						media->images.at(9), doorClick, DCP);
+	DCP->open = media->images.at(45);
+	DCP->closed = media->images.at(46);
+	DCP->locked = media->images.at(47);
+	Door *r28D = new Door(3893, 2972 - media->images.at(46)->height,
+						media->images.at(46), doorClick, DCP);
 	DCP->door = r28D;
 	r28D->bottom = r14Db; //Indicate that this is a vertical door
 	r14Db->bottom = r28D; //Indicate that this is a vertical door
@@ -1058,11 +1058,11 @@ bool loadLevel(vector<GameObject *>* objects, Media* media,
 	// Room 29 top door
 	DCP = new DoorClickPars;
 	DCP->mouse = mouse;
-	DCP->open = media->images.at(8);
-	DCP->closed = media->images.at(9);
-	DCP->locked = media->images.at(10);
-	Door *r29D = new Door(3893, 3952 - media->images.at(9)->height,
-						media->images.at(9), doorClick, DCP);
+	DCP->open = media->images.at(42);
+	DCP->closed = media->images.at(43);
+	DCP->locked = media->images.at(44);
+	Door *r29D = new Door(3872, 3952 - media->images.at(43)->height,
+						media->images.at(43), doorClick, DCP);
 	DCP->door = r29D;
 	r29D->bottom = r14Db; //Indicate that this is a vertical door
 	r14Db->bottom = r29D; //Indicate that this is a vertical door
@@ -1773,8 +1773,8 @@ int main(int argc, char *argv[]){
 
 		SDL_RenderPresent(window.render);
 		if (winTimer < 1) break;
-		else winTimer--;
-		printf("Ticks until win: %d\n", winTimer);
+		//else winTimer--;
+		//printf("Ticks until win: %d\n", winTimer);
 		double bar = (((double)targetFrequency * (double)GAME_LENGTH - (double)winTimer) / ((double)targetFrequency * (double)GAME_LENGTH));
 		uiElements.at(0)->moveTo(300 * bar + SCREEN_WIDTH / 2 - 165+7, uiElements.at(0)->y);
 	}
