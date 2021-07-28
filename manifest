@@ -10,7 +10,7 @@ worker.png
 doorWallOpen.png
 doorWallClosed.png
 doorWallLocked.png
-ladder.png
+hall9000.png 0 0
 ship.png
 r1.png
 hall.png 2587 93
@@ -49,8 +49,6 @@ doorBigClosed.png 228 108
 doorBigLocked.png 228 108
 MUSIC:
 Space_Amb_2.wav
-testMusic.wav
 SOUNDS:
-testSound.wav
 FONTS:
 testFont.ttf 16
