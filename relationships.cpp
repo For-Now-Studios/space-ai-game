@@ -323,7 +323,7 @@ void support(CurrentClick *cc, vector<CharacterObject*>& characters,
 							images->at(38), images->at(38));
 		Task* otherCharTask = new Task(location, nullptr, nullptr, 100, 0,
 			"Nothing", FORFRIENDS | WAITINGFOR, currChar,
-							images->at(40), images->at(40));
+							images->at(41), images->at(41));
 		currCharTask->sisterTask = otherCharTask;
 		otherCharTask->sisterTask = currCharTask;
 
